@@ -51,7 +51,7 @@
 | 연강 N시간 | `max_consecutive` N×60 |
 | 학교 N일만 / 덜 가고 싶어 | `max_days_on_campus` N / 4 |
 | 학점 N~M | `credit_range` (상한 미명시 시 max 40, 하한 미명시 시 min 0) |
-| 학점 적당히 | 일반 학기 학점 범위 → `docs/academic_rules.md` 확정 전까지 15–18 가정 |
+| 학점 적당히 | 15–18 (학칙상 신청 범위 0.5–22, `docs/academic_rules.md` §2) |
 
 시간 격자는 08:00–22:00, 30분 단위다(`app/core/time_slots.py`). 경계 밖 시간은 격자 끝으로 자른다.
 

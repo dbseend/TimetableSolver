@@ -1,14 +1,19 @@
 from functools import lru_cache
+from pathlib import Path
 from typing import Literal
 
 from pydantic import Field, SecretStr, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
+_BACKEND = Path(__file__).resolve().parents[2]
+# repo-root .env first, backend/.env overrides; real env vars override both
+ENV_FILES = (_BACKEND.parent / ".env", _BACKEND / ".env")
+
 
 class Settings(BaseSettings):
     """Runtime settings, read from environment variables (and an optional .env file)."""
 
-    model_config = SettingsConfigDict(env_file=".env", extra="ignore")
+    model_config = SettingsConfigDict(env_file=ENV_FILES, extra="ignore")
 
     # CORS
     allowed_origins: str = "http://localhost:5173"
