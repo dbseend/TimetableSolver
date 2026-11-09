@@ -1,0 +1,30 @@
+[project]
+name = "timetable-api"
+version = "0.1.0"
+description = "TimetableSolver API (FastAPI + OR-Tools CP-SAT)"
+requires-python = ">=3.12"
+dependencies = [
+    "fastapi>=0.162.2",
+    "httpx>=0.28.1",
+    "ortools>=9.15.6755",
+    "pydantic>=2",
+    "uvicorn[standard]>=0.54.0",
+]
+
+[dependency-groups]
+dev = [
+    "hypothesis>=6.170.15",
+    "pytest>=9.2.0",
+    "ruff>=0.17.4",
+]
+
+[tool.ruff]
+line-length = 160
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP"]
+ignore = ["B008"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
