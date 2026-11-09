@@ -231,3 +231,9 @@ frontend/src/
 - UI: 결과 화면 "설명 보기" 버튼(LLM 호출은 사용자가 누를 때만), 카드에 설명과 출처 표시.
 - 브라우저 확인(실제 Gemini): soft 점심·금 공강이 반영돼 점심 수업 과목이 빠지고, 금요일 과목은 hard 학점 하한 때문에 남음. 설명은 후검증 통과(llm).
 - 남은 것: COST 수치는 감으로 정한 초기값 → D-g에서 사용자 반응/사례로 조정.
+
+### D-g 진행 중 (2026-11-09)
+- `app/core/objective.py`: 목적식(PRIORITY_SCALE, COST, `score()`)을 솔버 밖으로 분리 — LLM이 만든 시간표도 같은 식으로 채점.
+- `backend/eval/compare.py`: (A) LLM 직접 생성 vs (C) 본 시스템, 합성 50/200/500 × 가능 8 + 불가능 6. (B) LLM+코드 실행은 범위 축소로 제외.
+- 1차 결과(`docs/eval/compare_gemini-3.5-flash-lite.json`): 본 시스템 정답 24/24·불가능 판정 6/6, LLM 직접 정답 11/24·불가능 판정 5/6. LLM 오류는 대부분 시간 충돌(23건), 없는 분반 제안은 0.
+- 남은 것: 상위 모델(gemini-3.6-flash) 비교, NL 평가(작성자 held-out 초안 + 사람 검수), 리포트 `docs/EVALUATION.md`.

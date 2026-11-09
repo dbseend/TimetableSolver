@@ -198,3 +198,22 @@ def test_solve_endpoint_returns_candidates():
     r = TestClient(app).post("/solve", json=body)
     assert r.status_code == 200
     assert r.json()["candidates"][0]["sections"] == ["A-01", "B-01"]
+
+
+def test_score_recomputes_the_solver_objective():
+    from app.core.objective import score
+    from app.domain.api_models import SolveRequest as Req
+
+    soft = {
+        "id": "s1",
+        "type": "day_off",
+        "strength": "soft",
+        "weight": 7,
+        "params": {"days": ["Mon"]},
+    }
+    raw = {"catalog": {"courses": MON, "sections": MON_S}, "pool": [{"course_id": "A"}],
+           "constraints": [soft]}  # fmt: skip
+    r = run(MON, MON_S, [soft], pool=["A"])
+    req = Req.model_validate(raw)
+    report, objective = score(req.catalog, req.pool, req.constraints, r.candidates[0].sections)
+    assert objective == r.candidates[0].objective

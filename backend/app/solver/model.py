@@ -14,6 +14,7 @@ from dataclasses import dataclass, field
 
 from ortools.sat.python import cp_model
 
+from app.core.objective import COST, PRIORITY_SCALE
 from app.core.periods import LAST_PERIOD, max_consecutive_periods, max_gap_periods, periods_of
 from app.core.time_slots import DAYS, parse_hhmm
 from app.domain.api_models import PoolItem
@@ -21,30 +22,8 @@ from app.domain.constraints import Constraint
 from app.domain.models import Catalog, Profile, Section
 from app.validation.validator import norm_name
 
-PRIORITY_SCALE = 1000  # per priority point of a chosen pool course (priority 3 -> 3000)
-# Penalty per unit of violation at weight 1, in the validator's units (see validator docstring).
-# Calibrated so a weight-5 violation of a typical size costs about half a priority-3 course:
-# one 75min class in an avoided window 5*4*75=1500, one class day on a day off 5*300=1500.
-COST = {
-    "credit_range": 100,  # per half-credit
-    "category_min": 100,  # per half-credit
-    "must_include": 600,
-    "must_exclude": 600,
-    "day_off": 300,  # per day
-    "time_avoid": 4,  # per minute
-    "time_prefer": 4,  # per minute
-    "max_gap": 200,  # per period over
-    "max_consecutive": 200,  # per period over
-    "lunch_free": 300,  # per day
-    "max_days_on_campus": 300,  # per day over
-    "instructor_avoid": 300,  # per section
-    "instructor_prefer": 300,
-}
+PERIODS = range(0, LAST_PERIOD + 1)
 BIG = 10_000  # loose upper bound for slack variables
-
-
-def penalty(constraint: Constraint, amount: int) -> int:
-    return constraint.weight * COST[constraint.type] * amount
 
 
 def candidate_sections(

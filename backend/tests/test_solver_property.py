@@ -10,11 +10,11 @@ import itertools
 from hypothesis import HealthCheck, given, settings
 from hypothesis import strategies as st
 
+from app.core.objective import PRIORITY_SCALE, penalty
 from app.core.time_slots import format_hhmm
 from app.domain.api_models import SolveRequest
 from app.domain.constraints import constraint_adapter
 from app.domain.models import Catalog
-from app.solver.model import PRIORITY_SCALE, penalty
 from app.solver.solve import solve
 from app.validation.validator import check
 
