@@ -111,8 +111,19 @@ class ConstraintsParseResponse(BaseModel):
 # ---- /solve ----------------------------------------------------------------------------
 
 
+class PoolItem(BaseModel):
+    """A course the student wants to consider. Higher priority is preferred when not all fit."""
+
+    course_id: str = Field(min_length=1)
+    priority: int = Field(default=3, ge=1, le=5)
+
+
 class SolveRequest(BaseModel):
+    """The solver picks courses only from `pool` (plus must_include targets), never the whole
+    catalog: without a pool it fills credits with arbitrary 0/1-credit courses."""
+
     catalog: Catalog
+    pool: list[PoolItem] = Field(min_length=1)
     profile: Profile = Field(default_factory=Profile)
     constraints: list[Constraint] = Field(default_factory=list)
     n: int = Field(default=3, ge=1, le=10)
@@ -120,10 +131,16 @@ class SolveRequest(BaseModel):
     time_limit_s: float | None = Field(default=None, gt=0)
 
     @model_validator(mode="after")
-    def _unique_constraint_ids(self) -> "SolveRequest":
+    def _unique_ids(self) -> "SolveRequest":
         ids = [c.id for c in self.constraints]
         if len(set(ids)) != len(ids):
             raise ValueError("duplicate constraint id")
+        pool = [p.course_id for p in self.pool]
+        if len(set(pool)) != len(pool):
+            raise ValueError("duplicate pool course id")
+        # a must_include target missing from the catalog is a diagnosis, not a 422; pool is not
+        if set(pool) - {c.id for c in self.catalog.courses}:
+            raise ValueError("pool references an unknown course")
         return self
 
 

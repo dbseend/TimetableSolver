@@ -6,6 +6,12 @@ from app.main import app, create_app
 
 client = TestClient(app)
 
+ONE_COURSE = {
+    "courses": [{"id": "C1", "name": "과목", "credit": 3, "category": "전선"}],
+    "sections": [],
+}
+POOL = [{"course_id": "C1"}]
+
 EMPTY_RESULT = {
     "status": "INFEASIBLE",
     "candidates": [],
@@ -16,7 +22,7 @@ STUB_REQUESTS = {
     "/catalog/validate": {"courses": [], "sections": []},
     "/profile/parse": {"consent": True, "rows": []},
     "/constraints/parse": {"text": "금요일 공강이면 좋겠다"},
-    "/solve": {"catalog": {"courses": [], "sections": []}},
+    "/solve": {"catalog": ONE_COURSE, "pool": POOL},
     "/explain": {
         "catalog": {"courses": [], "sections": []},
         "result": EMPTY_RESULT,
@@ -65,10 +71,25 @@ def test_duplicate_constraint_ids_rejected():
         "strength": "soft",
         "params": {"days": ["Fri"]},
     }
-    r = client.post(
-        "/solve", json={"catalog": {"courses": [], "sections": []}, "constraints": [c, c]}
-    )
+    r = client.post("/solve", json={"catalog": ONE_COURSE, "pool": POOL, "constraints": [c, c]})
     assert r.status_code == 422
+
+
+@pytest.mark.parametrize(
+    "pool",
+    [[], [{"course_id": "C1"}, {"course_id": "C1"}], [{"course_id": "NOPE"}]],
+    ids=["empty", "duplicate", "unknown"],
+)
+def test_pool_is_required_unique_and_known(pool):
+    r = client.post("/solve", json={"catalog": ONE_COURSE, "pool": pool})
+    assert r.status_code == 422
+
+
+def test_pool_priority_defaults_and_bounds():
+    ok = client.post("/solve", json={"catalog": ONE_COURSE, "pool": [{"course_id": "C1"}]})
+    assert ok.status_code == 501  # valid request, solver not implemented yet
+    bad = [{"course_id": "C1", "priority": 6}]
+    assert client.post("/solve", json={"catalog": ONE_COURSE, "pool": bad}).status_code == 422
 
 
 def test_input_length_guard():

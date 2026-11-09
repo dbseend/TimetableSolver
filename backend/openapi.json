@@ -1322,6 +1322,28 @@
         "title": "MustInclude",
         "type": "object"
       },
+      "PoolItem": {
+        "description": "A course the student wants to consider. Higher priority is preferred when not all fit.",
+        "properties": {
+          "course_id": {
+            "minLength": 1,
+            "title": "Course Id",
+            "type": "string"
+          },
+          "priority": {
+            "default": 3,
+            "maximum": 5.0,
+            "minimum": 1.0,
+            "title": "Priority",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "course_id"
+        ],
+        "title": "PoolItem",
+        "type": "object"
+      },
       "Profile": {
         "description": "Student's completed/in-progress courses. Grades are intentionally not modelled.",
         "properties": {
@@ -1563,6 +1585,7 @@
         "type": "object"
       },
       "SolveRequest": {
+        "description": "The solver picks courses only from `pool` (plus must_include targets), never the whole\ncatalog: without a pool it fills credits with arbitrary 0/1-credit courses.",
         "properties": {
           "catalog": {
             "$ref": "#/components/schemas/Catalog"
@@ -1645,6 +1668,14 @@
             "title": "N",
             "type": "integer"
           },
+          "pool": {
+            "items": {
+              "$ref": "#/components/schemas/PoolItem"
+            },
+            "minItems": 1,
+            "title": "Pool",
+            "type": "array"
+          },
           "profile": {
             "$ref": "#/components/schemas/Profile"
           },
@@ -1662,7 +1693,8 @@
           }
         },
         "required": [
-          "catalog"
+          "catalog",
+          "pool"
         ],
         "title": "SolveRequest",
         "type": "object"

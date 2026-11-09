@@ -579,6 +579,19 @@ export interface components {
             weight: number;
         };
         /**
+         * PoolItem
+         * @description A course the student wants to consider. Higher priority is preferred when not all fit.
+         */
+        PoolItem: {
+            /** Course Id */
+            course_id: string;
+            /**
+             * Priority
+             * @default 3
+             */
+            priority: number;
+        };
+        /**
          * Profile
          * @description Student's completed/in-progress courses. Grades are intentionally not modelled.
          */
@@ -655,7 +668,11 @@ export interface components {
             /** Meetings */
             meetings?: components["schemas"]["Meeting"][];
         };
-        /** SolveRequest */
+        /**
+         * SolveRequest
+         * @description The solver picks courses only from `pool` (plus must_include targets), never the whole
+         *     catalog: without a pool it fills credits with arbitrary 0/1-credit courses.
+         */
         SolveRequest: {
             catalog: components["schemas"]["Catalog"];
             /** Constraints */
@@ -670,6 +687,8 @@ export interface components {
              * @default 3
              */
             n: number;
+            /** Pool */
+            pool: components["schemas"]["PoolItem"][];
             profile?: components["schemas"]["Profile"];
             /** Time Limit S */
             time_limit_s?: number | null;

@@ -25,3 +25,6 @@ credit_range, must_include, must_exclude, day_off, time_avoid, time_prefer, max_
 - `Course.credit`: 0–10, 0.5 단위 (0.5학점 과목 존재). 솔버는 ×2 정수로 다룬다.
 - `Section.credit`, `Section.category`: 같은 과목인데 분반마다 다른 경우의 덮어쓰기. `null`이면 과목 값. 유효값은 `Catalog.credit_and_category(section)`.
 - `max_days_on_campus.max_days`: 0–6.
+
+## /solve 요청
+- `pool`: 관심 과목 `[{course_id, priority 1–5(기본 3)}]`, 최소 1개, 중복·미등록 과목이면 422. 솔버는 풀(+`must_include` 대상) 안에서만 과목을 고른다. 설계: `docs/PHASE_D_DESIGN.md` DD1.

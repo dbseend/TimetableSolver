@@ -163,7 +163,10 @@ def feasible(constraints) -> bool | None:
 
 @pytest.mark.parametrize("sc", SCEN["scenarios"], ids=lambda s: s["id"])
 def test_scenario_is_valid_and_minimally_infeasible(sc):
-    req = SolveRequest.model_validate({"catalog": CATALOG, "constraints": sc["constraints"]})
+    pool = [{"course_id": c} for c in COURSES]  # scenarios assume every course is a candidate
+    req = SolveRequest.model_validate(
+        {"catalog": CATALOG, "pool": pool, "constraints": sc["constraints"]}
+    )
     ids = {c.id for c in req.constraints}
     core = set(sc["expected_conflict_ids"])
     assert core <= ids and sc["expected_status"] == "INFEASIBLE"
