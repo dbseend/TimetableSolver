@@ -29,14 +29,18 @@ class Settings(BaseSettings):
     llm_model: str | None = None
     llm_api_key: SecretStr | None = None
 
+    # Supabase (server-side only; never expose to the client)
+    supabase_url: str | None = None
+    supabase_key: SecretStr | None = None
+
     log_level: str = "INFO"
 
-    @field_validator("allowed_origin_regex", "llm_model", mode="before")
+    @field_validator("allowed_origin_regex", "llm_model", "supabase_url", mode="before")
     @classmethod
     def _empty_to_none(cls, v: object) -> object:
         return None if isinstance(v, str) and not v.strip() else v
 
-    @field_validator("llm_api_key", mode="before")
+    @field_validator("llm_api_key", "supabase_key", mode="before")
     @classmethod
     def _empty_key_to_none(cls, v: object) -> object:
         return None if isinstance(v, str) and not v.strip() else v
@@ -50,6 +54,11 @@ class Settings(BaseSettings):
     def llm_enabled(self) -> bool:
         """LLM features need a provider and a key; the server starts either way."""
         return self.llm_provider != "none" and self.llm_api_key is not None
+
+    @property
+    def db_enabled(self) -> bool:
+        """Supabase catalog queries need a project URL and a key."""
+        return bool(self.supabase_url and self.supabase_key)
 
     @property
     def origins(self) -> list[str]:

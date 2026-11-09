@@ -1617,6 +1617,47 @@
         "title": "Section",
         "type": "object"
       },
+      "Semester": {
+        "properties": {
+          "id": {
+            "minLength": 1,
+            "title": "Id",
+            "type": "string"
+          },
+          "is_synthetic": {
+            "default": false,
+            "title": "Is Synthetic",
+            "type": "boolean"
+          },
+          "label": {
+            "minLength": 1,
+            "title": "Label",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "label"
+        ],
+        "title": "Semester",
+        "type": "object"
+      },
+      "SemestersResponse": {
+        "properties": {
+          "semesters": {
+            "items": {
+              "$ref": "#/components/schemas/Semester"
+            },
+            "title": "Semesters",
+            "type": "array"
+          }
+        },
+        "required": [
+          "semesters"
+        ],
+        "title": "SemestersResponse",
+        "type": "object"
+      },
       "SolveRequest": {
         "description": "The solver picks courses only from `pool` (plus must_include targets), never the whole\ncatalog: without a pool it fills credits with arbitrary 0/1-credit courses.",
         "properties": {
@@ -1987,6 +2028,88 @@
   },
   "openapi": "3.1.0",
   "paths": {
+    "/catalog": {
+      "get": {
+        "operationId": "get_catalog_by_query_catalog_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "semester",
+            "required": true,
+            "schema": {
+              "title": "Semester",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Catalog"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Catalog not found"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Validation error"
+          },
+          "501": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not implemented yet"
+          },
+          "502": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Database query failed"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Database disabled"
+          }
+        },
+        "summary": "Get Catalog By Query",
+        "tags": [
+          "catalog"
+        ]
+      }
+    },
     "/catalog/validate": {
       "post": {
         "operationId": "validate_catalog_catalog_validate_post",
@@ -2033,6 +2156,88 @@
           }
         },
         "summary": "Validate Catalog",
+        "tags": [
+          "catalog"
+        ]
+      }
+    },
+    "/catalog/{semester_id}": {
+      "get": {
+        "operationId": "get_catalog_by_id_catalog__semester_id__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "semester_id",
+            "required": true,
+            "schema": {
+              "title": "Semester Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Catalog"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Catalog not found"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Validation error"
+          },
+          "501": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not implemented yet"
+          },
+          "502": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Database query failed"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Database disabled"
+          }
+        },
+        "summary": "Get Catalog By Id",
         "tags": [
           "catalog"
         ]
@@ -2242,6 +2447,67 @@
         "summary": "Parse Profile",
         "tags": [
           "profile"
+        ]
+      }
+    },
+    "/semesters": {
+      "get": {
+        "operationId": "list_semesters_semesters_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SemestersResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Validation error"
+          },
+          "501": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not implemented yet"
+          },
+          "502": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Database query failed"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Database disabled"
+          }
+        },
+        "summary": "List Semesters",
+        "tags": [
+          "catalog"
         ]
       }
     },
