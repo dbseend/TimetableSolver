@@ -8,6 +8,7 @@ import type { ImportIssue } from "../features/catalog/adapter";
 import type { ProfileEntry } from "../features/profile/transcript";
 import type { MajorDefinition } from "../features/major/major";
 import { type ConstraintMeta, ingestParse, type PendingDraft, placeResolved } from "../features/review/review";
+import { describe } from "../features/constraints/model";
 
 export interface LoadedCatalog {
   catalog: Catalog;
@@ -61,9 +62,12 @@ export interface State {
   nextConstraintNo: number;
   revision: number;
   confirmedRevision: number | null;
-  solve: { phase: Phase; response: SolveResponse | null; error: string | null; selected: number };
+  /** stale: 결과를 만든 뒤 데이터·조건이 바뀌어 다시 생성해야 함(이전 결과는 최신처럼 보여 주지 않는다) */
+  solve: { phase: Phase; response: SolveResponse | null; error: string | null; selected: number; stale: boolean };
   diagnosis: { phase: Phase; response: DiagnosisResponse | null; error: string | null };
   nl: NlState;
+  /** 다른 강좌 데이터로 바꿀 때 유효하지 않아 제외한 조건 등 안내 */
+  notices: string[];
 }
 
 export const DEFAULT_CREDIT: Constraint = {
@@ -87,9 +91,10 @@ export const initialState: State = {
   nextConstraintNo: 2,
   revision: 1,
   confirmedRevision: null,
-  solve: { phase: "idle", response: null, error: null, selected: 0 },
+  solve: { phase: "idle", response: null, error: null, selected: 0, stale: false },
   diagnosis: { phase: "idle", response: null, error: null },
   nl: emptyNl,
+  notices: [],
 };
 
 export type Action =
@@ -120,7 +125,10 @@ export type Action =
   /** 기존 학점 조건과 새 요청 충돌: 기존 유지 / 새 조건(또는 직접 고친 값)으로 변경 */
   | { type: "conflict_resolve"; draftId: string; mode: "keep" | "replace"; params?: Record<string, unknown> }
   | { type: "nl_clear" }
-  | { type: "reset_all" };
+  | { type: "reset_all" }
+  /** 처음부터 다시 시작: 강좌 데이터 선택·조건·결과를 모두 지운다(사용자 확인 후) */
+  | { type: "restart" }
+  | { type: "notices_clear" };
 
 function bump(s: State, patch: Partial<State>): State {
   return {
@@ -128,19 +136,43 @@ function bump(s: State, patch: Partial<State>): State {
     ...patch,
     revision: s.revision + 1,
     confirmedRevision: null,
-    solve: { phase: "idle", response: null, error: null, selected: 0 },
+    solve: { phase: "idle", response: null, error: null, selected: 0, stale: !!s.solve.response || s.solve.stale },
     diagnosis: { phase: "idle", response: null, error: null },
   };
+}
+
+/** 새 카탈로그에서 조건(또는 초안)의 참조가 유효한지. 학점·요일·시간·등교일은 카탈로그와 무관하게 유효. */
+function validIn(catalog: Catalog, c: { type: string; params: Record<string, unknown> }): boolean {
+  const p = c.params as Record<string, unknown>;
+  const courses = new Set(catalog.courses.map((x) => x.id));
+  const sections = new Map(catalog.sections.map((x) => [x.id, x.course_id]));
+  const cats = new Set([...catalog.courses.flatMap((x) => x.category_ids), ...catalog.sections.flatMap((x) => x.category_ids ?? []), ...Object.values(catalog.category_groups).flat()]);
+  const insts = new Set(catalog.instructors.map((x) => x.id));
+  if ((c.type === "must_include" || c.type === "must_exclude") && p.course_id != null && !courses.has(p.course_id as string)) return false;
+  if (c.type === "must_include" && Array.isArray(p.allowed_section_ids) && !(p.allowed_section_ids as string[]).every((sid) => sections.get(sid) === p.course_id)) return false;
+  if (c.type === "category_min" && Array.isArray(p.category_ids) && !(p.category_ids as string[]).every((x) => cats.has(x))) return false;
+  if (c.type === "instructor_avoid" && Array.isArray(p.instructor_ids) && !(p.instructor_ids as string[]).every((x) => insts.has(x))) return false;
+  return true;
 }
 
 export function reducer(s: State, a: Action): State {
   switch (a.type) {
     case "catalog_loaded": {
-      // 새 카탈로그에서는 과목·교수·분류 참조 조건이 무효일 수 있으므로 학점 범위만 남긴다(명시적 안내).
-      const kept = s.constraints.filter((c) => c.type === "credit_range");
-      const constraints = kept.length ? kept : [DEFAULT_CREDIT];
+      // 같은 카탈로그를 다시 고르면 아무것도 바꾸지 않는다(조건·결과 유지)
+      if (s.loaded && s.loaded.revision === a.loaded.revision) return { ...s, notices: [] };
+      // 다른 데이터: 조건마다 참조(과목·분반·분류·교수)가 새 데이터에 있는지 다시 검사하고, 빠진 것은 알린다
+      const cat = a.loaded.catalog;
+      const oldCat = s.loaded?.catalog ?? null;
+      const keep = s.constraints.filter((c) => validIn(cat, c));
+      const removed = s.constraints.filter((c) => !validIn(cat, c));
+      const constraints = keep.some((c) => c.type === "credit_range" && c.strength === "hard") ? keep : [DEFAULT_CREDIT, ...keep.filter((c) => c.id !== "c1")];
       const meta = Object.fromEntries(constraints.map((c) => [c.id, s.meta[c.id] ?? DEFAULT_META.c1]));
-      return bump(s, { loaded: a.loaded, constraints, meta, nl: emptyNl });
+      const drafts = s.nl.drafts.filter((d) => validIn(cat, d));
+      const notices = [
+        ...removed.map((c) => `새 강좌 데이터에 없는 대상을 가리켜 제외한 조건: ${describe(c, oldCat)}`),
+        ...(s.nl.drafts.length > drafts.length ? [`이전 데이터 기준이라 확인할 조건 ${s.nl.drafts.length - drafts.length}개를 제외했어요. 필요하면 다시 입력해 주세요.`] : []),
+      ];
+      return bump(s, { loaded: a.loaded, constraints, meta, nl: { ...s.nl, drafts }, notices });
     }
     case "catalog_replaced":
       // 같은 카탈로그에 분류만 더하거나 뺀 경우(내 전공 설정): 조건은 유지하되 사라진 분류를 참조하는 조건은 지운다.
@@ -206,13 +238,13 @@ export function reducer(s: State, a: Action): State {
       return { ...next, confirmedRevision: next.revision };
     }
     case "solve_start":
-      return { ...s, solve: { phase: "solving", response: null, error: null, selected: 0 }, diagnosis: { phase: "idle", response: null, error: null } };
+      return { ...s, solve: { phase: "solving", response: null, error: null, selected: 0, stale: false }, diagnosis: { phase: "idle", response: null, error: null } };
     case "solve_done":
       if (a.forRevision !== s.revision) return s; // 오래된 응답 무시
-      return { ...s, solve: { phase: "done", response: a.response, error: null, selected: 0 } };
+      return { ...s, solve: { phase: "done", response: a.response, error: null, selected: 0, stale: false } };
     case "solve_error":
       if (a.forRevision !== s.revision) return s;
-      return { ...s, solve: { phase: "error", response: null, error: a.error, selected: 0 } };
+      return { ...s, solve: { phase: "error", response: null, error: a.error, selected: 0, stale: false } };
     case "select_candidate":
       return { ...s, solve: { ...s.solve, selected: a.index } };
     case "diagnose_start":
@@ -260,6 +292,10 @@ export function reducer(s: State, a: Action): State {
       return { ...s, nl: emptyNl };
     case "reset_all":
       return { ...initialState, loaded: s.loaded, revision: s.revision + 1 };
+    case "restart":
+      return { ...initialState, revision: s.revision + 1 };
+    case "notices_clear":
+      return { ...s, notices: [] };
   }
 }
 

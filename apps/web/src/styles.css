@@ -283,3 +283,12 @@ details[open] > summary::before { transform: rotate(90deg); }
 .change .after { font-weight: 650; }
 @media (max-width: 560px) { .change { grid-template-columns: 1fr; } }
 .footer { margin-top: var(--s8); color: var(--text-2); font-size: var(--fs-xs); line-height: 1.6; }
+
+/* ---------------------------------------------------------------- navigation */
+[hidden] { display: none !important; }
+.steps li { list-style: none; }
+button.step { font: inherit; border: 0; cursor: pointer; }
+button.step:disabled { cursor: default; opacity: 1; }
+button.step:not(:disabled):hover { background: var(--surface); }
+button.step:not(:disabled):not(.current) { text-decoration: underline; text-underline-offset: 3px; }
+@media (max-width: 560px) { button.step { min-height: 44px; } }

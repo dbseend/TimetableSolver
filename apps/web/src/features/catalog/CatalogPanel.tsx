@@ -168,8 +168,8 @@ export function CatalogPanel({ loaded, onLoaded, onCancel }: { loaded: LoadedCat
           <p>학기를 고르고 학교 강좌로 시작하세요. 파일을 올릴 필요가 없어요.</p>
         </div>
         {loaded && onCancel && (
-          <Button variant="secondary" size="sm" onClick={onCancel}>
-            현재 데이터 유지
+          <Button variant="secondary" size="sm" onClick={onCancel} data-testid="keep-data">
+            ← 조건 설정으로 돌아가기(현재 데이터 유지)
           </Button>
         )}
       </div>

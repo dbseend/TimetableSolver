@@ -91,8 +91,8 @@ export function DiagnosisPanel({
                 <Button onClick={() => onApply(p)} data-testid="apply-proposal">
                   변경 내용 확인하고 적용
                 </Button>
-                <Button variant="secondary" onClick={() => setPreview(null)}>
-                  취소
+                <Button variant="secondary" onClick={() => setPreview(null)} data-testid="preview-close">
+                  미리보기 닫기
                 </Button>
               </div>
             </>

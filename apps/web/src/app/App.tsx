@@ -28,6 +28,12 @@ function errText(e: unknown): string {
   return "알 수 없는 오류가 발생했습니다.";
 }
 
+type View = "prepare" | "conditions" | "results";
+function readHashView(): View | null {
+  const m = /^#\/(prepare|conditions|results)$/.exec(window.location.hash);
+  return m ? (m[1] as View) : null;
+}
+
 function reviewItemsOf(st: State) {
   return reviewItems({
     constraints: st.constraints,
@@ -49,8 +55,11 @@ export function App() {
   const [s, dispatch] = useReducer(reducer, initialState);
   const [caps, setCaps] = useState<Capabilities | null>(null);
   const [capsError, setCapsError] = useState<string | null>(null);
-  const [dataOpen, setDataOpen] = useState(false);
-  const [tab, setTab] = useState<"conditions" | "results">("conditions");
+  // 단계: 강좌 준비 / 조건 설정 / 시간표 비교. URL hash와 연결해 브라우저 뒤로가기와 맞춘다(외부로 나가는 history.back 호출 없음).
+  const [view, setViewState] = useState<View>(() => readHashView() ?? "prepare");
+  const [confirmRestart, setConfirmRestart] = useState(false);
+  const tab: "conditions" | "results" = view === "results" ? "results" : "conditions";
+  const setTab = (t: "conditions" | "results") => navigate(t);
   const [majorBusy, setMajorBusy] = useState(false);
   const [majorError, setMajorError] = useState<string | null>(null);
   const solveAbort = useRef<AbortController | null>(null);
@@ -74,11 +83,40 @@ export function App() {
   const stateRef = useRef(s);
   stateRef.current = s;
   const inFlight = useRef(false);
+
+  /** 단계 이동 규칙: 데이터가 없으면 강좌 준비만, 현재 결과가 없으면(미해결·미생성·변경됨) 결과 단계로 못 감 */
+  function allowed(v: View, st: State = stateRef.current): View {
+    if (!st.loaded) return "prepare";
+    if (v === "results" && !st.solve.response && st.solve.phase !== "solving") return "conditions";
+    return v;
+  }
+  function navigate(v: View, opts: { replace?: boolean } = {}) {
+    const next = allowed(v);
+    setViewState(next);
+    const url = `#/${next}`;
+    if (opts.replace || window.location.hash === url) window.history.replaceState({ view: next }, "", url);
+    else window.history.pushState({ view: next }, "", url);
+  }
+  useEffect(() => {
+    // 첫 진입: 현재 상태로 정규화(데이터 없으면 강좌 준비)
+    const v = allowed(readHashView() ?? "prepare");
+    setViewState(v);
+    window.history.replaceState({ view: v }, "", `#/${v}`);
+    const onPop = () => {
+      const v2 = allowed(readHashView() ?? "prepare");
+      setViewState(v2);
+      if (`#/${v2}` !== window.location.hash) window.history.replaceState({ view: v2 }, "", `#/${v2}`);
+    };
+    window.addEventListener("popstate", onPop);
+    return () => window.removeEventListener("popstate", onPop);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
   const solving = s.solve.phase === "solving";
 
   async function onCatalogLoaded(l: NonNullable<typeof s.loaded>) {
     dispatch({ type: "catalog_loaded", loaded: l });
-    setDataOpen(false);
+    stateRef.current = { ...stateRef.current, loaded: l }; // 이동 규칙 판단용(다음 렌더 전)
+    navigate("conditions");
     const saved = await storage.get<ProfileEntry[]>(PROFILE_KEY);
     if (saved?.length) dispatch({ type: "profile_set", entries: rematchProfile(saved, l.catalog), dropped: [] });
   }
@@ -127,7 +165,8 @@ export function App() {
     solveAbort.current = ac;
     inFlight.current = true;
     dispatch({ type: "solve_start" });
-    setTab("results");
+    stateRef.current = { ...stateRef.current, solve: { ...stateRef.current.solve, phase: "solving" } };
+    navigate("results");
     try {
       const res = await api.solve({ ...buildRequest(constraints, revision), allowed_section_ids: allowed }, ac.signal);
       dispatch({ type: "solve_done", forRevision: res.input_revision, response: res });
@@ -202,7 +241,9 @@ export function App() {
   const parseMode = caps?.parse_provider_mode ?? null;
   const notImplemented = caps ? Object.entries(caps.features).filter(([, v]) => v === "not_implemented").map(([k]) => k) : [];
   const resp = s.solve.response;
-  const stepIndex = !catalog ? 0 : resp && resp.candidates.length ? 2 : 1;
+  const stepIndex = view === "prepare" || !catalog ? 0 : view === "results" ? 2 : 1;
+  const stepEnabled = [true, !!catalog, !!catalog && (!!resp || solving)];
+  const stepView: View[] = ["prepare", "conditions", "results"];
   const steps = ["강좌 준비", "조건 설정", "시간표 비교"];
 
   const header = (
@@ -225,16 +266,58 @@ export function App() {
         ) : (
           <Badge tone="outline">강좌 데이터 없음</Badge>
         )}
+        {s.loaded && (
+          <Button variant="ghost" size="sm" onClick={() => setConfirmRestart(true)} data-testid="restart">
+            처음부터 다시 시작
+          </Button>
+        )}
       </div>
     </header>
+  );
+
+  const restartDialog = confirmRestart && (
+    <Card tight role="alertdialog" aria-labelledby="restart-h" data-testid="restart-confirm" style={{ marginBottom: 16 }}>
+      <h3 id="restart-h">처음부터 다시 시작할까요?</h3>
+      <p className="small" style={{ margin: "8px 0" }}>
+        다음 내용이 지워져요: 선택한 강좌 데이터, 조건 {s.constraints.length}개, 확인할 조건 {items.length}개, 만든 시간표 결과, 내 전공 과목 선택, 이 브라우저에 저장한 이수내역.
+      </p>
+      <div className="row">
+        <Button
+          variant="primary"
+          onClick={async () => {
+            await storage.clearAll();
+            dispatch({ type: "restart" });
+            setConfirmRestart(false);
+            stateRef.current = { ...stateRef.current, loaded: null };
+            navigate("prepare", { replace: true });
+          }}
+          data-testid="restart-yes"
+        >
+          모두 지우고 처음으로
+        </Button>
+        <Button variant="secondary" onClick={() => setConfirmRestart(false)} data-testid="restart-no">
+          취소
+        </Button>
+      </div>
+    </Card>
   );
 
   const stepper = (
     <ol className="steps" aria-label="진행 단계">
       {steps.map((label, i) => (
-        <li key={label} className={`step ${i === stepIndex ? "current" : i < stepIndex ? "done" : ""}`} aria-current={i === stepIndex ? "step" : undefined}>
-          <span className="dot">{i < stepIndex ? <Icon name="check" size={13} /> : i + 1}</span>
-          {label}
+        <li key={label}>
+          <button
+            type="button"
+            className={`step ${i === stepIndex ? "current" : i < stepIndex ? "done" : ""}`}
+            aria-current={i === stepIndex ? "step" : undefined}
+            disabled={!stepEnabled[i] || i === stepIndex}
+            title={!stepEnabled[i] ? (i === 2 ? "시간표를 먼저 만들어 주세요" : "강좌 데이터를 먼저 골라 주세요") : undefined}
+            onClick={() => navigate(stepView[i])}
+            data-testid={`step-${stepView[i]}`}
+          >
+            <span className="dot">{i < stepIndex ? <Icon name="check" size={13} /> : i + 1}</span>
+            {label}
+          </button>
         </li>
       ))}
     </ol>
@@ -262,13 +345,16 @@ export function App() {
       </div>
     );
   }
+  const prepareView = view === "prepare";
   const cat = s.loaded.catalog;
 
   return (
     <div className="app">
       {header}
+      {restartDialog}
       {stepper}
-      <div className="mobile-tabs">
+      {prepareView && <CatalogPanel loaded={s.loaded} onLoaded={onCatalogLoaded} onCancel={() => navigate("conditions")} />}
+      <div className="mobile-tabs" hidden={prepareView}>
         <Segmented
           label="화면 전환"
           value={tab}
@@ -279,9 +365,29 @@ export function App() {
           ]}
         />
       </div>
-      <div className="layout" data-tab={tab}>
+      {/* 강좌 준비 화면에서는 숨기기만 한다(입력·선택·결과 보존) */}
+      <div className="layout" data-tab={tab} hidden={prepareView}>
         <aside className="side" aria-label="조건 설정">
-          <DataSummary loaded={s.loaded} onChange={() => setDataOpen(true)} />
+          <div className="row">
+            <Button variant="ghost" size="sm" onClick={() => navigate("prepare")} data-testid="back-to-prepare">
+              ← 강좌 준비로
+            </Button>
+          </div>
+          {s.notices.length > 0 && (
+            <div data-testid="catalog-change-notice">
+              <Alert tone="warning" title="강좌 데이터를 바꿔 조건을 다시 확인했어요">
+                <ul className="sat-list">
+                  {s.notices.map((n, i) => (
+                    <li key={i}>{n}</li>
+                  ))}
+                </ul>
+                <Button variant="ghost" size="sm" onClick={() => dispatch({ type: "notices_clear" })}>
+                  확인
+                </Button>
+              </Alert>
+            </div>
+          )}
+          <DataSummary loaded={s.loaded} onChange={() => navigate("prepare")} />
           <MajorPanel
             loaded={s.loaded}
             busy={majorBusy}
@@ -352,9 +458,30 @@ export function App() {
         </aside>
 
         <main className="main" aria-label="시간표 결과">
-          {dataOpen && <CatalogPanel loaded={s.loaded} onLoaded={onCatalogLoaded} onCancel={() => setDataOpen(false)} />}
           <Card>
-            {s.solve.phase === "idle" && !resp && (
+            {(resp || s.solve.stale) && (
+              <div className="row" style={{ marginBottom: 12 }}>
+                <Button
+                  variant="secondary"
+                  size="sm"
+                  onClick={() => {
+                    navigate("conditions");
+                    requestAnimationFrame(() => document.querySelector<HTMLElement>("#cons-h")?.scrollIntoView({ block: "start" }));
+                  }}
+                  data-testid="back-to-conditions"
+                >
+                  ← 조건 수정하기
+                </Button>
+              </div>
+            )}
+            {s.solve.stale && !resp && s.solve.phase === "idle" && (
+              <div data-testid="results-stale" style={{ marginBottom: 12 }}>
+                <Alert tone="warning" title="조건이 변경되어 다시 생성해야 합니다">
+                  이전 결과는 바뀌기 전 조건으로 만든 것이라 보여 주지 않아요. 조건을 확인하고 ‘이 조건으로 시간표 만들기’를 눌러 주세요.
+                </Alert>
+              </div>
+            )}
+            {s.solve.phase === "idle" && !resp && !s.solve.stale && (
               <div className="empty" data-testid="results-empty">
                 <h3>아직 만든 시간표가 없어요</h3>
                 {items.length > 0 ? (

@@ -38,6 +38,7 @@ from app.contracts import (
 from app.domain.catalog import catalog_revision, validate_catalog_semantics
 from app.domain.request_checks import RequestProblem
 from app.llm.base import ProviderError
+from app.protection import basic_auth_failure, limiter, llm_daily_limit, rate_limit_failure
 from app.solver.runner import SolverBusy, SolverCancelled, SolverCrashed, SolverTimeout, make_runner
 
 log = logging.getLogger("timetable.api")
@@ -86,6 +87,10 @@ async def request_context(request: Request, call_next):
     cl = request.headers.get("content-length")
     if cl is not None and cl.isdigit() and int(cl) > MAX_BODY_BYTES:
         resp = err(request, 413, "PAYLOAD_TOO_LARGE", "요청 크기가 5 MiB를 초과합니다.")
+    elif (denied := basic_auth_failure(request)) is not None:
+        resp = denied  # 접근 비밀번호(ACCESS_PASSWORD 설정 시)
+    elif (limited := rate_limit_failure(request, request.state.request_id)) is not None:
+        resp = limited  # IP별 요청 제한
     else:
         resp = await call_next(request)
     resp.headers["X-Request-ID"] = request.state.request_id
@@ -281,6 +286,9 @@ async def parse_route(body: ParseRequest, request: Request):
     provider = provider_from_env()
     if provider is None:
         return err(request, 503, "PARSER_UNAVAILABLE", "자연어 해석기가 설정되지 않았습니다. 수동 조건 입력을 사용하세요.")
+    if provider.mode == "live" and not limiter.take_llm_call(llm_daily_limit()):
+        # 공개 배포에서 외부 LLM 호출 남용·비용 방지: 일일 총 상한(재시작 시 초기화)
+        return err(request, 429, "LLM_DAILY_LIMIT", "오늘 자연어 해석 사용량을 모두 썼어요. 직접 조건 추가로 계속할 수 있어요.")
     try:
         out = await asyncio.to_thread(provider.parse, body)
     except ProviderError as e:
@@ -290,3 +298,10 @@ async def parse_route(body: ParseRequest, request: Request):
 
 
 app.include_router(api)
+
+# 배포: 빌드된 프론트(apps/web/dist)를 같은 주소에서 제공(WEB_DIST 설정 시). API 경로가 먼저 등록되어 우선한다.
+_web_dist = os.environ.get("WEB_DIST")
+if _web_dist and os.path.isdir(_web_dist):
+    from fastapi.staticfiles import StaticFiles
+
+    app.mount("/", StaticFiles(directory=_web_dist, html=True), name="web")
