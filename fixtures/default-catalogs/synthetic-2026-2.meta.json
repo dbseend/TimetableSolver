@@ -1,0 +1,42 @@
+{
+ "id": "synthetic-2026-2",
+ "term_id": "2026-2",
+ "label": "합성 테스트 학기",
+ "as_of": "2026-11-09",
+ "source_file": "synthetic-portal-export.xls",
+ "generated_at": "2026-11-09T13:05:43.544Z",
+ "period_table_basis": "사용자 확인 학교 공지 '변경 후' 기준(요일별, 수요일 1~3교시 별도, 토·일 없음, 교시별 구간)",
+ "major_type_categories": [
+  "전필",
+  "전선"
+ ],
+ "course_orgs": {
+  "SYN101": "가상학부 주간",
+  "SYN102": "가상학부 주간",
+  "SYN103": "가상학부 주간",
+  "SYN104": "가상학부 주간"
+ },
+ "import_summary": {
+  "rows": 4,
+  "courses": 4,
+  "sections": 4,
+  "unsupported_sections": 2,
+  "excluded_courses": 0,
+  "exclusion_reasons": {
+   "PERIOD_TABLE_MISSING_FOR_DAY": 1,
+   "TIME_TBD": 1
+  },
+  "issue_counts": {
+   "warning:SECTION_UNSUPPORTED": 2,
+   "warning:INSTRUCTOR_ID_FROM_NAME": 1
+  }
+ },
+ "import_issues": [
+  {
+   "severity": "warning",
+   "row": null,
+   "code": "INSTRUCTOR_ID_FROM_NAME",
+   "message": "교수 ID 열이 없어 이름으로 식별합니다. 동명이인은 구분되지 않습니다."
+  }
+ ]
+}

@@ -1,0 +1,24 @@
+{
+  "schema_version": "1.0",
+  "catalog_id": "tiny-7",
+  "term_id": "test",
+  "timezone": "Asia/Seoul",
+  "data_origin": "synthetic",
+  "category_groups": {"major": ["major_required", "major_elective"]},
+  "courses": [
+    {"id": "A", "name": "A", "credit_units": 300, "category_ids": ["major_required"], "equivalence_group_id": null},
+    {"id": "B", "name": "B", "credit_units": 300, "category_ids": ["major_required"], "equivalence_group_id": null},
+    {"id": "C", "name": "C", "credit_units": 300, "category_ids": ["major_elective"], "equivalence_group_id": null},
+    {"id": "D", "name": "D", "credit_units": 300, "category_ids": ["major_elective"], "equivalence_group_id": null}
+  ],
+  "instructors": [],
+  "sections": [
+    {"id": "A1", "course_id": "A", "section_label": "1", "instructor_ids": [], "delivery_mode": "in_person", "meetings": [{"day": "Mon", "start_minute": 540, "end_minute": 600, "room": null, "campus_required": true}], "support_status": "supported", "issue_codes": []},
+    {"id": "A2", "course_id": "A", "section_label": "2", "instructor_ids": [], "delivery_mode": "in_person", "meetings": [{"day": "Fri", "start_minute": 540, "end_minute": 600, "room": null, "campus_required": true}], "support_status": "supported", "issue_codes": []},
+    {"id": "B1", "course_id": "B", "section_label": "1", "instructor_ids": [], "delivery_mode": "in_person", "meetings": [{"day": "Mon", "start_minute": 600, "end_minute": 660, "room": null, "campus_required": true}], "support_status": "supported", "issue_codes": []},
+    {"id": "B2", "course_id": "B", "section_label": "2", "instructor_ids": [], "delivery_mode": "in_person", "meetings": [{"day": "Tue", "start_minute": 540, "end_minute": 600, "room": null, "campus_required": true}], "support_status": "supported", "issue_codes": []},
+    {"id": "C1", "course_id": "C", "section_label": "1", "instructor_ids": [], "delivery_mode": "in_person", "meetings": [{"day": "Mon", "start_minute": 570, "end_minute": 630, "room": null, "campus_required": true}], "support_status": "supported", "issue_codes": []},
+    {"id": "C2", "course_id": "C", "section_label": "2", "instructor_ids": [], "delivery_mode": "in_person", "meetings": [{"day": "Wed", "start_minute": 720, "end_minute": 780, "room": null, "campus_required": true}], "support_status": "supported", "issue_codes": []},
+    {"id": "D1", "course_id": "D", "section_label": "1", "instructor_ids": [], "delivery_mode": "in_person", "meetings": [{"day": "Fri", "start_minute": 600, "end_minute": 660, "room": null, "campus_required": true}], "support_status": "supported", "issue_codes": []}
+  ]
+}

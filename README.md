@@ -1,46 +1,118 @@
 # TimetableSolver
 
-자연어 선호 → 제약 JSON(LLM) → CP-SAT 솔버 → 검증된 시간표 후보 + 설명 + 불가능 진단.
+자연어·수동 조건 → 사용자 확인 → OR-Tools CP-SAT 시간표 생성 → 독립 검증기 통과 후보만 표시하는 로컬 웹 MVP.
 
-- 기획: [docs/PLAN.md](docs/PLAN.md)
-- 개발 계획: [docs/DEVELOPMENT_PLAN.md](docs/DEVELOPMENT_PLAN.md)
-- API 계약: [docs/API.md](docs/API.md), `backend/openapi.json`
+- 백엔드: `services/api` (FastAPI, Pydantic v2, OR-Tools, uv)
+- 프론트: `apps/web` (React 19, Vite, TypeScript, 생성 OpenAPI 타입)
+- 계약 원본: `services/api/app/contracts.py` → `packages/contracts/openapi.json` → `apps/web/src/generated/api-types.ts`
+- 진행 상황·미구현·미검증 목록: [`docs/PROGRESS.md`](docs/PROGRESS.md) · main 선별 통합 기록: [`docs/INTEGRATION.md`](docs/INTEGRATION.md) · main 병합 계획(미실행): [`docs/MERGE_PLAN.md`](docs/MERGE_PLAN.md)
 
-> **공개 저장소.** 실제 수강 이력·성적표·설문 응답·API 키는 절대 커밋하지 않는다. 자세한 규칙은 [data/README.md](data/README.md).
+> 이 브랜치(`feat/timetable-integration`)는 아직 main에 병합되지 않았다. main에는 이전 구현(`backend/`, `frontend/`)이 있으며, 정리 절차는 `docs/MERGE_PLAN.md`를 따른다.
 
-## 구조
+## 동작하는 기능
+
+- 강좌 준비: **학기 선택 → 학교 강좌로 시작하기**(관리자가 변환해 둔 기본 학교 데이터, 업로드 불필요, 기준일·지원/제외 분반 표시). 보조: 합성 샘플, 학교 파일 직접 올리기(CSV/TSV, 포털 HTML `.xls`·CP949, 열 매핑·요일별 교시표). 분반별 학점·이수구분 보존, 미지원 분반 사유 표시
+- 조건: 자연어(데모 해석기 또는 Gemini) 또는 직접 추가. 완전히 해석된 조건은 바로 '반영 완료', 확인이 필요한 것(빈 값·모호한 교수 분반·기존 학점 범위와 충돌·지원하지 않는 요구·학점 범위 누락·내 전공 미확인)만 생성 버튼 바로 위 '확인할 조건'에 모여 그 자리에서 고치거나 제외. 반영된 조건도 그 자리에서 수정·삭제
+- 생성: 버튼 하나 — 확인할 조건이 있으면 '조건 N개 확인하기'(첫 항목으로 이동, 계산 요청 없음), 없으면 조건 요약과 '이 조건으로 시간표 만들기'(클릭 시점 조건으로 확정·생성). CP-SAT 후보 최대 3개(독립 검증기 통과분만), 시간표·목록·비교표, 충족/아쉬운 조건
+- 불가능: 충돌 조건 묶음 → 재풀이·검증된 단일 수정안 미리보기 → 확인 후 적용
+- 이수내역: 브라우저 안에서만 처리(학번·이름·성적 즉시 제거), 서버엔 수강 가능 분반 ID만
+
+## 사용 흐름
+
+1. 학기 선택 → **학교 강좌로 시작하기**
+2. 원하는 조건을 문장으로 쓰거나 **직접 조건 추가**
+3. 생성 버튼 위 **확인할 조건**이 있으면 각 카드에서 값 입력·선택 → **이대로 반영**, 또는 **이 조건 제외**
+4. 조건 요약을 보고 **이 조건으로 시간표 만들기** → 후보 비교 → (불가능하면) 부딪히는 조건 찾기 → 수정안 확인 후 적용
+
+## 알려진 제한
+
+- 시간 미정·토요일 분반은 미지원(실제 학교 파일 819분반 중 656분반 사용), 교시표 적용 학기·예외 미확인
+- 내 전공 인정 규칙은 사용자가 과목을 확인하는 방식으로만 반영(학교 규칙 자동 판정 없음)
+- 자연어: 하한만·상한만으로 쪼개진 같은 강도의 총학점 범위는 서버가 하나로 합친다(강도가 다르거나 모순·모호하면 합치지 않음). 자연어 정확도 평가는 미실시
+- 점심·최장 공강·연강, 복수 조건 완화, 범용 xlsx, 공개 배포는 범위 밖
+
+## 실행 (Windows PowerShell)
+
+필요: Python 3.12+와 [uv](https://docs.astral.sh/uv/), Node.js 22+.
+
+터미널 1 — 백엔드:
+
+```powershell
+cd C:\dev\Timetable-solver\TimetableSolver\services\api
+uv sync
+uv run uvicorn app.main:app --host 127.0.0.1 --port 8000
 ```
-backend/   FastAPI + OR-Tools (Render)
-frontend/  Vite + React + TS (Vercel)
-data/      synthetic/ 만 커밋. private/ raw/ 는 gitignore
-docs/      기획·계획·ADR
+
+터미널 2 — 프론트:
+
+```powershell
+cd C:\dev\Timetable-solver\TimetableSolver\apps\web
+npm ci
+npm run dev
 ```
 
-## 로컬 실행
-Backend (Python 3.13)
-```
-cd backend
-python -m venv .venv && source .venv/bin/activate
-pip install -r requirements-dev.txt
-cp ../.env.example .env
-uvicorn app.main:app --reload     # http://localhost:8000/docs
-ruff check . && pytest -q
+브라우저: <http://localhost:5173> (Vite가 `/api`를 `http://127.0.0.1:8000`으로 프록시). API 문서: <http://127.0.0.1:8000/docs>.
+
+### 기본 학교 데이터(관리자, 학기마다)
+
+실제 학교 파일은 커밋하지 않는다. 변환 결과는 `local-data/catalogs/`(Git 제외)에 생기고, 백엔드가 자동으로 찾는다(`CATALOG_DIR`로 변경 가능).
+
+```powershell
+cd C:\dev\Timetable-solver\TimetableSolver\apps\web
+node scripts/build-school-catalog.mjs ..\..\local-data\개설시간표.xls --term 2026-2 --as-of 2026-11-09 --label "2026학년도 2학기"
 ```
 
-Frontend (Node 22)
-```
-cd frontend
-cp .env.example .env.local
-npm install
-npm run dev                        # http://localhost:5173
-npm run typecheck && npm test && npm run build
+백엔드를 다시 띄울 필요 없이 다음 요청부터 반영된다(파일 변경 감지). 배포 시 저장 위치·공개 범위는 `docs/decisions/0009-default-school-catalog.md`.
+
+### 자연어 해석 모드
+
+- 기본: **데모 해석(fixture)** — LLM이 아닌 규칙 기반 파서. 화면에 "데모 해석" 배지가 표시된다.
+- Gemini live: `services/api\.env` 파일(커밋 제외됨)에 아래 변수를 직접 입력하고 `--env-file`로 기동한다.
+
+  ```text
+  LLM_PROVIDER=gemini
+  GEMINI_API_KEY=<직접 입력>
+  LLM_MODEL=<공식 문서에서 확인한 모델 ID>
+  ```
+
+  ```powershell
+  uv run uvicorn app.main:app --host 127.0.0.1 --port 8000 --env-file .env
+  ```
+
+  키는 서버 환경 변수로만 읽고 프론트 번들·로그·오류 응답에 넣지 않는다. 키가 없거나 호출이 실패해도 수동 조건 입력과 솔버는 동작한다.
+
+## 테스트
+
+```powershell
+# 백엔드
+cd C:\dev\Timetable-solver\TimetableSolver\services\api
+uv run pytest -q
+uv run ruff check .
+uv run ruff format --check .
+
+# 프론트
+cd C:\dev\Timetable-solver\TimetableSolver\apps\web
+npm test              # Vitest 단위 테스트
+npm run typecheck
+npm run build
+npx playwright install chromium   # 최초 1회
+npm run e2e           # 전용 백엔드(127.0.0.1:8010, fixture 해석기)와 Vite(5174)를 자동 기동해 E2E — Gemini를 호출하지 않음
 ```
 
-## API 변경 절차
-1. 백엔드 모델 수정
-2. `python backend/scripts/export_openapi.py`
-3. `cd frontend && npm run gen:types`
-4. 둘 다 커밋 (CI가 drift 검사)
+CI: `.github/workflows/ci.yml`(백엔드 Ubuntu/Windows × Python 3.12/3.13, 계약 드리프트, 프론트, E2E). 줄바꿈은 `.gitattributes`로 LF 고정.
 
-## 현재 상태
-Phase A(레포), B(기본 구성) 완료. `/health`만 동작하고 나머지 엔드포인트는 계약 스텁(501).
+계약 변경 시 타입 재생성:
+
+```powershell
+cd C:\dev\Timetable-solver\TimetableSolver\services\api; uv run python scripts/export_openapi.py
+cd ..\..\apps\web; npm run gen:api
+```
+
+## 학교 개설강좌 파일
+
+화면의 "학교 개설강좌 올리기" → (포털 HTML 내보내기 형식이면 자동 인식) 학기 ID 입력 → 교시표 확인 체크 → 필요 시 열 매핑·셀 줄·이수구분 매핑 수정 → "변환하고 검증하기".
+
+- 지원: CSV/TSV(UTF-8), 학사 포털에서 내려받은 HTML 표(.xls 확장자, EUC-KR/CP949 가능). 엑셀 이진(.xls)·xlsx는 미지원(엑셀에서 "CSV UTF-8"로 저장).
+- 시간 표기: 요일+시각 / 요일+교시 / `월1-2,수3` 한 칸. 교시표는 `1=09:00-10:15` 형식이며 요일마다 다르면 `[월,화,목,금]`·`[수]` 머리글을 쓴다. 표가 없는 요일의 교시는 추정하지 않고 해당 분반을 제외한다.
+- 샘플과 업로드 파일은 모두 `apps/web/src/features/catalog/adapter.ts`의 `importCatalog`를 거쳐 같은 Catalog가 되고, 서버 `/catalog/validate`로 정규화·revision을 받은 뒤 같은 솔버를 사용한다.
+- 실제 학교 파일은 `local-data/`(커밋 제외)에 둔다. 회귀 테스트는 합성 파일 `fixtures/catalogs/synthetic-portal-export.xls`를 쓴다.

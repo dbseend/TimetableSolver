@@ -1,0 +1,18 @@
+# 실제 학교 자료·비밀은 이미지에 넣지 않는다
+local-data
+.env
+.env.*
+**/.env
+# 빌드 산출물·캐시
+**/node_modules
+**/.venv
+**/dist
+**/__pycache__
+**/.pytest_cache
+**/.ruff_cache
+**/.hypothesis
+**/*.tsbuildinfo
+apps/web/test-results
+apps/web/playwright-report
+.git
+docs/screens

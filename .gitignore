@@ -1,36 +1,36 @@
-# --- secrets / env ---
-.env
-.env.*
-!.env.example
-
-# --- python ---
-.venv/
-venv/
+# Python
 __pycache__/
 *.pyc
+.venv/
+venv/
 .pytest_cache/
 .ruff_cache/
 .hypothesis/
 .mypy_cache/
-
-# --- node ---
+# Node
 node_modules/
 dist/
 coverage/
 *.tsbuildinfo
 .vercel/
+apps/web/test-results/
+apps/web/playwright-report/
+# env / secrets
+.env
+.env.*
+!.env.example
+# OS / editor
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+.claude/
 
-# --- data: real data must NEVER be committed (see data/README.md) ---
+# 실제 학교 자료(커밋 금지)
+local-data/
 data/private/
 data/raw/
 data/**/*.xlsx
 data/**/*.xls
-
-# --- LLM response caches (may contain user text) ---
+# LLM 응답 캐시(사용자 문장 포함 가능)
 **/llm_cache/
-
-# --- os / editor ---
-.DS_Store
-.idea/
-.vscode/
-.claude/

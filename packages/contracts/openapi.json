@@ -1,0 +1,3574 @@
+{
+  "components": {
+    "schemas": {
+      "Candidate": {
+        "additionalProperties": false,
+        "properties": {
+          "constraint_evaluations": {
+            "items": {
+              "$ref": "#/components/schemas/ConstraintEvaluation"
+            },
+            "title": "Constraint Evaluations",
+            "type": "array"
+          },
+          "facts": {
+            "items": {
+              "$ref": "#/components/schemas/Fact"
+            },
+            "title": "Facts",
+            "type": "array"
+          },
+          "hard_validation": {
+            "const": "passed",
+            "title": "Hard Validation",
+            "type": "string"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "objective_penalty": {
+            "title": "Objective Penalty",
+            "type": "integer"
+          },
+          "optimality_proven": {
+            "title": "Optimality Proven",
+            "type": "boolean"
+          },
+          "original_soft_score": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Original Soft Score"
+          },
+          "search_status": {
+            "enum": [
+              "optimal",
+              "feasible"
+            ],
+            "title": "Search Status",
+            "type": "string"
+          },
+          "selected_section_ids": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Selected Section Ids",
+            "type": "array"
+          },
+          "total_credit_units": {
+            "title": "Total Credit Units",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "id",
+          "selected_section_ids",
+          "search_status",
+          "optimality_proven",
+          "objective_penalty",
+          "original_soft_score",
+          "total_credit_units",
+          "constraint_evaluations",
+          "facts",
+          "hard_validation"
+        ],
+        "title": "Candidate",
+        "type": "object"
+      },
+      "Capabilities": {
+        "additionalProperties": false,
+        "properties": {
+          "features": {
+            "additionalProperties": {
+              "enum": [
+                "implemented",
+                "not_implemented"
+              ],
+              "type": "string"
+            },
+            "title": "Features",
+            "type": "object"
+          },
+          "limits": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "title": "Limits",
+            "type": "object"
+          },
+          "live_llm_configured": {
+            "title": "Live Llm Configured",
+            "type": "boolean"
+          },
+          "parse_provider_mode": {
+            "enum": [
+              "live",
+              "fixture",
+              "unavailable"
+            ],
+            "title": "Parse Provider Mode",
+            "type": "string"
+          },
+          "schema_version": {
+            "const": "1.0",
+            "default": "1.0",
+            "title": "Schema Version",
+            "type": "string"
+          },
+          "supported_constraint_types": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Supported Constraint Types",
+            "type": "array"
+          },
+          "unsupported_constraint_types": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Unsupported Constraint Types",
+            "type": "array"
+          }
+        },
+        "required": [
+          "supported_constraint_types",
+          "unsupported_constraint_types",
+          "parse_provider_mode",
+          "live_llm_configured",
+          "features",
+          "limits"
+        ],
+        "title": "Capabilities",
+        "type": "object"
+      },
+      "Catalog": {
+        "additionalProperties": false,
+        "properties": {
+          "catalog_id": {
+            "maxLength": 128,
+            "minLength": 1,
+            "title": "Catalog Id",
+            "type": "string"
+          },
+          "category_groups": {
+            "additionalProperties": {
+              "items": {
+                "maxLength": 128,
+                "minLength": 1,
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "title": "Category Groups",
+            "type": "object"
+          },
+          "courses": {
+            "items": {
+              "$ref": "#/components/schemas/Course"
+            },
+            "maxItems": 2000,
+            "title": "Courses",
+            "type": "array"
+          },
+          "data_origin": {
+            "default": "synthetic",
+            "enum": [
+              "synthetic",
+              "user_import"
+            ],
+            "title": "Data Origin",
+            "type": "string"
+          },
+          "instructors": {
+            "items": {
+              "$ref": "#/components/schemas/Instructor"
+            },
+            "title": "Instructors",
+            "type": "array"
+          },
+          "schema_version": {
+            "const": "1.0",
+            "default": "1.0",
+            "title": "Schema Version",
+            "type": "string"
+          },
+          "sections": {
+            "items": {
+              "$ref": "#/components/schemas/Section"
+            },
+            "maxItems": 1000,
+            "title": "Sections",
+            "type": "array"
+          },
+          "term_id": {
+            "maxLength": 128,
+            "minLength": 1,
+            "title": "Term Id",
+            "type": "string"
+          },
+          "timezone": {
+            "const": "Asia/Seoul",
+            "default": "Asia/Seoul",
+            "title": "Timezone",
+            "type": "string"
+          }
+        },
+        "required": [
+          "catalog_id",
+          "term_id",
+          "courses",
+          "sections"
+        ],
+        "title": "Catalog",
+        "type": "object"
+      },
+      "CatalogValidateRequest": {
+        "additionalProperties": false,
+        "properties": {
+          "catalog": {
+            "$ref": "#/components/schemas/Catalog"
+          }
+        },
+        "required": [
+          "catalog"
+        ],
+        "title": "CatalogValidateRequest",
+        "type": "object"
+      },
+      "CatalogValidateResponse": {
+        "additionalProperties": false,
+        "properties": {
+          "catalog": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Catalog"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "catalog_revision": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Catalog Revision"
+          },
+          "errors": {
+            "items": {
+              "$ref": "#/components/schemas/RowIssue"
+            },
+            "title": "Errors",
+            "type": "array"
+          },
+          "request_id": {
+            "title": "Request Id",
+            "type": "string"
+          },
+          "stats": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "title": "Stats",
+            "type": "object"
+          },
+          "valid": {
+            "title": "Valid",
+            "type": "boolean"
+          },
+          "warnings": {
+            "items": {
+              "$ref": "#/components/schemas/RowIssue"
+            },
+            "title": "Warnings",
+            "type": "array"
+          }
+        },
+        "required": [
+          "request_id",
+          "valid",
+          "catalog_revision",
+          "catalog",
+          "errors",
+          "warnings",
+          "stats"
+        ],
+        "title": "CatalogValidateResponse",
+        "type": "object"
+      },
+      "CategoryMin": {
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "maxLength": 128,
+            "minLength": 1,
+            "title": "Id",
+            "type": "string"
+          },
+          "params": {
+            "$ref": "#/components/schemas/CategoryMinParams"
+          },
+          "strength": {
+            "enum": [
+              "hard",
+              "soft"
+            ],
+            "title": "Strength",
+            "type": "string"
+          },
+          "type": {
+            "const": "category_min",
+            "title": "Type",
+            "type": "string"
+          },
+          "weight": {
+            "anyOf": [
+              {
+                "maximum": 10.0,
+                "minimum": 1.0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Weight"
+          }
+        },
+        "required": [
+          "id",
+          "strength",
+          "type",
+          "params"
+        ],
+        "title": "CategoryMin",
+        "type": "object"
+      },
+      "CategoryMinParams": {
+        "additionalProperties": false,
+        "properties": {
+          "category_ids": {
+            "items": {
+              "maxLength": 128,
+              "minLength": 1,
+              "type": "string"
+            },
+            "minItems": 1,
+            "title": "Category Ids",
+            "type": "array"
+          },
+          "min_units": {
+            "maximum": 6000.0,
+            "minimum": 1.0,
+            "title": "Min Units",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "category_ids",
+          "min_units"
+        ],
+        "title": "CategoryMinParams",
+        "type": "object"
+      },
+      "Confirmation": {
+        "additionalProperties": false,
+        "properties": {
+          "confirmed_revision": {
+            "minimum": 0.0,
+            "title": "Confirmed Revision",
+            "type": "integer"
+          },
+          "input_revision": {
+            "minimum": 0.0,
+            "title": "Input Revision",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "input_revision",
+          "confirmed_revision"
+        ],
+        "title": "Confirmation",
+        "type": "object"
+      },
+      "ConstraintChange": {
+        "additionalProperties": false,
+        "properties": {
+          "after": {
+            "additionalProperties": true,
+            "title": "After",
+            "type": "object"
+          },
+          "before": {
+            "additionalProperties": true,
+            "title": "Before",
+            "type": "object"
+          },
+          "constraint_id": {
+            "title": "Constraint Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "constraint_id",
+          "before",
+          "after"
+        ],
+        "title": "ConstraintChange",
+        "type": "object"
+      },
+      "ConstraintEvaluation": {
+        "additionalProperties": false,
+        "properties": {
+          "constraint_id": {
+            "title": "Constraint Id",
+            "type": "string"
+          },
+          "evidence": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Evidence",
+            "type": "array"
+          },
+          "satisfied": {
+            "title": "Satisfied",
+            "type": "boolean"
+          },
+          "strength": {
+            "enum": [
+              "hard",
+              "soft"
+            ],
+            "title": "Strength",
+            "type": "string"
+          },
+          "type": {
+            "title": "Type",
+            "type": "string"
+          },
+          "unit": {
+            "title": "Unit",
+            "type": "string"
+          },
+          "violation": {
+            "title": "Violation",
+            "type": "integer"
+          },
+          "weight": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Weight"
+          }
+        },
+        "required": [
+          "constraint_id",
+          "type",
+          "strength",
+          "weight",
+          "satisfied",
+          "violation",
+          "unit",
+          "evidence"
+        ],
+        "title": "ConstraintEvaluation",
+        "type": "object"
+      },
+      "Course": {
+        "additionalProperties": false,
+        "properties": {
+          "category_ids": {
+            "items": {
+              "maxLength": 128,
+              "minLength": 1,
+              "type": "string"
+            },
+            "title": "Category Ids",
+            "type": "array"
+          },
+          "credit_units": {
+            "maximum": 3000.0,
+            "minimum": 0.0,
+            "title": "Credit Units",
+            "type": "integer"
+          },
+          "equivalence_group_id": {
+            "anyOf": [
+              {
+                "maxLength": 128,
+                "minLength": 1,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Equivalence Group Id"
+          },
+          "id": {
+            "maxLength": 128,
+            "minLength": 1,
+            "title": "Id",
+            "type": "string"
+          },
+          "name": {
+            "maxLength": 200,
+            "minLength": 1,
+            "title": "Name",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "credit_units"
+        ],
+        "title": "Course",
+        "type": "object"
+      },
+      "CreditRange": {
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "maxLength": 128,
+            "minLength": 1,
+            "title": "Id",
+            "type": "string"
+          },
+          "params": {
+            "$ref": "#/components/schemas/CreditRangeParams"
+          },
+          "strength": {
+            "enum": [
+              "hard",
+              "soft"
+            ],
+            "title": "Strength",
+            "type": "string"
+          },
+          "type": {
+            "const": "credit_range",
+            "title": "Type",
+            "type": "string"
+          },
+          "weight": {
+            "anyOf": [
+              {
+                "maximum": 10.0,
+                "minimum": 1.0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Weight"
+          }
+        },
+        "required": [
+          "id",
+          "strength",
+          "type",
+          "params"
+        ],
+        "title": "CreditRange",
+        "type": "object"
+      },
+      "CreditRangeParams": {
+        "additionalProperties": false,
+        "properties": {
+          "max_units": {
+            "maximum": 6000.0,
+            "minimum": 0.0,
+            "title": "Max Units",
+            "type": "integer"
+          },
+          "min_units": {
+            "maximum": 6000.0,
+            "minimum": 0.0,
+            "title": "Min Units",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "min_units",
+          "max_units"
+        ],
+        "title": "CreditRangeParams",
+        "type": "object"
+      },
+      "DayOff": {
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "maxLength": 128,
+            "minLength": 1,
+            "title": "Id",
+            "type": "string"
+          },
+          "params": {
+            "$ref": "#/components/schemas/DayOffParams"
+          },
+          "strength": {
+            "enum": [
+              "hard",
+              "soft"
+            ],
+            "title": "Strength",
+            "type": "string"
+          },
+          "type": {
+            "const": "day_off",
+            "title": "Type",
+            "type": "string"
+          },
+          "weight": {
+            "anyOf": [
+              {
+                "maximum": 10.0,
+                "minimum": 1.0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Weight"
+          }
+        },
+        "required": [
+          "id",
+          "strength",
+          "type",
+          "params"
+        ],
+        "title": "DayOff",
+        "type": "object"
+      },
+      "DayOffParams": {
+        "additionalProperties": false,
+        "properties": {
+          "days": {
+            "items": {
+              "enum": [
+                "Mon",
+                "Tue",
+                "Wed",
+                "Thu",
+                "Fri",
+                "Sat",
+                "Sun"
+              ],
+              "type": "string"
+            },
+            "maxItems": 7,
+            "minItems": 1,
+            "title": "Days",
+            "type": "array"
+          }
+        },
+        "required": [
+          "days"
+        ],
+        "title": "DayOffParams",
+        "type": "object"
+      },
+      "DefaultCatalogList": {
+        "additionalProperties": false,
+        "properties": {
+          "catalogs": {
+            "items": {
+              "$ref": "#/components/schemas/DefaultCatalogSummary"
+            },
+            "title": "Catalogs",
+            "type": "array"
+          }
+        },
+        "required": [
+          "catalogs"
+        ],
+        "title": "DefaultCatalogList",
+        "type": "object"
+      },
+      "DefaultCatalogResponse": {
+        "additionalProperties": false,
+        "properties": {
+          "catalog": {
+            "$ref": "#/components/schemas/Catalog"
+          },
+          "catalog_revision": {
+            "title": "Catalog Revision",
+            "type": "string"
+          },
+          "course_orgs": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "title": "Course Orgs",
+            "type": "object"
+          },
+          "import_issues": {
+            "items": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "title": "Import Issues",
+            "type": "array"
+          },
+          "major_type_categories": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Major Type Categories",
+            "type": "array"
+          },
+          "summary": {
+            "$ref": "#/components/schemas/DefaultCatalogSummary"
+          }
+        },
+        "required": [
+          "summary",
+          "catalog",
+          "catalog_revision",
+          "course_orgs",
+          "major_type_categories",
+          "import_issues"
+        ],
+        "title": "DefaultCatalogResponse",
+        "type": "object"
+      },
+      "DefaultCatalogSummary": {
+        "additionalProperties": false,
+        "description": "관리자가 변환해 둔 기본 학교 카탈로그 요약(서버가 읽을 때 다시 검증).",
+        "properties": {
+          "as_of": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "As Of"
+          },
+          "error": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Error"
+          },
+          "excluded_courses": {
+            "title": "Excluded Courses",
+            "type": "integer"
+          },
+          "exclusion_reasons": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "title": "Exclusion Reasons",
+            "type": "object"
+          },
+          "generated_at": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Generated At"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "label": {
+            "title": "Label",
+            "type": "string"
+          },
+          "period_table_basis": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Period Table Basis"
+          },
+          "source_file": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Source File"
+          },
+          "stats": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "title": "Stats",
+            "type": "object"
+          },
+          "term_id": {
+            "title": "Term Id",
+            "type": "string"
+          },
+          "valid": {
+            "title": "Valid",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "id",
+          "term_id",
+          "label",
+          "as_of",
+          "source_file",
+          "generated_at",
+          "period_table_basis",
+          "valid",
+          "error",
+          "stats",
+          "exclusion_reasons",
+          "excluded_courses"
+        ],
+        "title": "DefaultCatalogSummary",
+        "type": "object"
+      },
+      "DiagnoseRequest": {
+        "additionalProperties": false,
+        "properties": {
+          "allowed_section_ids": {
+            "items": {
+              "maxLength": 128,
+              "minLength": 1,
+              "type": "string"
+            },
+            "maxItems": 1000,
+            "title": "Allowed Section Ids",
+            "type": "array"
+          },
+          "catalog": {
+            "$ref": "#/components/schemas/Catalog"
+          },
+          "catalog_revision": {
+            "maxLength": 64,
+            "minLength": 64,
+            "title": "Catalog Revision",
+            "type": "string"
+          },
+          "confirmation": {
+            "$ref": "#/components/schemas/Confirmation"
+          },
+          "constraints": {
+            "items": {
+              "discriminator": {
+                "mapping": {
+                  "category_min": "#/components/schemas/CategoryMin",
+                  "credit_range": "#/components/schemas/CreditRange",
+                  "day_off": "#/components/schemas/DayOff",
+                  "instructor_avoid": "#/components/schemas/InstructorAvoid",
+                  "max_days_on_campus": "#/components/schemas/MaxDaysOnCampus",
+                  "must_exclude": "#/components/schemas/MustExclude",
+                  "must_include": "#/components/schemas/MustInclude",
+                  "time_avoid": "#/components/schemas/TimeAvoid"
+                },
+                "propertyName": "type"
+              },
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/CreditRange"
+                },
+                {
+                  "$ref": "#/components/schemas/MustInclude"
+                },
+                {
+                  "$ref": "#/components/schemas/MustExclude"
+                },
+                {
+                  "$ref": "#/components/schemas/DayOff"
+                },
+                {
+                  "$ref": "#/components/schemas/TimeAvoid"
+                },
+                {
+                  "$ref": "#/components/schemas/CategoryMin"
+                },
+                {
+                  "$ref": "#/components/schemas/InstructorAvoid"
+                },
+                {
+                  "$ref": "#/components/schemas/MaxDaysOnCampus"
+                }
+              ]
+            },
+            "maxItems": 50,
+            "title": "Constraints",
+            "type": "array"
+          },
+          "diagnosis_budget_ms": {
+            "default": 5000,
+            "maximum": 10000.0,
+            "minimum": 200.0,
+            "title": "Diagnosis Budget Ms",
+            "type": "integer"
+          },
+          "options": {
+            "$ref": "#/components/schemas/SolveOptions"
+          },
+          "schema_version": {
+            "const": "1.0",
+            "default": "1.0",
+            "title": "Schema Version",
+            "type": "string"
+          }
+        },
+        "required": [
+          "catalog",
+          "catalog_revision",
+          "allowed_section_ids",
+          "constraints",
+          "confirmation"
+        ],
+        "title": "DiagnoseRequest",
+        "type": "object"
+      },
+      "DiagnosisResponse": {
+        "additionalProperties": false,
+        "properties": {
+          "attempted_changes_count": {
+            "title": "Attempted Changes Count",
+            "type": "integer"
+          },
+          "background_infeasible": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Background Infeasible"
+          },
+          "core_constraint_ids": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Core Constraint Ids",
+            "type": "array"
+          },
+          "core_is_minimal": {
+            "const": false,
+            "default": false,
+            "title": "Core Is Minimal",
+            "type": "boolean"
+          },
+          "input_revision": {
+            "title": "Input Revision",
+            "type": "integer"
+          },
+          "proposals": {
+            "items": {
+              "$ref": "#/components/schemas/RelaxationProposal"
+            },
+            "title": "Proposals",
+            "type": "array"
+          },
+          "request_hash": {
+            "title": "Request Hash",
+            "type": "string"
+          },
+          "request_id": {
+            "title": "Request Id",
+            "type": "string"
+          },
+          "schema_version": {
+            "const": "1.0",
+            "default": "1.0",
+            "title": "Schema Version",
+            "type": "string"
+          },
+          "scope_note": {
+            "title": "Scope Note",
+            "type": "string"
+          },
+          "search_complete_within_declared_scope": {
+            "title": "Search Complete Within Declared Scope",
+            "type": "boolean"
+          },
+          "status": {
+            "enum": [
+              "diagnosed",
+              "partial",
+              "unknown",
+              "not_infeasible"
+            ],
+            "title": "Status",
+            "type": "string"
+          },
+          "termination_reason": {
+            "title": "Termination Reason",
+            "type": "string"
+          }
+        },
+        "required": [
+          "request_id",
+          "request_hash",
+          "input_revision",
+          "status",
+          "core_constraint_ids",
+          "background_infeasible",
+          "proposals",
+          "attempted_changes_count",
+          "search_complete_within_declared_scope",
+          "termination_reason",
+          "scope_note"
+        ],
+        "title": "DiagnosisResponse",
+        "type": "object"
+      },
+      "DraftConstraint": {
+        "additionalProperties": false,
+        "description": "확정 전 초안. params의 일부가 null(미해결)일 수 있다.",
+        "properties": {
+          "action": {
+            "default": "add",
+            "enum": [
+              "add",
+              "delete"
+            ],
+            "title": "Action",
+            "type": "string"
+          },
+          "draft_id": {
+            "title": "Draft Id",
+            "type": "string"
+          },
+          "params": {
+            "additionalProperties": true,
+            "title": "Params",
+            "type": "object"
+          },
+          "source_text": {
+            "title": "Source Text",
+            "type": "string"
+          },
+          "strength": {
+            "anyOf": [
+              {
+                "enum": [
+                  "hard",
+                  "soft"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Strength"
+          },
+          "target_constraint_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Target Constraint Id"
+          },
+          "type": {
+            "title": "Type",
+            "type": "string"
+          },
+          "unresolved_fields": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Unresolved Fields",
+            "type": "array"
+          },
+          "weight": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Weight"
+          }
+        },
+        "required": [
+          "draft_id",
+          "type",
+          "strength",
+          "weight",
+          "params",
+          "source_text",
+          "unresolved_fields"
+        ],
+        "title": "DraftConstraint",
+        "type": "object"
+      },
+      "EntityCourse": {
+        "additionalProperties": false,
+        "properties": {
+          "category_ids": {
+            "items": {
+              "maxLength": 128,
+              "minLength": 1,
+              "type": "string"
+            },
+            "title": "Category Ids",
+            "type": "array"
+          },
+          "id": {
+            "maxLength": 128,
+            "minLength": 1,
+            "title": "Id",
+            "type": "string"
+          },
+          "name": {
+            "maxLength": 200,
+            "title": "Name",
+            "type": "string"
+          },
+          "section_ids": {
+            "items": {
+              "maxLength": 128,
+              "minLength": 1,
+              "type": "string"
+            },
+            "title": "Section Ids",
+            "type": "array"
+          }
+        },
+        "required": [
+          "id",
+          "name"
+        ],
+        "title": "EntityCourse",
+        "type": "object"
+      },
+      "EntityInstructor": {
+        "additionalProperties": false,
+        "properties": {
+          "course_ids": {
+            "items": {
+              "maxLength": 128,
+              "minLength": 1,
+              "type": "string"
+            },
+            "title": "Course Ids",
+            "type": "array"
+          },
+          "id": {
+            "maxLength": 128,
+            "minLength": 1,
+            "title": "Id",
+            "type": "string"
+          },
+          "name": {
+            "maxLength": 100,
+            "title": "Name",
+            "type": "string"
+          },
+          "section_ids": {
+            "items": {
+              "maxLength": 128,
+              "minLength": 1,
+              "type": "string"
+            },
+            "title": "Section Ids",
+            "type": "array"
+          }
+        },
+        "required": [
+          "id",
+          "name"
+        ],
+        "title": "EntityInstructor",
+        "type": "object"
+      },
+      "ErrorBody": {
+        "additionalProperties": false,
+        "properties": {
+          "code": {
+            "title": "Code",
+            "type": "string"
+          },
+          "fields": {
+            "items": {
+              "$ref": "#/components/schemas/ErrorField"
+            },
+            "title": "Fields",
+            "type": "array"
+          },
+          "message": {
+            "title": "Message",
+            "type": "string"
+          },
+          "request_id": {
+            "title": "Request Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "code",
+          "message",
+          "request_id"
+        ],
+        "title": "ErrorBody",
+        "type": "object"
+      },
+      "ErrorField": {
+        "additionalProperties": false,
+        "properties": {
+          "path": {
+            "title": "Path",
+            "type": "string"
+          },
+          "reason": {
+            "title": "Reason",
+            "type": "string"
+          }
+        },
+        "required": [
+          "path",
+          "reason"
+        ],
+        "title": "ErrorField",
+        "type": "object"
+      },
+      "ErrorResponse": {
+        "additionalProperties": false,
+        "properties": {
+          "error": {
+            "$ref": "#/components/schemas/ErrorBody"
+          }
+        },
+        "required": [
+          "error"
+        ],
+        "title": "ErrorResponse",
+        "type": "object"
+      },
+      "ExistingConstraintRef": {
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "maxLength": 128,
+            "minLength": 1,
+            "title": "Id",
+            "type": "string"
+          },
+          "label": {
+            "maxLength": 200,
+            "title": "Label",
+            "type": "string"
+          },
+          "type": {
+            "title": "Type",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "type",
+          "label"
+        ],
+        "title": "ExistingConstraintRef",
+        "type": "object"
+      },
+      "Fact": {
+        "additionalProperties": false,
+        "properties": {
+          "fact_id": {
+            "title": "Fact Id",
+            "type": "string"
+          },
+          "payload": {
+            "additionalProperties": true,
+            "title": "Payload",
+            "type": "object"
+          },
+          "type": {
+            "title": "Type",
+            "type": "string"
+          }
+        },
+        "required": [
+          "fact_id",
+          "type",
+          "payload"
+        ],
+        "title": "Fact",
+        "type": "object"
+      },
+      "Instructor": {
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "maxLength": 128,
+            "minLength": 1,
+            "title": "Id",
+            "type": "string"
+          },
+          "name": {
+            "maxLength": 100,
+            "minLength": 1,
+            "title": "Name",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "name"
+        ],
+        "title": "Instructor",
+        "type": "object"
+      },
+      "InstructorAvoid": {
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "maxLength": 128,
+            "minLength": 1,
+            "title": "Id",
+            "type": "string"
+          },
+          "params": {
+            "$ref": "#/components/schemas/InstructorAvoidParams"
+          },
+          "strength": {
+            "enum": [
+              "hard",
+              "soft"
+            ],
+            "title": "Strength",
+            "type": "string"
+          },
+          "type": {
+            "const": "instructor_avoid",
+            "title": "Type",
+            "type": "string"
+          },
+          "weight": {
+            "anyOf": [
+              {
+                "maximum": 10.0,
+                "minimum": 1.0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Weight"
+          }
+        },
+        "required": [
+          "id",
+          "strength",
+          "type",
+          "params"
+        ],
+        "title": "InstructorAvoid",
+        "type": "object"
+      },
+      "InstructorAvoidParams": {
+        "additionalProperties": false,
+        "properties": {
+          "instructor_ids": {
+            "items": {
+              "maxLength": 128,
+              "minLength": 1,
+              "type": "string"
+            },
+            "minItems": 1,
+            "title": "Instructor Ids",
+            "type": "array"
+          }
+        },
+        "required": [
+          "instructor_ids"
+        ],
+        "title": "InstructorAvoidParams",
+        "type": "object"
+      },
+      "MaxDaysOnCampus": {
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "maxLength": 128,
+            "minLength": 1,
+            "title": "Id",
+            "type": "string"
+          },
+          "params": {
+            "$ref": "#/components/schemas/MaxDaysParams"
+          },
+          "strength": {
+            "enum": [
+              "hard",
+              "soft"
+            ],
+            "title": "Strength",
+            "type": "string"
+          },
+          "type": {
+            "const": "max_days_on_campus",
+            "title": "Type",
+            "type": "string"
+          },
+          "weight": {
+            "anyOf": [
+              {
+                "maximum": 10.0,
+                "minimum": 1.0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Weight"
+          }
+        },
+        "required": [
+          "id",
+          "strength",
+          "type",
+          "params"
+        ],
+        "title": "MaxDaysOnCampus",
+        "type": "object"
+      },
+      "MaxDaysParams": {
+        "additionalProperties": false,
+        "properties": {
+          "max_days": {
+            "maximum": 7.0,
+            "minimum": 0.0,
+            "title": "Max Days",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "max_days"
+        ],
+        "title": "MaxDaysParams",
+        "type": "object"
+      },
+      "Meeting": {
+        "additionalProperties": false,
+        "properties": {
+          "campus_required": {
+            "title": "Campus Required",
+            "type": "boolean"
+          },
+          "day": {
+            "enum": [
+              "Mon",
+              "Tue",
+              "Wed",
+              "Thu",
+              "Fri",
+              "Sat",
+              "Sun"
+            ],
+            "title": "Day",
+            "type": "string"
+          },
+          "end_minute": {
+            "maximum": 1440.0,
+            "minimum": 0.0,
+            "title": "End Minute",
+            "type": "integer"
+          },
+          "room": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Room"
+          },
+          "start_minute": {
+            "maximum": 1440.0,
+            "minimum": 0.0,
+            "title": "Start Minute",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "day",
+          "start_minute",
+          "end_minute",
+          "campus_required"
+        ],
+        "title": "Meeting",
+        "type": "object"
+      },
+      "MustExclude": {
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "maxLength": 128,
+            "minLength": 1,
+            "title": "Id",
+            "type": "string"
+          },
+          "params": {
+            "$ref": "#/components/schemas/MustExcludeParams"
+          },
+          "strength": {
+            "enum": [
+              "hard",
+              "soft"
+            ],
+            "title": "Strength",
+            "type": "string"
+          },
+          "type": {
+            "const": "must_exclude",
+            "title": "Type",
+            "type": "string"
+          },
+          "weight": {
+            "anyOf": [
+              {
+                "maximum": 10.0,
+                "minimum": 1.0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Weight"
+          }
+        },
+        "required": [
+          "id",
+          "strength",
+          "type",
+          "params"
+        ],
+        "title": "MustExclude",
+        "type": "object"
+      },
+      "MustExcludeParams": {
+        "additionalProperties": false,
+        "properties": {
+          "course_id": {
+            "maxLength": 128,
+            "minLength": 1,
+            "title": "Course Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "course_id"
+        ],
+        "title": "MustExcludeParams",
+        "type": "object"
+      },
+      "MustInclude": {
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "maxLength": 128,
+            "minLength": 1,
+            "title": "Id",
+            "type": "string"
+          },
+          "params": {
+            "$ref": "#/components/schemas/MustIncludeParams"
+          },
+          "strength": {
+            "enum": [
+              "hard",
+              "soft"
+            ],
+            "title": "Strength",
+            "type": "string"
+          },
+          "type": {
+            "const": "must_include",
+            "title": "Type",
+            "type": "string"
+          },
+          "weight": {
+            "anyOf": [
+              {
+                "maximum": 10.0,
+                "minimum": 1.0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Weight"
+          }
+        },
+        "required": [
+          "id",
+          "strength",
+          "type",
+          "params"
+        ],
+        "title": "MustInclude",
+        "type": "object"
+      },
+      "MustIncludeParams": {
+        "additionalProperties": false,
+        "properties": {
+          "allowed_section_ids": {
+            "anyOf": [
+              {
+                "items": {
+                  "maxLength": 128,
+                  "minLength": 1,
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Allowed Section Ids"
+          },
+          "course_id": {
+            "maxLength": 128,
+            "minLength": 1,
+            "title": "Course Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "course_id"
+        ],
+        "title": "MustIncludeParams",
+        "type": "object"
+      },
+      "ParseEntities": {
+        "additionalProperties": false,
+        "properties": {
+          "category_groups": {
+            "additionalProperties": {
+              "items": {
+                "maxLength": 128,
+                "minLength": 1,
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "title": "Category Groups",
+            "type": "object"
+          },
+          "category_ids": {
+            "items": {
+              "maxLength": 128,
+              "minLength": 1,
+              "type": "string"
+            },
+            "title": "Category Ids",
+            "type": "array"
+          },
+          "courses": {
+            "items": {
+              "$ref": "#/components/schemas/EntityCourse"
+            },
+            "maxItems": 2000,
+            "title": "Courses",
+            "type": "array"
+          },
+          "instructors": {
+            "items": {
+              "$ref": "#/components/schemas/EntityInstructor"
+            },
+            "maxItems": 2000,
+            "title": "Instructors",
+            "type": "array"
+          }
+        },
+        "required": [
+          "courses",
+          "instructors"
+        ],
+        "title": "ParseEntities",
+        "type": "object"
+      },
+      "ParseRequest": {
+        "additionalProperties": false,
+        "properties": {
+          "catalog_revision": {
+            "maxLength": 64,
+            "minLength": 64,
+            "title": "Catalog Revision",
+            "type": "string"
+          },
+          "entities": {
+            "$ref": "#/components/schemas/ParseEntities"
+          },
+          "existing_constraints": {
+            "items": {
+              "$ref": "#/components/schemas/ExistingConstraintRef"
+            },
+            "maxItems": 50,
+            "title": "Existing Constraints",
+            "type": "array"
+          },
+          "input_revision": {
+            "minimum": 0.0,
+            "title": "Input Revision",
+            "type": "integer"
+          },
+          "schema_version": {
+            "const": "1.0",
+            "default": "1.0",
+            "title": "Schema Version",
+            "type": "string"
+          },
+          "text": {
+            "maxLength": 2000,
+            "minLength": 1,
+            "title": "Text",
+            "type": "string"
+          }
+        },
+        "required": [
+          "text",
+          "catalog_revision",
+          "input_revision",
+          "entities"
+        ],
+        "title": "ParseRequest",
+        "type": "object"
+      },
+      "ParseResponse": {
+        "additionalProperties": false,
+        "properties": {
+          "catalog_revision": {
+            "title": "Catalog Revision",
+            "type": "string"
+          },
+          "draft_constraints": {
+            "items": {
+              "$ref": "#/components/schemas/DraftConstraint"
+            },
+            "title": "Draft Constraints",
+            "type": "array"
+          },
+          "input_revision": {
+            "title": "Input Revision",
+            "type": "integer"
+          },
+          "provider_mode": {
+            "enum": [
+              "live",
+              "fixture"
+            ],
+            "title": "Provider Mode",
+            "type": "string"
+          },
+          "questions": {
+            "items": {
+              "$ref": "#/components/schemas/Question"
+            },
+            "title": "Questions",
+            "type": "array"
+          },
+          "request_id": {
+            "title": "Request Id",
+            "type": "string"
+          },
+          "schema_version": {
+            "const": "1.0",
+            "default": "1.0",
+            "title": "Schema Version",
+            "type": "string"
+          },
+          "status": {
+            "enum": [
+              "parsed",
+              "needs_clarification"
+            ],
+            "title": "Status",
+            "type": "string"
+          },
+          "unsupported_requests": {
+            "items": {
+              "$ref": "#/components/schemas/UnsupportedRequest"
+            },
+            "title": "Unsupported Requests",
+            "type": "array"
+          },
+          "warnings": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Warnings",
+            "type": "array"
+          }
+        },
+        "required": [
+          "request_id",
+          "catalog_revision",
+          "input_revision",
+          "status",
+          "draft_constraints",
+          "questions",
+          "unsupported_requests",
+          "warnings",
+          "provider_mode"
+        ],
+        "title": "ParseResponse",
+        "type": "object"
+      },
+      "Question": {
+        "additionalProperties": false,
+        "properties": {
+          "draft_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Draft Id"
+          },
+          "field": {
+            "title": "Field",
+            "type": "string"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "message": {
+            "title": "Message",
+            "type": "string"
+          },
+          "options": {
+            "items": {
+              "$ref": "#/components/schemas/QuestionOption"
+            },
+            "title": "Options",
+            "type": "array"
+          }
+        },
+        "required": [
+          "id",
+          "draft_id",
+          "field",
+          "message",
+          "options"
+        ],
+        "title": "Question",
+        "type": "object"
+      },
+      "QuestionOption": {
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "label": {
+            "title": "Label",
+            "type": "string"
+          },
+          "patch": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Patch"
+          }
+        },
+        "required": [
+          "id",
+          "label"
+        ],
+        "title": "QuestionOption",
+        "type": "object"
+      },
+      "RelaxationProposal": {
+        "additionalProperties": false,
+        "properties": {
+          "base_request_hash": {
+            "title": "Base Request Hash",
+            "type": "string"
+          },
+          "changed_constraint_violations": {
+            "items": {
+              "$ref": "#/components/schemas/ConstraintEvaluation"
+            },
+            "title": "Changed Constraint Violations",
+            "type": "array"
+          },
+          "changed_hard_count": {
+            "title": "Changed Hard Count",
+            "type": "integer"
+          },
+          "changes": {
+            "items": {
+              "$ref": "#/components/schemas/ConstraintChange"
+            },
+            "title": "Changes",
+            "type": "array"
+          },
+          "objective_delta": {
+            "title": "Objective Delta",
+            "type": "null"
+          },
+          "original_soft_penalty": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Original Soft Penalty"
+          },
+          "original_soft_score": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Original Soft Score"
+          },
+          "proposal_id": {
+            "title": "Proposal Id",
+            "type": "string"
+          },
+          "verification_status": {
+            "const": "passed",
+            "title": "Verification Status",
+            "type": "string"
+          },
+          "verified_candidate": {
+            "$ref": "#/components/schemas/Candidate"
+          }
+        },
+        "required": [
+          "proposal_id",
+          "base_request_hash",
+          "changes",
+          "changed_hard_count",
+          "verified_candidate",
+          "original_soft_penalty",
+          "original_soft_score",
+          "changed_constraint_violations",
+          "verification_status"
+        ],
+        "title": "RelaxationProposal",
+        "type": "object"
+      },
+      "RowIssue": {
+        "additionalProperties": false,
+        "properties": {
+          "code": {
+            "title": "Code",
+            "type": "string"
+          },
+          "message": {
+            "title": "Message",
+            "type": "string"
+          },
+          "path": {
+            "title": "Path",
+            "type": "string"
+          }
+        },
+        "required": [
+          "path",
+          "code",
+          "message"
+        ],
+        "title": "RowIssue",
+        "type": "object"
+      },
+      "SearchInfo": {
+        "additionalProperties": false,
+        "properties": {
+          "min_section_distance": {
+            "title": "Min Section Distance",
+            "type": "integer"
+          },
+          "requested_count": {
+            "title": "Requested Count",
+            "type": "integer"
+          },
+          "returned_count": {
+            "title": "Returned Count",
+            "type": "integer"
+          },
+          "termination_reason": {
+            "enum": [
+              "requested_count",
+              "exhausted_under_diversity",
+              "time_limit",
+              "not_started"
+            ],
+            "title": "Termination Reason",
+            "type": "string"
+          }
+        },
+        "required": [
+          "requested_count",
+          "returned_count",
+          "termination_reason",
+          "min_section_distance"
+        ],
+        "title": "SearchInfo",
+        "type": "object"
+      },
+      "Section": {
+        "additionalProperties": false,
+        "properties": {
+          "category_ids": {
+            "anyOf": [
+              {
+                "items": {
+                  "maxLength": 128,
+                  "minLength": 1,
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Category Ids"
+          },
+          "course_id": {
+            "maxLength": 128,
+            "minLength": 1,
+            "title": "Course Id",
+            "type": "string"
+          },
+          "credit_units": {
+            "anyOf": [
+              {
+                "maximum": 3000.0,
+                "minimum": 0.0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Credit Units"
+          },
+          "delivery_mode": {
+            "enum": [
+              "in_person",
+              "online_sync",
+              "online_async"
+            ],
+            "title": "Delivery Mode",
+            "type": "string"
+          },
+          "id": {
+            "maxLength": 128,
+            "minLength": 1,
+            "title": "Id",
+            "type": "string"
+          },
+          "instructor_ids": {
+            "items": {
+              "maxLength": 128,
+              "minLength": 1,
+              "type": "string"
+            },
+            "title": "Instructor Ids",
+            "type": "array"
+          },
+          "issue_codes": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Issue Codes",
+            "type": "array"
+          },
+          "meetings": {
+            "items": {
+              "$ref": "#/components/schemas/Meeting"
+            },
+            "maxItems": 10,
+            "title": "Meetings",
+            "type": "array"
+          },
+          "section_label": {
+            "maxLength": 32,
+            "minLength": 1,
+            "title": "Section Label",
+            "type": "string"
+          },
+          "support_status": {
+            "default": "supported",
+            "enum": [
+              "supported",
+              "unsupported"
+            ],
+            "title": "Support Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "course_id",
+          "section_label",
+          "delivery_mode"
+        ],
+        "title": "Section",
+        "type": "object"
+      },
+      "SolveOptions": {
+        "additionalProperties": false,
+        "properties": {
+          "max_candidates": {
+            "default": 3,
+            "maximum": 5.0,
+            "minimum": 1.0,
+            "title": "Max Candidates",
+            "type": "integer"
+          },
+          "min_section_distance": {
+            "default": 2,
+            "maximum": 20.0,
+            "minimum": 1.0,
+            "title": "Min Section Distance",
+            "type": "integer"
+          },
+          "time_budget_ms": {
+            "default": 3000,
+            "maximum": 8000.0,
+            "minimum": 100.0,
+            "title": "Time Budget Ms",
+            "type": "integer"
+          }
+        },
+        "title": "SolveOptions",
+        "type": "object"
+      },
+      "SolveRequest": {
+        "additionalProperties": false,
+        "properties": {
+          "allowed_section_ids": {
+            "items": {
+              "maxLength": 128,
+              "minLength": 1,
+              "type": "string"
+            },
+            "maxItems": 1000,
+            "title": "Allowed Section Ids",
+            "type": "array"
+          },
+          "catalog": {
+            "$ref": "#/components/schemas/Catalog"
+          },
+          "catalog_revision": {
+            "maxLength": 64,
+            "minLength": 64,
+            "title": "Catalog Revision",
+            "type": "string"
+          },
+          "confirmation": {
+            "$ref": "#/components/schemas/Confirmation"
+          },
+          "constraints": {
+            "items": {
+              "discriminator": {
+                "mapping": {
+                  "category_min": "#/components/schemas/CategoryMin",
+                  "credit_range": "#/components/schemas/CreditRange",
+                  "day_off": "#/components/schemas/DayOff",
+                  "instructor_avoid": "#/components/schemas/InstructorAvoid",
+                  "max_days_on_campus": "#/components/schemas/MaxDaysOnCampus",
+                  "must_exclude": "#/components/schemas/MustExclude",
+                  "must_include": "#/components/schemas/MustInclude",
+                  "time_avoid": "#/components/schemas/TimeAvoid"
+                },
+                "propertyName": "type"
+              },
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/CreditRange"
+                },
+                {
+                  "$ref": "#/components/schemas/MustInclude"
+                },
+                {
+                  "$ref": "#/components/schemas/MustExclude"
+                },
+                {
+                  "$ref": "#/components/schemas/DayOff"
+                },
+                {
+                  "$ref": "#/components/schemas/TimeAvoid"
+                },
+                {
+                  "$ref": "#/components/schemas/CategoryMin"
+                },
+                {
+                  "$ref": "#/components/schemas/InstructorAvoid"
+                },
+                {
+                  "$ref": "#/components/schemas/MaxDaysOnCampus"
+                }
+              ]
+            },
+            "maxItems": 50,
+            "title": "Constraints",
+            "type": "array"
+          },
+          "options": {
+            "$ref": "#/components/schemas/SolveOptions"
+          },
+          "schema_version": {
+            "const": "1.0",
+            "default": "1.0",
+            "title": "Schema Version",
+            "type": "string"
+          }
+        },
+        "required": [
+          "catalog",
+          "catalog_revision",
+          "allowed_section_ids",
+          "constraints",
+          "confirmation"
+        ],
+        "title": "SolveRequest",
+        "type": "object"
+      },
+      "SolveResponse": {
+        "additionalProperties": false,
+        "properties": {
+          "candidates": {
+            "items": {
+              "$ref": "#/components/schemas/Candidate"
+            },
+            "title": "Candidates",
+            "type": "array"
+          },
+          "catalog_revision": {
+            "title": "Catalog Revision",
+            "type": "string"
+          },
+          "input_revision": {
+            "title": "Input Revision",
+            "type": "integer"
+          },
+          "request_hash": {
+            "title": "Request Hash",
+            "type": "string"
+          },
+          "request_id": {
+            "title": "Request Id",
+            "type": "string"
+          },
+          "schema_version": {
+            "const": "1.0",
+            "default": "1.0",
+            "title": "Schema Version",
+            "type": "string"
+          },
+          "search": {
+            "$ref": "#/components/schemas/SearchInfo"
+          },
+          "status": {
+            "enum": [
+              "optimal",
+              "feasible",
+              "infeasible",
+              "unknown"
+            ],
+            "title": "Status",
+            "type": "string"
+          },
+          "timing": {
+            "$ref": "#/components/schemas/Timing"
+          },
+          "warnings": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Warnings",
+            "type": "array"
+          }
+        },
+        "required": [
+          "request_id",
+          "input_revision",
+          "catalog_revision",
+          "request_hash",
+          "status",
+          "candidates",
+          "search",
+          "timing",
+          "warnings"
+        ],
+        "title": "SolveResponse",
+        "type": "object"
+      },
+      "TimeAvoid": {
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "maxLength": 128,
+            "minLength": 1,
+            "title": "Id",
+            "type": "string"
+          },
+          "params": {
+            "$ref": "#/components/schemas/TimeAvoidParams"
+          },
+          "strength": {
+            "enum": [
+              "hard",
+              "soft"
+            ],
+            "title": "Strength",
+            "type": "string"
+          },
+          "type": {
+            "const": "time_avoid",
+            "title": "Type",
+            "type": "string"
+          },
+          "weight": {
+            "anyOf": [
+              {
+                "maximum": 10.0,
+                "minimum": 1.0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Weight"
+          }
+        },
+        "required": [
+          "id",
+          "strength",
+          "type",
+          "params"
+        ],
+        "title": "TimeAvoid",
+        "type": "object"
+      },
+      "TimeAvoidParams": {
+        "additionalProperties": false,
+        "properties": {
+          "days": {
+            "items": {
+              "enum": [
+                "Mon",
+                "Tue",
+                "Wed",
+                "Thu",
+                "Fri",
+                "Sat",
+                "Sun"
+              ],
+              "type": "string"
+            },
+            "maxItems": 7,
+            "minItems": 1,
+            "title": "Days",
+            "type": "array"
+          },
+          "end_minute": {
+            "maximum": 1440.0,
+            "minimum": 0.0,
+            "title": "End Minute",
+            "type": "integer"
+          },
+          "start_minute": {
+            "maximum": 1440.0,
+            "minimum": 0.0,
+            "title": "Start Minute",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "days",
+          "start_minute",
+          "end_minute"
+        ],
+        "title": "TimeAvoidParams",
+        "type": "object"
+      },
+      "Timing": {
+        "additionalProperties": false,
+        "properties": {
+          "first_candidate_ms": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "First Candidate Ms"
+          },
+          "model_build_ms": {
+            "title": "Model Build Ms",
+            "type": "number"
+          },
+          "process_ms": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Process Ms"
+          },
+          "solve_ms": {
+            "title": "Solve Ms",
+            "type": "number"
+          },
+          "total_ms": {
+            "title": "Total Ms",
+            "type": "number"
+          },
+          "validation_ms": {
+            "title": "Validation Ms",
+            "type": "number"
+          }
+        },
+        "required": [
+          "validation_ms",
+          "model_build_ms",
+          "first_candidate_ms",
+          "solve_ms",
+          "total_ms"
+        ],
+        "title": "Timing",
+        "type": "object"
+      },
+      "UnsupportedRequest": {
+        "additionalProperties": false,
+        "properties": {
+          "message": {
+            "title": "Message",
+            "type": "string"
+          },
+          "reason_code": {
+            "title": "Reason Code",
+            "type": "string"
+          },
+          "source_text": {
+            "title": "Source Text",
+            "type": "string"
+          }
+        },
+        "required": [
+          "source_text",
+          "reason_code",
+          "message"
+        ],
+        "title": "UnsupportedRequest",
+        "type": "object"
+      }
+    }
+  },
+  "info": {
+    "title": "TimetableSolver API",
+    "version": "0.1.0"
+  },
+  "openapi": "3.1.0",
+  "paths": {
+    "/api/v1/capabilities": {
+      "get": {
+        "operationId": "capabilities_api_v1_capabilities_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Capabilities"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Bad Request"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "413": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Request Entity Too Large"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Too Many Requests"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Internal Server Error"
+          },
+          "502": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Bad Gateway"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Service Unavailable"
+          },
+          "504": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Gateway Timeout"
+          }
+        },
+        "summary": "Capabilities"
+      }
+    },
+    "/api/v1/catalog/validate": {
+      "post": {
+        "operationId": "catalog_validate_api_v1_catalog_validate_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CatalogValidateRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CatalogValidateResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Bad Request"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "413": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Request Entity Too Large"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Too Many Requests"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Internal Server Error"
+          },
+          "502": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Bad Gateway"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Service Unavailable"
+          },
+          "504": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Gateway Timeout"
+          }
+        },
+        "summary": "Catalog Validate"
+      }
+    },
+    "/api/v1/catalogs": {
+      "get": {
+        "description": "관리자가 변환해 둔 기본 학교 카탈로그 목록(학기·기준일·지원 분반 수·제외 사유).",
+        "operationId": "catalogs_list_api_v1_catalogs_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DefaultCatalogList"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Bad Request"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "413": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Request Entity Too Large"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Too Many Requests"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Internal Server Error"
+          },
+          "502": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Bad Gateway"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Service Unavailable"
+          },
+          "504": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Gateway Timeout"
+          }
+        },
+        "summary": "Catalogs List"
+      }
+    },
+    "/api/v1/catalogs/{catalog_id}": {
+      "get": {
+        "description": "기본 학교 카탈로그 본문. 업로드와 같은 서버 검증을 통과한 것만 내려준다.",
+        "operationId": "catalogs_get_api_v1_catalogs__catalog_id__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "catalog_id",
+            "required": true,
+            "schema": {
+              "title": "Catalog Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DefaultCatalogResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Bad Request"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "413": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Request Entity Too Large"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Too Many Requests"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Internal Server Error"
+          },
+          "502": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Bad Gateway"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Service Unavailable"
+          },
+          "504": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Gateway Timeout"
+          }
+        },
+        "summary": "Catalogs Get"
+      }
+    },
+    "/api/v1/constraints/parse": {
+      "post": {
+        "operationId": "parse_route_api_v1_constraints_parse_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ParseRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ParseResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Bad Request"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "413": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Request Entity Too Large"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Too Many Requests"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Internal Server Error"
+          },
+          "502": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Bad Gateway"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Service Unavailable"
+          },
+          "504": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Gateway Timeout"
+          }
+        },
+        "summary": "Parse Route"
+      }
+    },
+    "/api/v1/diagnose": {
+      "post": {
+        "operationId": "diagnose_route_api_v1_diagnose_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DiagnoseRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DiagnosisResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Bad Request"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "413": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Request Entity Too Large"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Too Many Requests"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Internal Server Error"
+          },
+          "502": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Bad Gateway"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Service Unavailable"
+          },
+          "504": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Gateway Timeout"
+          }
+        },
+        "summary": "Diagnose Route"
+      }
+    },
+    "/api/v1/health": {
+      "get": {
+        "operationId": "health_api_v1_health_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Health Api V1 Health Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Bad Request"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "413": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Request Entity Too Large"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Too Many Requests"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Internal Server Error"
+          },
+          "502": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Bad Gateway"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Service Unavailable"
+          },
+          "504": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Gateway Timeout"
+          }
+        },
+        "summary": "Health"
+      }
+    },
+    "/api/v1/ready": {
+      "get": {
+        "operationId": "ready_api_v1_ready_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Bad Request"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "413": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Request Entity Too Large"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Too Many Requests"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Internal Server Error"
+          },
+          "502": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Bad Gateway"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Service Unavailable"
+          },
+          "504": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Gateway Timeout"
+          }
+        },
+        "summary": "Ready"
+      }
+    },
+    "/api/v1/solve": {
+      "post": {
+        "operationId": "solve_route_api_v1_solve_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SolveRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SolveResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Bad Request"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "413": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Request Entity Too Large"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Too Many Requests"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Internal Server Error"
+          },
+          "502": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Bad Gateway"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Service Unavailable"
+          },
+          "504": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Gateway Timeout"
+          }
+        },
+        "summary": "Solve Route"
+      }
+    }
+  }
+}
