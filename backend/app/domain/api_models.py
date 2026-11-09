@@ -205,3 +205,6 @@ class ExplainRequest(BaseModel):
 class ExplainResponse(BaseModel):
     candidate_explanations: list[str]
     diagnosis_text: str | None = None
+    # per explanation (candidates first, then the diagnosis): "llm" if the LLM rewrite passed
+    # the fact check, "template" otherwise
+    sources: list[Literal["llm", "template"]] = Field(default_factory=list)

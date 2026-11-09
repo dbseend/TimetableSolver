@@ -1,4 +1,4 @@
-import { render, screen } from "@testing-library/react";
+import { render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { MemoryRouter } from "react-router-dom";
 import { beforeEach, describe, expect, it, vi } from "vitest";
@@ -36,6 +36,16 @@ describe("solve flow", () => {
     vi.stubGlobal(
       "fetch",
       vi.fn(async (url: string, init?: RequestInit) => {
+        if (url.endsWith("/explain")) {
+          return {
+            ok: true,
+            json: async () => ({
+              candidate_explanations: ["알파 1로 3학점이다."],
+              diagnosis_text: null,
+              sources: ["llm"],
+            }),
+          };
+        }
         if (url.endsWith("/solve")) {
           const body = JSON.parse(String(init?.body));
           solveBodies.push(body);
@@ -75,6 +85,11 @@ describe("solve flow", () => {
     await user.click(screen.getByRole("button", { name: "이 조건 빼고 다시 풀기" }));
     expect(await screen.findByRole("article", { name: "후보 1" })).toHaveTextContent("3학점");
     expect(solveBodies[1].constraints.map((c) => c.id)).toEqual(["c2"]);
+
+    await user.click(screen.getByRole("button", { name: "설명 보기" }));
+    const card = await screen.findByRole("article", { name: "후보 1" });
+    expect(await within(card).findByText(/알파 1로 3학점이다/)).toBeInTheDocument();
+    expect(card).toHaveTextContent("사실 확인 통과");
   });
 
   it("asks for a catalog before solving", async () => {

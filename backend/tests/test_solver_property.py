@@ -1,7 +1,8 @@
 """Solver vs brute force on random small instances, both graded by the independent validator.
 
-Checks: same feasibility verdict, optimal objective equals the brute-force maximum, every
-candidate passes the validator, and an infeasibility core is infeasible and minimal.
+Checks: same feasibility verdict, optimal objective (priority reward minus weighted soft
+violations, recomputed from validator amounts) equals the brute-force maximum, every candidate
+passes the validator, and an infeasibility core is infeasible and minimal.
 """
 
 import itertools
@@ -13,7 +14,7 @@ from app.core.time_slots import format_hhmm
 from app.domain.api_models import SolveRequest
 from app.domain.constraints import constraint_adapter
 from app.domain.models import Catalog
-from app.solver.model import PRIORITY_SCALE
+from app.solver.model import PRIORITY_SCALE, penalty
 from app.solver.solve import solve
 from app.validation.validator import check
 
@@ -104,8 +105,8 @@ def constraint(ids):
         ),
     }
     return st.sampled_from(sorted(params)).flatmap(
-        lambda t: st.tuples(params[t], st.sampled_from(["hard", "hard", "soft"])).map(
-            lambda ps: {"id": "x", "type": t, "params": ps[0], "strength": ps[1]}
+        lambda t: st.tuples(params[t], st.sampled_from(["hard", "soft"]), st.integers(1, 10)).map(
+            lambda ps: {"id": "x", "type": t, "params": ps[0], "strength": ps[1], "weight": ps[2]}
         )
     )
 
@@ -122,11 +123,14 @@ def brute_force(req: SolveRequest, constraints):
     ]
     best = None
     pool_ids = [p.course_id for p in req.pool]
+    soft = [c for c in constraints if c.strength == "soft"]
     for combo in itertools.product(*options):
         chosen = [sid for sid in combo if sid]
-        if check(cat, chosen, constraints, pool_ids).feasible(constraints):
+        report = check(cat, chosen, constraints, pool_ids)
+        if report.feasible(constraints):
             courses = {sid.split("-")[0] for sid in chosen}
             value = sum(PRIORITY_SCALE * priority.get(c, 3) for c in courses)
+            value -= sum(penalty(c, report.violations.get(c.id, 0)) for c in soft)
             best = value if best is None else max(best, value)
     return best
 

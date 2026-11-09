@@ -792,6 +792,17 @@
               }
             ],
             "title": "Diagnosis Text"
+          },
+          "sources": {
+            "items": {
+              "enum": [
+                "llm",
+                "template"
+              ],
+              "type": "string"
+            },
+            "title": "Sources",
+            "type": "array"
           }
         },
         "required": [
@@ -2110,6 +2121,7 @@
     },
     "/explain": {
       "post": {
+        "description": "Always answers: template text, LLM rewrite only when it passes the fact check.",
         "operationId": "explain_explain_post",
         "requestBody": {
           "content": {

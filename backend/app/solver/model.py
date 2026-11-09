@@ -4,7 +4,9 @@ Always on: at most one section per course, no overlapping meetings (exact minute
 courses (+ must_include targets). Each hard user constraint gets an assumption literal so an
 infeasible request can be explained by a core of constraint ids.
 
-Soft constraints are not encoded yet (D-f); the objective only rewards pool priority.
+Objective = pool priority reward - sum(weight * COST[type] * violation) over soft constraints.
+Each soft violation is encoded to equal the validator's amount for the same timetable, so the
+reported objective can be recomputed independently (tests do, by brute force).
 """
 
 from collections import defaultdict
@@ -19,8 +21,30 @@ from app.domain.constraints import Constraint
 from app.domain.models import Catalog, Profile, Section
 from app.validation.validator import norm_name
 
-PRIORITY_SCALE = 100
-PERIODS = range(0, LAST_PERIOD + 1)
+PRIORITY_SCALE = 1000  # per priority point of a chosen pool course (priority 3 -> 3000)
+# Penalty per unit of violation at weight 1, in the validator's units (see validator docstring).
+# Calibrated so a weight-5 violation of a typical size costs about half a priority-3 course:
+# one 75min class in an avoided window 5*4*75=1500, one class day on a day off 5*300=1500.
+COST = {
+    "credit_range": 100,  # per half-credit
+    "category_min": 100,  # per half-credit
+    "must_include": 600,
+    "must_exclude": 600,
+    "day_off": 300,  # per day
+    "time_avoid": 4,  # per minute
+    "time_prefer": 4,  # per minute
+    "max_gap": 200,  # per period over
+    "max_consecutive": 200,  # per period over
+    "lunch_free": 300,  # per day
+    "max_days_on_campus": 300,  # per day over
+    "instructor_avoid": 300,  # per section
+    "instructor_prefer": 300,
+}
+BIG = 10_000  # loose upper bound for slack variables
+
+
+def penalty(constraint: Constraint, amount: int) -> int:
+    return constraint.weight * COST[constraint.type] * amount
 
 
 def candidate_sections(
@@ -115,6 +139,18 @@ def build(
             m.add(p <= sum(x[sid] for sid in in_period[(day, n)]))
             occ[(day, n)] = p
         return occ[(day, n)]
+
+    def earlier(day: str) -> dict[int, cp_model.IntVar]:
+        """earlier[j] == some class in period j or before on that day."""
+        before = {}
+        for j in range(0, LAST_PERIOD + 1):
+            b = m.new_bool_var(f"before[{day},{j}]")
+            cur, prev = period(day, j), before.get(j - 1, 0)
+            m.add(b >= cur)
+            m.add(b >= prev)
+            m.add(b <= cur + prev)
+            before[j] = b
+        return before
 
     def later(day: str) -> dict[int, cp_model.IntVar]:
         """later[j] == some class in a period after j on that day."""
@@ -215,8 +251,88 @@ def build(
                         m.add(sum(x[sid] for sid in theirs) >= 1).only_enforce_if(a)
     m.add_assumptions(list(built.lits.values()))
 
+    def slack(lower) -> cp_model.IntVar:
+        """max(0, lower) under minimisation pressure."""
+        v = m.new_int_var(0, BIG, "slack")
+        m.add(v >= lower)
+        return v
+
+    def flag(lower) -> cp_model.IntVar:
+        """A 0/1 indicator forced to 1 when `lower` >= 1 (penalised, so otherwise 0)."""
+        z = m.new_bool_var("flag")
+        if not isinstance(lower, int) or lower > 0:
+            m.add(z >= lower)
+        return z
+
+    def violation(c: Constraint):
+        p = c.params
+        match c.type:
+            case "credit_range":
+                return slack(2 * p.min - total2) + slack(total2 - 2 * p.max)
+            case "must_include":
+                return 1 - sum(by_course.get(p.course_id, []))
+            case "must_exclude":
+                return sum(by_course.get(p.course_id, []))
+            case "day_off":
+                return sum(used(d) for d in p.days if on_day[d])
+            case "time_avoid" | "time_prefer":
+                w0, w1 = parse_hhmm(p.start), parse_hhmm(p.end)
+                return sum(
+                    (
+                        _overlap(s, e, w0, w1)
+                        if c.type == "time_avoid"
+                        else e - s - _overlap(s, e, w0, w1)
+                    )
+                    * x[sid]
+                    for d, s, e, sid in blocks
+                    if d in p.days
+                )
+            case "max_gap":  # windows of g+1 empty periods with classes on both sides
+                g = max_gap_periods(p.minutes)
+                total = 0
+                for day in DAYS:
+                    if not on_day[day]:
+                        continue
+                    before, after = earlier(day), later(day)
+                    for j in range(1, LAST_PERIOD - g):
+                        inner = sum(period(day, k) for k in range(j, j + g + 1))
+                        total += flag(before[j - 1] + after[j + g] - inner - 1)
+                return total
+            case "lunch_free":  # days whose window has less than the free minutes
+                w0, w1 = parse_hhmm(p.start), parse_hhmm(p.end)
+                total = 0
+                for day in DAYS:
+                    taken = sum(
+                        _overlap(s, e, w0, w1) * x[sid] for d, s, e, sid in blocks if d == day
+                    )
+                    if not isinstance(taken, int):
+                        z = m.new_bool_var("lunch")
+                        m.add((w1 - w0) * z >= taken - ((w1 - w0) - p.min_free_minutes))
+                        total += z
+                return total
+            case "max_consecutive":  # full windows of r+1 periods = periods over the limit
+                r = max_consecutive_periods(p.minutes)
+                return sum(
+                    flag(sum(period(day, j) for j in range(n, n + r + 1)) - r)
+                    for day in DAYS
+                    for n in range(0, LAST_PERIOD - r + 1)
+                    if on_day[day]
+                )
+            case "max_days_on_campus":
+                return slack(sum(used(d) for d in DAYS if on_day[d]) - p.max_days)
+            case "category_min":
+                got = sum(credit2[sid] * v for sid, v in x.items() if category[sid] == p.category)
+                return slack(2 * p.credits - got)
+            case "instructor_avoid" | "instructor_prefer":
+                theirs = sum(
+                    x[s.id] for s in secs if norm_name(s.instructor) == norm_name(p.instructor)
+                )
+                return theirs if c.type == "instructor_avoid" else flag(1 - theirs)
+
     priority = {p.course_id: p.priority for p in pool}
-    m.maximize(
-        sum(PRIORITY_SCALE * priority.get(cid, 3) * sum(vs) for cid, vs in by_course.items())
+    reward = sum(PRIORITY_SCALE * priority.get(cid, 3) * sum(vs) for cid, vs in by_course.items())
+    penalties = sum(
+        c.weight * COST[c.type] * violation(c) for c in constraints if c.strength == "soft"
     )
+    m.maximize(reward - penalties)
     return built

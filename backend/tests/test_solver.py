@@ -182,7 +182,7 @@ def test_relaxations_report_which_drop_helps_and_its_cost():
     assert r.status == "INFEASIBLE" and sorted(r.diagnosis.core) == ["c1", "c2"]
     relax = {x.drop: x for x in r.diagnosis.relaxations}
     assert relax["c2"].feasible and relax["c2"].objective_delta == 0  # all three still fit
-    assert relax["c1"].feasible and relax["c1"].objective_delta == -900  # Monday-only courses lost
+    assert relax["c1"].feasible and relax["c1"].objective_delta == -9000  # Monday courses lost
 
 
 def test_solve_endpoint_returns_candidates():

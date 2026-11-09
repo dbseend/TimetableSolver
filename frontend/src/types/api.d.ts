@@ -47,7 +47,10 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** Explain */
+        /**
+         * Explain
+         * @description Always answers: template text, LLM rewrite only when it passes the fact check.
+         */
         post: operations["explain_explain_post"];
         delete?: never;
         options?: never;
@@ -358,6 +361,8 @@ export interface components {
             candidate_explanations: string[];
             /** Diagnosis Text */
             diagnosis_text?: string | null;
+            /** Sources */
+            sources?: ("llm" | "template")[];
         };
         /** HealthResponse */
         HealthResponse: {

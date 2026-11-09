@@ -21,11 +21,13 @@ EMPTY_RESULT = {
 STUB_REQUESTS = {
     "/catalog/validate": {"courses": [], "sections": []},
     "/profile/parse": {"consent": True, "rows": []},
-    "/explain": {
-        "catalog": {"courses": [], "sections": []},
-        "result": EMPTY_RESULT,
-    },
 }
+
+
+def test_explain_answers_without_llm():
+    body = {"catalog": {"courses": [], "sections": []}, "result": EMPTY_RESULT}
+    r = client.post("/explain", json=body)
+    assert r.status_code == 200 and r.json()["candidate_explanations"] == []
 
 
 def test_openapi_exposes_the_contract():

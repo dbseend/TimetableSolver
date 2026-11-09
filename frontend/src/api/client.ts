@@ -10,6 +10,7 @@ export type SolveResult = S["SolveResult"];
 export type Constraint = NonNullable<SolveRequest["constraints"]>[number];
 export type ParseRequest = S["ConstraintsParseRequest"];
 export type ParseResponse = S["ConstraintsParseResponse"];
+export type ExplainResponse = S["ExplainResponse"];
 
 /** Error with the API's machine-readable code (e.g. llm_disabled). */
 export class ApiError extends Error {
@@ -51,3 +52,6 @@ export const postSolve = (body: SolveRequest, signal?: AbortSignal) =>
 
 export const postParse = (body: ParseRequest, signal?: AbortSignal) =>
   post<ParseResponse>("/constraints/parse", body, signal);
+
+export const postExplain = (body: S["ExplainRequest"], signal?: AbortSignal) =>
+  post<ExplainResponse>("/explain", body, signal);

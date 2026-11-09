@@ -1,5 +1,12 @@
 import { useState } from "react";
-import { postSolve, type Catalog, type Constraint, type SolveResult } from "../api/client";
+import {
+  postExplain,
+  postSolve,
+  type Catalog,
+  type Constraint,
+  type ExplainResponse,
+  type SolveResult,
+} from "../api/client";
 import TimetableGrid, { blocksFor } from "../components/TimetableGrid";
 import { summarize } from "../constraints";
 import { useSession } from "../state";
@@ -24,6 +31,7 @@ export default function Results() {
   const { catalog, pool, constraintsText, setConstraintsText, result, setResult } = useSession();
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [explanation, setExplanation] = useState<ExplainResponse | null>(null);
   const parsed = parseConstraints(constraintsText);
   const constraints = ("value" in parsed ? parsed.value : []) as Constraint[];
   const byId = new Map(constraints.map((c) => [c.id, c]));
@@ -42,6 +50,7 @@ export default function Results() {
     if (!catalog) return;
     setBusy(true);
     setError(null);
+    setExplanation(null);
     try {
       setResult(await postSolve({ catalog, pool, constraints: list, n: 3, diversity_k: 1 }));
     } catch (e) {
@@ -51,6 +60,21 @@ export default function Results() {
       setBusy(false);
     }
   }
+
+  async function explain() {
+    if (!catalog || !result) return;
+    setBusy(true);
+    try {
+      setExplanation(await postExplain({ catalog, constraints, result }));
+    } catch (e) {
+      setError((e as Error).message);
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  const sources = explanation?.sources ?? [];
+  const note = (i: number) => (sources[i] === "llm" ? "AI가 다듬은 설명 (사실 확인 통과)" : "자동 요약");
 
   function dropAndRerun(id: string) {
     const rest = constraints.filter((c) => c.id !== id);
@@ -74,12 +98,18 @@ export default function Results() {
         <>
           <p>
             <strong>{STATUS[result.status]}</strong> · 후보 {result.candidates?.length ?? 0}개 · 대상 분반{" "}
-            {result.stats.n_sections_after_filter}개 · {result.stats.solve_ms}ms
+            {result.stats.n_sections_after_filter}개 · {result.stats.solve_ms}ms{" "}
+            <button onClick={explain} disabled={busy}>
+              설명 보기
+            </button>
           </p>
 
           {result.diagnosis && (
             <div role="region" aria-label="진단" style={{ border: "1px solid #f28b82", padding: 12, borderRadius: 6 }}>
               <h3 style={{ marginTop: 0 }}>함께 만족할 수 없는 조건</h3>
+              {explanation?.diagnosis_text && (
+                <p title={note(sources.length - 1)}>{explanation.diagnosis_text}</p>
+              )}
               <ul>
                 {result.diagnosis.core.map((id) => (
                   <li key={id}>{describe(byId.get(id), id)}</li>
@@ -115,6 +145,12 @@ export default function Results() {
               <h3>
                 후보 {i + 1} · {totalCredits(catalog, c.sections)}학점 · {c.sections.length}개 분반
               </h3>
+              {explanation?.candidate_explanations[i] && (
+                <p>
+                  {explanation.candidate_explanations[i]}{" "}
+                  <small style={{ color: "#666" }}>({note(i)})</small>
+                </p>
+              )}
               <TimetableGrid blocks={blocksFor(catalog, c.sections)} />
               {c.violated.length > 0 && (
                 <p>
