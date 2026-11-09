@@ -1,4 +1,5 @@
 from functools import lru_cache
+from typing import Literal
 
 from pydantic import Field, SecretStr, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
@@ -19,7 +20,7 @@ class Settings(BaseSettings):
     daily_llm_call_limit: int = Field(default=200, ge=0)
 
     # LLM (server-side only; never expose to the client)
-    llm_provider: str = "gemini"
+    llm_provider: Literal["gemini", "none"] = "gemini"
     llm_model: str | None = None
     llm_api_key: SecretStr | None = None
 
@@ -34,6 +35,16 @@ class Settings(BaseSettings):
     @classmethod
     def _empty_key_to_none(cls, v: object) -> object:
         return None if isinstance(v, str) and not v.strip() else v
+
+    @field_validator("llm_provider", mode="before")
+    @classmethod
+    def _normalize_provider(cls, v: object) -> object:
+        return v.strip().lower() if isinstance(v, str) else v
+
+    @property
+    def llm_enabled(self) -> bool:
+        """LLM features need a provider and a key; the server starts either way."""
+        return self.llm_provider != "none" and self.llm_api_key is not None
 
     @property
     def origins(self) -> list[str]:
