@@ -7,6 +7,7 @@ from __future__ import annotations
 
 import os
 
+from app.application.instructor_sections import resolve_must_include
 from app.contracts import (
     DAYS,
     SUPPORTED_CONSTRAINT_TYPES,
@@ -86,14 +87,19 @@ REASON_MSG = {
     "INVALID_VALUE": "해석 결과 값이 허용 범위를 벗어나 거절했습니다.",
     "UNSUPPORTED_TYPE": "지원하지 않는 조건 유형입니다.",
     "P1_NOT_IMPLEMENTED": "이번 MVP에서 구현하지 않은 조건 유형입니다.",
+    "SECTION_INSTRUCTOR_MISMATCH": "해석 결과의 분반이 요청한 교수의 분반이 아니라 거절했습니다.",
 }
 
 
 def build_response(req: ParseRequest, out: ProviderOutput, mode: str, request_id: str) -> ParseResponse:
     drafts, unsupported = [], [UnsupportedRequest(**u) for u in out.unsupported]
     rejected: set[str] = set()
+    extra_questions: list[dict] = []
     for d in out.drafts:
-        reason = _check_draft(d, req)
+        # 교수+과목 요구는 서버 매핑으로 분반 제한을 만들고 검증한다(누락·모호하면 질문).
+        reason, qs = resolve_must_include(d, req)
+        extra_questions += qs
+        reason = reason or _check_draft(d, req)
         if reason:
             rejected.add(d["draft_id"])
             unsupported.append(UnsupportedRequest(source_text=d.get("source_text", ""), reason_code=reason, message=REASON_MSG[reason]))
@@ -106,7 +112,7 @@ def build_response(req: ParseRequest, out: ProviderOutput, mode: str, request_id
         if d.get("strength") is None and d.get("action") != "delete" and "strength" not in unresolved:
             unresolved.append("strength")
         drafts.append(DraftConstraint(**{**d, "unresolved_fields": unresolved}))
-    questions = [Question(**q) for q in out.questions if q.get("draft_id") not in rejected]
+    questions = [Question(**q) for q in [*out.questions, *extra_questions] if q.get("draft_id") not in rejected]
     needs = bool(questions) or any(d.unresolved_fields for d in drafts)
     return ParseResponse(
         request_id=request_id,

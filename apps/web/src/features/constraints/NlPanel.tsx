@@ -3,6 +3,7 @@ import type { Catalog, Constraint, DraftConstraint } from "../../lib/types";
 import type { NlState } from "../../app/state";
 import { Alert, Badge, Button, Icon } from "../../ui";
 import { applyPatch, describe, draftToConstraint, isResolved, STRENGTH_LABEL, SUPPORTED_TYPES, TYPE_LABEL } from "./model";
+import { FieldEditor, isEditable } from "./FieldEditor";
 
 /** 예시는 현재 지원하는 조건만. 누르면 입력창만 채운다(API 자동 호출 없음). */
 const EXAMPLES = ["15~18학점으로, 금요일은 가능하면 비워 주세요.", "주 4일만 등교하고 싶어요.", "오후 6시 이후 수업은 피하고 싶어요."];
@@ -108,6 +109,9 @@ export function NlPanel({ catalog, nl, parseMode, constraints, onParse, onDrafts
             const target = d.action === "delete" ? constraints.find((c) => c.id === d.target_constraint_id) : null;
             const resolved = isResolved(d);
             const qs = questionsFor(d);
+            // 선택지 질문이 다루지 않는 빈 값은 그 자리에서 입력·선택(조건을 버리고 다시 쓰지 않아도 됨)
+            const covered = new Set(qs.filter((q) => q.options.length).flatMap((q) => (q.field === "params.time_window" ? ["params.start_minute", "params.end_minute"] : [q.field])));
+            const editable = d.action === "add" ? d.unresolved_fields.filter((f) => isEditable(f) && !covered.has(f)) : [];
             return (
               <div key={d.draft_id} className={`draft ${resolved ? "" : "pending"}`} data-testid={`draft-${d.draft_id}`}>
                 <div className="row between">
@@ -142,7 +146,7 @@ export function NlPanel({ catalog, nl, parseMode, constraints, onParse, onDrafts
                 {qs.map((q) => (
                   <div key={q.id} className="question" data-testid={`question-${q.id}`}>
                     <p>{q.message}</p>
-                    {q.options.length === 0 && <p className="xs muted">선택지가 없는 질문입니다. 값이 비어 있으면 이 초안을 버리고 ‘직접 조건 추가’로 입력하세요.</p>}
+                    {q.options.length === 0 && <p className="xs muted">선택지가 없는 질문입니다. 아래에서 빈 값을 직접 정하거나 이 초안을 버리세요.</p>}
                     <div className="row">
                       {q.options.map((o) => (
                         <button key={o.id} type="button" className="option" onClick={() => replace(d, applyPatch(d, q.field, o.patch))}>
@@ -152,7 +156,14 @@ export function NlPanel({ catalog, nl, parseMode, constraints, onParse, onDrafts
                     </div>
                   </div>
                 ))}
-                {!resolved && !qs.length && <p className="xs warn" style={{ marginTop: 8 }}>비어 있는 값이 있어 추가할 수 없어요. 버리고 직접 입력해 주세요.</p>}
+                {editable.map((f) => (
+                  <FieldEditor key={f} catalog={catalog} draft={d} field={f as never} onApply={(value) => replace(d, applyPatch(d, f, { [f]: value }))} />
+                ))}
+                {!resolved && !qs.length && !editable.length && (
+                  <p className="xs warn" style={{ marginTop: 8 }}>
+                    확인할 값이 남아 있어 추가할 수 없어요. 버리고 ‘직접 조건 추가’로 입력해 주세요.
+                  </p>
+                )}
                 <div className="row" style={{ marginTop: 12 }}>
                   <Button
                     size="sm"

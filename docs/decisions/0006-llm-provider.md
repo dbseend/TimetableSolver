@@ -41,6 +41,8 @@ body: {
   (2026-11-09 수정: 이전에는 null 키를 지워 미해결 초안이 해결된 것처럼 보였다. 회귀 테스트 `test_gemini_null_required_param_stays_unresolved`).
 - 카탈로그에 없는 ID, 범위 밖 값, 미지원 type은 초안을 거절하고 `unsupported_requests`에 이유와 함께 드러낸다.
 - 모델의 자유 질문은 선택지 없는 질문(`field="free"`)으로 전달하고 UI가 그대로 보여 준다.
+- (2026-11-09) 보내는 엔티티는 문장 관련 후보로 축소한다(`app/llm/entities.py`). 교수에는 `course_ids`와 `section_ids`를 함께 보낸다.
+- (2026-11-09) 교수+과목 요구: 모델은 `must_include.instructor_ids`를 주고, 분반 제한은 서버가 엔티티 매핑으로 계산·검증한다(`app/application/instructor_sections.py`). 누락·동명이인·담당 분반 없음은 질문으로 돌린다.
 
 ## 전송 데이터
 

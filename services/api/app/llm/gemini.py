@@ -36,6 +36,8 @@ lunch_free, max_gap, max_consecutive, time_prefer, instructor_prefer는 이번 �
 명시적 희망 표현(가능하면/되도록/좋겠)은 soft, 명시적 의무·금지(반드시/무조건/절대/필수/꼭) 또는 수치 하한/상한은 hard를 제안하라.
 같은 요구의 강도 단서가 모순되면 질문하라. 나머지는 soft를 기본으로 하라.
 '아침', '9시 수업', '전공', '교수 A 과목'처럼 모호하면 후보와 질문을 제공하라.
+특정 교수의 특정 과목 요구는 must_include에 course_id와 그 교수의 instructor_ids를 함께 넣어라. 분반은 서버가 계산하니 allowed_section_ids는 비워 두어도 된다.
+교수 요구를 생략하고 과목만 반환하지 마라.
 학점은 credit_units=학점×100, 시간은 자정부터 정수 분이다. 요일은 Mon..Sun.
 실행 가능한 확정은 사용자 확인 단계가 담당한다."""
 
@@ -88,7 +90,7 @@ RESPONSE_SCHEMA = {
 # 누락·null인 키는 null로 유지해 build_response가 미해결로 표시하게 한다(키를 지워 '해결됨'으로 보이게 하지 않음).
 PARAM_KEYS: dict[str, tuple[str, ...]] = {
     "credit_range": ("min_units", "max_units"),
-    "must_include": ("course_id", "allowed_section_ids"),
+    "must_include": ("course_id", "allowed_section_ids", "instructor_ids"),  # instructor_ids는 서버가 분반으로 변환
     "must_exclude": ("course_id",),
     "day_off": ("days",),
     "time_avoid": ("days", "start_minute", "end_minute"),
@@ -111,7 +113,8 @@ class GeminiProvider:
         courses, instructors, narrowed = select_entities(req)
         entities = {
             "courses": [{"id": c.id, "name": c.name, "category_ids": c.category_ids} for c in courses],
-            "instructors": [{"id": i.id, "name": i.name, "course_ids": i.course_ids} for i in instructors],
+            # 교수–과목–분반 연결(축소된 후보에만, 작은 목록)
+            "instructors": [{"id": i.id, "name": i.name, "course_ids": i.course_ids, "section_ids": i.section_ids} for i in instructors],
             "note": "문장과 관련된 후보만 보냈다. 목록에 없으면 null과 질문을 반환하라." if narrowed else "전체 목록",
             "category_groups": req.entities.category_groups,
             "existing_constraints": [c.model_dump() for c in req.existing_constraints],
