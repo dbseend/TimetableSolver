@@ -15,8 +15,9 @@ async function loadDemo(page: Page) {
   await expect(page.getByTestId("catalog-status")).toContainText("demo-campus-2026-2");
 }
 
+/** 주요 버튼 하나: 확인할 조건이 없으면 '이 조건으로 시간표 만들기'(현재 조건 확정 + 생성) */
 async function confirmAndSolve(page: Page) {
-  await page.getByTestId("confirm").click();
+  await expect(page.getByTestId("solve")).toHaveText("이 조건으로 시간표 만들기");
   await page.getByTestId("solve").click();
 }
 
@@ -28,10 +29,14 @@ async function addManual(page: Page, type: string, strength: "hard" | "soft", fi
   await page.getByTestId("cadd").click();
 }
 
-test("샘플 → 수동 조건 → 확인 → 실제 /solve → 그리드·후보 비교", async ({ page }) => {
+test("샘플 → 수동 조건만 → 요약 확인 후 버튼 한 번으로 생성 → 그리드·후보 비교", async ({ page }) => {
+  const solves: string[] = [];
+  page.on("request", (r) => r.url().endsWith("/api/v1/solve") && solves.push(r.url()));
   await loadDemo(page);
-  // 확인 전에는 생성 불가
-  await expect(page.getByTestId("solve")).toBeDisabled();
+  // 자연어 단계 없이도 바로 생성 가능. 버튼을 누르기 전에는 /solve 요청 없음, 요약에 기본 제안값 표시
+  await expect(page.getByTestId("final-summary")).toContainText("총 15~18학점");
+  await expect(page.getByTestId("final-summary")).toContainText("기본 제안값");
+  expect(solves).toEqual([]);
   await addManual(page, "day_off", "hard", async (p) => {
     await p.getByTestId("cdays").getByLabel("금").check();
   });
@@ -49,10 +54,12 @@ test("샘플 → 수동 조건 → 확인 → 실제 /solve → 그리드·후�
   const credits = await page.getByTestId("compare").locator("tr", { hasText: "학점" }).first().locator("td").allTextContents();
   for (const c of credits) expect(Number(c)).toBeGreaterThanOrEqual(15);
 
-  // 조건 변경 → 확인 무효화 → 결과 초기화
+  expect(solves).toHaveLength(1);
+  // 조건 변경 → 이전 확인·결과 무효화(결과 지워짐) → 다시 버튼을 눌러야 생성
   await addManual(page, "max_days_on_campus", "soft", async () => {});
-  await expect(page.getByTestId("solve")).toBeDisabled();
   await expect(page.getByTestId("results")).toHaveCount(0);
+  await expect(page.getByTestId("solve")).toHaveText("이 조건으로 시간표 만들기");
+  expect(solves).toHaveLength(1);
 });
 
 test("불가능 → 진단 → 검증된 단일 수정안 미리보기 → 확인 후 적용 → 재풀이", async ({ page }) => {
@@ -80,30 +87,37 @@ test("불가능 → 진단 → 검증된 단일 수정안 미리보기 → 확�
   await expect(page.getByTestId("constraint-list")).toContainText(/가능하면|학점/);
 });
 
-test("데모 자연어 해석 → 질문/칩 → 미지원 제외 확인 → 확인 → 생성", async ({ page }) => {
+test("데모 자연어: 완전한 조건은 바로 반영, 확인할 조건(질문·미지원)만 버튼 위에서 처리 → 생성", async ({ page }) => {
   const bodies = captureBodies(page);
+  const solves: string[] = [];
+  page.on("request", (r) => r.url().endsWith("/api/v1/solve") && solves.push(r.url()));
   await loadDemo(page);
   await expect(page.getByTestId("demo-badge")).toBeVisible();
   await page.getByTestId("nl-input").fill("금요일은 공강이면 좋겠어, 운영체제는 꼭 들어야 해, 아침 수업은 싫어, 점심시간은 꼭 비워줘");
   await page.getByTestId("nl-parse").click();
-  await expect(page.getByTestId("nl-result")).toBeVisible();
-  await expect(page.getByTestId("nl-unsupported")).toContainText("점심");
-  // 미처리 해석이 있으면 확인 불가
-  await expect(page.getByTestId("confirm")).toBeDisabled();
-
-  const drafts = page.locator("[data-testid^=draft-]");
-  const count = await drafts.count();
-  expect(count).toBeGreaterThanOrEqual(3);
-  // '아침' 질문: 시간대 선택 전에는 추가 불가
-  const morning = drafts.filter({ hasText: "아침" });
-  await expect(morning.locator("[data-testid^=accept-]")).toBeDisabled();
-  await morning.getByRole("button", { name: /09:00 이전/ }).click();
-  await expect(morning.locator("[data-testid^=accept-]")).toBeEnabled();
-  // 모두 추가
-  while ((await drafts.count()) > 0) await drafts.first().locator("[data-testid^=accept-]").click();
-  await page.getByTestId("ack-0").click();
+  await expect(page.getByTestId("nl-result")).toContainText("반영 2개");
+  // 완전한 해석(금요일 공강·운영체제)은 바로 '반영 완료'
   await expect(page.getByTestId("constraint-list")).toContainText("운영체제");
   await expect(page.getByTestId("constraint-list")).toContainText("금요일 공강");
+  // 확인할 조건 2개: '아침'(시간대 질문) + '점심'(미지원)
+  await expect(page.getByTestId("review-count")).toContainText("확인할 조건 2개");
+  await expect(page.getByTestId("solve")).toHaveText("조건 2개 확인하기");
+  await page.getByTestId("solve").click(); // 첫 항목으로 이동(생성 요청 없음)
+  expect(solves).toEqual([]);
+  const first = page.getByTestId("review-item-0");
+  await expect(first).toContainText("아침");
+  await expect(first.locator("input").first()).toBeFocused();
+  await first.getByLabel(/09:00 이전/).check();
+  await first.getByTestId("ri0-apply").click();
+  await expect(page.getByTestId("review-done")).toContainText("반영 완료");
+  // 남은 하나는 미지원(점심) — 명시적으로 제외하기 전에는 생성 불가
+  await expect(page.getByTestId("review-count")).toContainText("확인할 조건 1개");
+  const lunch = page.getByTestId("review-item-0");
+  await expect(lunch).toContainText("점심");
+  await expect(lunch).toContainText("지원하지 않는 조건");
+  await lunch.getByTestId("ri0-exclude").click();
+  await expect(page.getByTestId("excluded-list")).toContainText("점심");
+  await expect(page.getByTestId("constraint-list")).toContainText("09:00와 겹치는 수업 피하기");
   await confirmAndSolve(page);
   await expect(page.getByTestId("results")).toBeVisible({ timeout: 30_000 });
   await expect(page.getByTestId("selected-sections")).toContainText("운영체제");
@@ -209,24 +223,30 @@ test("포털 HTML(.xls, CP949) 합성 파일 → 형식 인식·요일별 교시
   await expect(page.getByTestId("catalog-status")).toContainText("미지원 2");
 });
 
-test("조건 변경 후 늦게 도착한 /solve 응답은 무시하고, 계산 중 상태를 정직하게 표시", async ({ page }) => {
+test("조건 변경 후 늦게 도착한 /solve 응답은 무시, 중복 클릭은 요청 1번, 계산 중 상태 표시", async ({ page }) => {
   await loadDemo(page);
   let release!: () => void;
   const gate = new Promise<void>((r) => (release = r));
+  let solveCalls = 0;
   await page.route("**/api/v1/solve", async (route) => {
+    solveCalls += 1;
     await gate; // 응답을 붙잡아 둔다
     await route.continue();
   });
-  await confirmAndSolve(page);
+  await expect(page.getByTestId("solve")).toHaveText("이 조건으로 시간표 만들기");
+  await page.getByTestId("solve").dblclick(); // 빠른 중복 클릭
   await expect(page.getByText("시간표를 계산하고 있어요")).toBeVisible();
+  await expect(page.getByTestId("solve")).toBeDisabled();
+  expect(solveCalls).toBe(1);
   // 계산 중 조건 변경 → revision 증가, 확인 무효화
   await addManual(page, "max_days_on_campus", "soft", async () => {});
   release();
   await page.waitForResponse("**/api/v1/solve");
   await page.waitForTimeout(300);
   await expect(page.getByTestId("results")).toHaveCount(0); // 오래된 응답은 반영하지 않음
-  await expect(page.getByTestId("solve")).toBeDisabled();
-  await expect(page.getByTestId("confirm")).toBeEnabled();
+  await expect(page.getByTestId("solve")).toBeEnabled(); // 바뀐 조건으로 다시 만들 수 있음
+  await expect(page.getByTestId("solve")).toHaveText("이 조건으로 시간표 만들기");
+  expect(solveCalls).toBe(1);
 });
 
 test("네트워크 오류는 계산 실패로 표시(불가능과 구분)", async ({ page }) => {
@@ -269,19 +289,21 @@ test("내 전공 최소 학점: 과목 확인 전에는 차단, 확인한 과목
     await p.getByTestId("constraint-form").getByLabel("전선", { exact: true }).check();
     await p.getByTestId("cmin").fill("3");
   });
-  await expect(page.getByTestId("confirm-reason")).toContainText("내 전공 과목을 확인");
-  await expect(page.getByTestId("confirm")).toBeDisabled();
-  // 내 전공 과목 확인
-  await page.getByTestId("major-open").click();
+  // 확인할 조건으로 바로 안내: 내 전공 과목 확인 또는 이 조건 제외
+  const item = page.getByTestId("review-item-0");
+  await expect(item).toContainText("내 전공 과목을 확인");
+  await expect(page.getByTestId("solve")).toHaveText("조건 1개 확인하기");
+  await item.getByTestId("ri0-open-major").click(); // 내 전공 패널을 열어 줌
   await page.getByTestId("major-panel").getByLabel("가상학부 주간").check();
   await expect(page.getByTestId("major-candidates")).toContainText("합성과목 가");
   await expect(page.getByTestId("major-apply")).toBeDisabled(); // 확인 체크 전
   await page.getByTestId("major-confirm").check();
   await page.getByTestId("major-apply").click();
   await expect(page.getByTestId("major-panel")).toContainText("확인됨");
-  // 전선을 직접 쓴 조건은 여전히 차단 → 지우고 '내 전공' 그룹으로 다시 추가
-  await expect(page.getByTestId("confirm-reason")).toContainText("학부와 관계없이");
-  await page.getByTestId("constraint-list").getByLabel(/삭제: 전선/).click();
+  // 전선을 직접 쓴 조건은 여전히 확인 필요 → '이 조건 제외'로 지우고 '내 전공' 그룹으로 다시 추가
+  await expect(page.getByTestId("review-item-0")).toContainText("학부와 관계없이");
+  await page.getByTestId("review-item-0").getByTestId("ri0-exclude").click();
+  await expect(page.getByTestId("constraint-list")).not.toContainText("전선 합계");
   await addManual(page, "category_min", "hard", async (p) => {
     await p.getByRole("button", { name: /그룹 '내 전공' 선택/ }).click();
     await p.getByTestId("cmin").fill("3");

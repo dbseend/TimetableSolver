@@ -51,9 +51,15 @@ export function IconButton({ icon, label, variant = "ghost", ...rest }: ButtonHT
   );
 }
 
-export function Card({ children, className, tight, ...rest }: { children: ReactNode; className?: string; tight?: boolean } & React.HTMLAttributes<HTMLElement>) {
+export function Card({
+  children,
+  className,
+  tight,
+  ref,
+  ...rest
+}: { children: ReactNode; className?: string; tight?: boolean; ref?: React.Ref<HTMLElement> } & React.HTMLAttributes<HTMLElement>) {
   return (
-    <section {...rest} className={["card", tight && "tight", className].filter(Boolean).join(" ")}>
+    <section {...rest} ref={ref} className={["card", tight && "tight", className].filter(Boolean).join(" ")}>
       {children}
     </section>
   );

@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import type { LoadedCatalog } from "../../app/state";
 import { fmtCredits } from "../../lib/time";
 import { Alert, Badge, Button, Card } from "../../ui";
@@ -25,6 +25,19 @@ export function MajorPanel({
   const c = loaded.catalog;
   const orgsAll = useMemo(() => [...new Set(Object.values(loaded.courseOrgs))].sort(), [loaded.courseOrgs]);
   const [open, setOpen] = useState(false);
+  const panelRef = useRef<HTMLElement>(null);
+  // '확인할 조건'의 '내 전공 과목 정하기' 버튼에서 열고 이동
+  useEffect(() => {
+    const h = () => {
+      setOpen(true);
+      requestAnimationFrame(() => {
+        panelRef.current?.scrollIntoView({ block: "start", behavior: "smooth" });
+        panelRef.current?.querySelector<HTMLElement>("input, button")?.focus({ preventScroll: true });
+      });
+    };
+    window.addEventListener("open-major-panel", h);
+    return () => window.removeEventListener("open-major-panel", h);
+  }, []);
   const [orgs, setOrgs] = useState<string[]>([]);
   const [types, setTypes] = useState<string[]>(loaded.majorTypeCategories);
   const [unchecked, setUnchecked] = useState<Set<string>>(new Set());
@@ -36,7 +49,7 @@ export function MajorPanel({
   if (!loaded.majorTypeCategories.length && !loaded.major) return null;
 
   return (
-    <Card tight aria-labelledby="major-h" data-testid="major-panel">
+    <Card tight aria-labelledby="major-h" data-testid="major-panel" ref={panelRef}>
       <div className="row between">
         <h3 id="major-h">내 전공 학점 기준</h3>
         {loaded.major ? <Badge tone="success">✓ 과목 {loaded.major.courseIds.length}개 확인됨</Badge> : <Badge tone="warning">미확인</Badge>}

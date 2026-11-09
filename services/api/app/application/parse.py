@@ -8,6 +8,7 @@ from __future__ import annotations
 import os
 
 from app.application.instructor_sections import resolve_must_include
+from app.application.normalize import merge_split_credit_ranges
 from app.contracts import (
     DAYS,
     SUPPORTED_CONSTRAINT_TYPES,
@@ -95,6 +96,9 @@ def build_response(req: ParseRequest, out: ProviderOutput, mode: str, request_id
     drafts, unsupported = [], [UnsupportedRequest(**u) for u in out.unsupported]
     rejected: set[str] = set()
     extra_questions: list[dict] = []
+    # 같은 요청에서 하한만·상한만으로 쪼개진 총학점 범위를 하나로(의미가 명확할 때만)
+    norm_drafts, norm_questions, norm_warnings = merge_split_credit_ranges(list(out.drafts), list(out.questions))
+    out = ProviderOutput(drafts=norm_drafts, questions=norm_questions, unsupported=out.unsupported, warnings=[*out.warnings, *norm_warnings])
     for d in out.drafts:
         # 교수+과목 요구는 서버 매핑으로 분반 제한을 만들고 검증한다(누락·모호하면 질문).
         reason, qs = resolve_must_include(d, req)

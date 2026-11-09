@@ -49,7 +49,7 @@ describe("revision / confirmation state", () => {
     expect(reducer(s0, { type: "solve_done", forRevision: s0.revision, response: fake }).solve.phase).toBe("done");
   });
   it("unacknowledged unsupported requests block confirmation", () => {
-    const resp = { draft_constraints: [], unsupported_requests: [{ source_text: "점심", reason_code: "P1", message: "" }] } as never;
+    const resp = { draft_constraints: [], questions: [], warnings: [], unsupported_requests: [{ source_text: "점심", reason_code: "P1", message: "" }] } as never;
     let s = reducer(initialState, { type: "nl_done", forRevision: 1, response: resp });
     expect(pendingNlCount(s.nl)).toBe(1);
     s = reducer(s, { type: "nl_ack", index: 0 });

@@ -5,6 +5,8 @@ import { creditToUnits, parseHHMM } from "../../lib/time";
 import { allCategoryIds } from "../../lib/catalog";
 import { Badge, Button, IconButton } from "../../ui";
 import { describe, STRENGTH_LABEL, SUPPORTED_TYPES, TYPE_LABEL } from "./model";
+import { DraftForm } from "../review/DraftForm";
+import type { ConstraintMeta } from "../review/review";
 
 type NewConstraint = Omit<Constraint, "id">;
 
@@ -23,54 +25,115 @@ function WeightSelect({ value, onChange, id }: { value: number; onChange: (w: nu
   );
 }
 
-/** 문장형 조건 카드 목록. 강도·중요도 변경과 삭제는 모두 revision을 올리고 확인을 무효화한다(상위 reducer). */
+const EDIT_FIELDS: Record<ConstraintType, string[]> = {
+  credit_range: ["params.min_units", "params.max_units"],
+  must_include: ["params.course_id"],
+  must_exclude: ["params.course_id"],
+  day_off: ["params.days"],
+  time_avoid: ["params.days", "params.start_minute", "params.end_minute"],
+  category_min: ["params.category_ids", "params.min_units"],
+  instructor_avoid: ["params.instructor_ids"],
+  max_days_on_campus: ["params.max_days"],
+};
+
+/**
+ * 하나의 조건 목록: '반영 완료' 조건(그 자리에서 수정·삭제)과 '지원하지 않아 제외한 요구'.
+ * '확인 필요' 조건은 생성 버튼 바로 위 '확인할 조건'에 있다. 변경하면 이전 결과는 지워지고 다시 만들어야 한다(상위 reducer).
+ */
 export function ConstraintList({
   constraints,
   catalog,
+  meta,
+  excluded,
   onRemove,
   onReplace,
 }: {
   constraints: Constraint[];
   catalog: Catalog | null;
+  meta?: Record<string, ConstraintMeta>;
+  excluded?: { source_text: string; message: string }[];
   onRemove: (id: string) => void;
   onReplace: (c: Constraint) => void;
 }) {
-  if (!constraints.length) return <p className="small muted">아직 조건이 없어요. 학점 범위는 꼭 하나 필요합니다.</p>;
+  const [editing, setEditing] = useState<string | null>(null);
+  if (!constraints.length && !excluded?.length) return <p className="small muted">아직 조건이 없어요. 총 학점 범위는 꼭 하나 필요합니다.</p>;
   return (
-    <ul className="ccards" data-testid="constraint-list">
-      {constraints.map((c) => {
-        const sentence = describe(c, catalog);
-        return (
-          <li key={c.id} className={`ccard ${c.strength}`} data-testid={`constraint-${c.id}`}>
-            <div className="top">
-              <div className="sentence">
-                <div className="kind">{TYPE_LABEL[c.type]}</div>
-                {sentence}
+    <>
+      <ul className="ccards" data-testid="constraint-list">
+        {constraints.map((c) => {
+          const sentence = describe(c, catalog);
+          const m = meta?.[c.id];
+          return (
+            <li key={c.id} className={`ccard ${c.strength}`} data-testid={`constraint-${c.id}`}>
+              <div className="top">
+                <div className="sentence">
+                  <div className="kind">
+                    <span className="ok">✓ 반영 완료</span> · {TYPE_LABEL[c.type]}
+                    {m?.origin === "nl" && m.source_text && <> · 문장 “{m.source_text}”에서</>}
+                    {m?.suggested && <span className="badge warning" style={{ marginLeft: 4 }}>기본 제안값</span>}
+                  </div>
+                  {sentence}
+                </div>
+                <div className="actions">
+                  {catalog && (
+                    <IconButton icon="edit" label={`수정: ${sentence}`} onClick={() => setEditing(editing === c.id ? null : c.id)} aria-expanded={editing === c.id} />
+                  )}
+                  <IconButton icon="trash" label={`삭제: ${sentence}`} variant="danger-ghost" onClick={() => onRemove(c.id)} />
+                </div>
               </div>
-              <div className="actions">
-                <IconButton icon="trash" label={`삭제: ${sentence}`} variant="danger-ghost" onClick={() => onRemove(c.id)} />
-              </div>
-            </div>
-            <div className="foot">
-              <div className="row" role="group" aria-label="지키는 정도">
-                {(["hard", "soft"] as const).map((s) => (
-                  <button
-                    key={s}
-                    type="button"
-                    className="toggle"
-                    aria-pressed={c.strength === s}
-                    onClick={() => c.strength !== s && onReplace({ ...c, strength: s, weight: s === "soft" ? 5 : null } as Constraint)}
-                  >
-                    {STRENGTH_LABEL[s]}
-                  </button>
-                ))}
-              </div>
-              {c.strength === "soft" && <WeightSelect id={`w-${c.id}`} value={c.weight ?? 5} onChange={(w) => onReplace({ ...c, weight: w } as Constraint)} />}
-            </div>
-          </li>
-        );
-      })}
-    </ul>
+              {editing === c.id && catalog ? (
+                <div style={{ marginTop: 10 }} data-testid={`edit-${c.id}`}>
+                  <DraftForm
+                    catalog={catalog}
+                    draft={{ draft_id: c.id, type: c.type, strength: c.strength, weight: c.weight ?? null, params: c.params as Record<string, unknown>, source_text: m?.source_text ?? "", unresolved_fields: [], action: "add", target_constraint_id: null }}
+                    fields={EDIT_FIELDS[c.type]}
+                    editAll
+                    submitLabel="수정 반영"
+                    testIdPrefix={`edit-${c.id}`}
+                    onSubmit={(d) => {
+                      const params = { ...(d.params as Record<string, unknown>) };
+                      if (c.type === "must_include" && params.course_id !== (c.params as { course_id: string }).course_id) params.allowed_section_ids = null;
+                      onReplace({ ...c, strength: d.strength!, weight: d.strength === "soft" ? (d.weight ?? 5) : null, params } as Constraint);
+                      setEditing(null);
+                    }}
+                    onCancel={() => setEditing(null)}
+                  />
+                </div>
+              ) : (
+                <div className="foot">
+                  <div className="row" role="group" aria-label="지키는 정도">
+                    {(["hard", "soft"] as const).map((s) => (
+                      <button
+                        key={s}
+                        type="button"
+                        className="toggle"
+                        aria-pressed={c.strength === s}
+                        onClick={() => c.strength !== s && onReplace({ ...c, strength: s, weight: s === "soft" ? 5 : null } as Constraint)}
+                      >
+                        {STRENGTH_LABEL[s]}
+                      </button>
+                    ))}
+                  </div>
+                  {c.strength === "soft" && <WeightSelect id={`w-${c.id}`} value={c.weight ?? 5} onChange={(w) => onReplace({ ...c, weight: w } as Constraint)} />}
+                </div>
+              )}
+            </li>
+          );
+        })}
+      </ul>
+      {!!excluded?.length && (
+        <ul className="ccards" data-testid="excluded-list" style={{ marginTop: 8 }}>
+          {excluded.map((u, i) => (
+            <li key={i} className="ccard" style={{ borderStyle: "dashed" }}>
+              <div className="kind">지원하지 않는 조건 · 제외됨</div>
+              <span className="small">
+                “{u.source_text}” — {u.message}
+              </span>
+            </li>
+          ))}
+        </ul>
+      )}
+    </>
   );
 }
 

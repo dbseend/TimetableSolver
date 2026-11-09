@@ -28,7 +28,7 @@ test("새 접속: 학기·기준일·지원/제외 분반 표시 → 업로드 �
   await page.getByTestId("cmin").fill("3");
   await page.getByTestId("cmax").fill("4");
   await page.getByTestId("cadd").click();
-  await page.getByTestId("confirm").click();
+  await expect(page.getByTestId("solve")).toHaveText("이 조건으로 시간표 만들기");
   await page.getByTestId("solve").click();
   await expect(page.getByTestId("results")).toBeVisible({ timeout: 30_000 });
   await expect(page.getByTestId("compare")).toContainText("검증 통과");

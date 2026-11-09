@@ -6,15 +6,17 @@ import { CatalogPanel, DataSummary } from "../features/catalog/CatalogPanel";
 import { ProfilePanel } from "../features/profile/ProfilePanel";
 import { computeEligibility } from "../features/profile/eligibility";
 import { type ProfileEntry, rematchProfile } from "../features/profile/transcript";
-import { ConfirmBadge, ConstraintForm, ConstraintList } from "../features/constraints/ConstraintEditor";
+import { ConstraintForm, ConstraintList } from "../features/constraints/ConstraintEditor";
 import { NlPanel } from "../features/constraints/NlPanel";
-import { buildEntities, describe, hardCreditRangeProblem } from "../features/constraints/model";
+import { buildEntities, describe } from "../features/constraints/model";
+import { ReviewPanel } from "../features/review/ReviewPanel";
+import { reviewItems } from "../features/review/review";
 import { ResultsPanel } from "../features/timetable/ResultsPanel";
 import { DiagnosisPanel } from "../features/diagnostics/DiagnosisPanel";
 import { Alert, Badge, Button, Card, Icon, Segmented, Spinner } from "../ui";
-import { initialState, pendingNlCount, reducer } from "./state";
+import { initialState, reducer, type State } from "./state";
 import { MajorPanel } from "../features/major/MajorPanel";
-import { applyMajor, clearMajor, constraintsUsingMyMajor, majorConstraintProblem } from "../features/major/major";
+import { applyMajor, clearMajor, constraintsUsingMyMajor } from "../features/major/major";
 
 const PROFILE_KEY = "profile.v1";
 
@@ -24,6 +26,23 @@ function errText(e: unknown): string {
     return `${e.message}${f} [${e.code}${e.status ? ` · HTTP ${e.status}` : ""}]`;
   }
   return "알 수 없는 오류가 발생했습니다.";
+}
+
+function reviewItemsOf(st: State) {
+  return reviewItems({
+    constraints: st.constraints,
+    pending: st.nl.drafts,
+    unsupported: st.nl.unsupported,
+    majorTypeCategories: st.loaded?.majorTypeCategories ?? [],
+    major: st.loaded?.major ?? null,
+  });
+}
+
+function focusFirstReview() {
+  const el = document.querySelector<HTMLElement>('[data-review-index="0"]');
+  if (!el) return;
+  el.scrollIntoView({ block: "center", behavior: "smooth" });
+  (el.querySelector<HTMLElement>("input, select, textarea, button") ?? el).focus({ preventScroll: true });
 }
 
 export function App() {
@@ -50,13 +69,11 @@ export function App() {
 
   const catalog = s.loaded?.catalog ?? null;
   const eligibility = useMemo(() => (catalog ? computeEligibility(catalog, s.profile) : { allowed: [], excluded: [] }), [catalog, s.profile]);
-  const pending = pendingNlCount(s.nl);
-  const creditProblem = hardCreditRangeProblem(s.constraints);
-  const confirmed = s.confirmedRevision === s.revision;
-  const majorProblem = s.loaded ? majorConstraintProblem(s.constraints, s.loaded.majorTypeCategories, s.loaded.major) : null;
-  const confirmBlock = !catalog
-    ? "먼저 강좌 데이터를 준비하세요."
-    : (creditProblem ?? majorProblem ?? (pending > 0 ? `자연어 해석 결과 ${pending}건을 추가·버리기·제외 확인으로 정리해 주세요.` : null));
+  const items = reviewItemsOf(s);
+  // 최신 렌더 상태(클릭 시점 스냅샷용). 상태 갱신 직후 이전 값을 읽지 않도록 이벤트에서 ref로 읽는다.
+  const stateRef = useRef(s);
+  stateRef.current = s;
+  const inFlight = useRef(false);
   const solving = s.solve.phase === "solving";
 
   async function onCatalogLoaded(l: NonNullable<typeof s.loaded>) {
@@ -104,19 +121,32 @@ export function App() {
     };
   }
 
-  async function runSolve(constraints = s.constraints, revision = s.revision) {
+  async function runSolve(constraints = s.constraints, revision = s.revision, allowed = eligibility.allowed) {
     solveAbort.current?.abort();
     const ac = new AbortController();
     solveAbort.current = ac;
+    inFlight.current = true;
     dispatch({ type: "solve_start" });
     setTab("results");
     try {
-      const res = await api.solve(buildRequest(constraints, revision), ac.signal);
+      const res = await api.solve({ ...buildRequest(constraints, revision), allowed_section_ids: allowed }, ac.signal);
       dispatch({ type: "solve_done", forRevision: res.input_revision, response: res });
     } catch (e) {
       if ((e as Error).name === "AbortError") return;
       dispatch({ type: "solve_error", forRevision: revision, error: errText(e) });
+    } finally {
+      if (solveAbort.current === ac) inFlight.current = false;
     }
+  }
+
+  /** '이 조건으로 시간표 만들기': 클릭 시점 상태 스냅샷을 다시 검사하고, 그 스냅샷으로 확정·생성 요청을 보낸다. */
+  function generate() {
+    const cur = stateRef.current;
+    if (inFlight.current || cur.solve.phase === "solving" || !cur.loaded) return; // 중복 요청 방지
+    if (reviewItemsOf(cur).length) return; // 확인할 조건이 남으면 /solve를 부르지 않는다
+    const allowed = computeEligibility(cur.loaded.catalog, cur.profile).allowed;
+    dispatch({ type: "confirm" }); // 이 revision의 조건을 사용자가 확정
+    void runSolve(cur.constraints, cur.revision, allowed);
   }
 
   async function runDiagnose() {
@@ -269,26 +299,17 @@ export function App() {
             onClearAll={clearAll}
           />
           <Card tight aria-labelledby="cons-h">
-            <NlPanel
-              catalog={cat}
-              nl={s.nl}
-              parseMode={parseMode}
-              constraints={s.constraints}
-              onParse={runParse}
-              onDrafts={(drafts) => dispatch({ type: "nl_drafts", drafts })}
-              onAck={(index) => dispatch({ type: "nl_ack", index })}
-              onAccept={(constraint) => dispatch({ type: "constraint_add", constraint })}
-              onDeleteConstraint={(id) => dispatch({ type: "constraint_remove", id })}
-              onClear={() => dispatch({ type: "nl_clear" })}
-            />
+            <NlPanel nl={s.nl} parseMode={parseMode} onParse={runParse} onGoReview={() => focusFirstReview()} />
             <hr className="divider" />
             <div className="row between" style={{ marginBottom: 12 }}>
-              <h3 id="cons-h">내 조건 {s.constraints.length}개</h3>
-              <ConfirmBadge confirmed={confirmed} />
+              <h3 id="cons-h">내 조건 · 반영 완료 {s.constraints.length}개</h3>
+              {items.length > 0 && <span className="badge warning">확인 필요 {items.length}개 · 아래에서</span>}
             </div>
             <ConstraintList
               constraints={s.constraints}
               catalog={cat}
+              meta={s.meta}
+              excluded={s.nl.unsupported.filter((u) => u.excluded)}
               onRemove={(id) => dispatch({ type: "constraint_remove", id })}
               onReplace={(constraint) => dispatch({ type: "constraint_replace", constraint })}
             />
@@ -301,30 +322,33 @@ export function App() {
               </div>
             </details>
           </Card>
-          <div className="action-bar">
-            <Card tight>
-              <div className="stack">
-                <p className="small muted">
-                  수강 가능 분반 <b className="num">{eligibility.allowed.length}</b>개 · {confirmed ? "조건 확인 완료" : "조건 확인 전"}
-                </p>
-                {eligibility.allowed.length === 0 && <p className="reason">수강 가능 분반이 0개라 결과는 불가능이 됩니다.</p>}
-                {confirmBlock && (
-                  <p className="reason" data-testid="confirm-reason">
-                    <Icon name="info" /> {confirmBlock}
-                  </p>
-                )}
-                {!confirmBlock && !confirmed && <p className="small muted">조건이 바뀌면 다시 확인해야 시간표를 만들 수 있어요.</p>}
-                <div className="row">
-                  <Button variant={confirmed ? "secondary" : "primary"} onClick={() => dispatch({ type: "confirm" })} disabled={!!confirmBlock || confirmed} data-testid="confirm">
-                    {confirmed ? "✓ 확인 완료" : "조건 확인하기"}
-                  </Button>
-                  <Button onClick={() => runSolve()} disabled={!confirmed || !!confirmBlock || solving} data-testid="solve">
-                    {solving ? "계산 중…" : "시간표 만들기"}
-                  </Button>
-                </div>
-              </div>
-            </Card>
-          </div>
+          <Card tight aria-label="시간표 만들기" data-testid="action-card">
+            <div className="stack">
+              <p className="small muted">
+                수강 가능 분반 <b className="num">{eligibility.allowed.length}</b>개
+              </p>
+              {eligibility.allowed.length === 0 && <p className="reason">수강 가능 분반이 0개라 결과는 불가능이 됩니다.</p>}
+              <ReviewPanel
+                catalog={cat}
+                items={items}
+                constraints={s.constraints}
+                meta={s.meta}
+                generating={solving}
+                blockedReason={null}
+                onGenerate={generate}
+                handlers={{
+                  applyDraft: (draftId, draft) => dispatch({ type: "review_apply", draftId, draft }),
+                  discardDraft: (draftId) => dispatch({ type: "review_discard", draftId }),
+                  resolveConflict: (draftId, mode, params) => dispatch({ type: "conflict_resolve", draftId, mode, params }),
+                  excludeUnsupported: (index) => dispatch({ type: "nl_ack", index }),
+                  addConstraint: (constraint) => dispatch({ type: "constraint_add", constraint }),
+                  replaceConstraint: (constraint) => dispatch({ type: "constraint_replace", constraint }),
+                  removeConstraints: (ids) => ids.forEach((id) => dispatch({ type: "constraint_remove", id })),
+                  openMajor: () => window.dispatchEvent(new CustomEvent("open-major-panel")),
+                }}
+              />
+            </div>
+          </Card>
         </aside>
 
         <main className="main" aria-label="시간표 결과">
@@ -333,7 +357,28 @@ export function App() {
             {s.solve.phase === "idle" && !resp && (
               <div className="empty" data-testid="results-empty">
                 <h3>아직 만든 시간표가 없어요</h3>
-                <p className="small">왼쪽에서 조건을 확인하고 ‘시간표 만들기’를 누르면 여기에 후보가 나와요.</p>
+                {items.length > 0 ? (
+                  <>
+                    <p className="small">
+                      확인할 조건이 <b>{items.length}개</b> 남았어요. 확인을 마치면 ‘이 조건으로 시간표 만들기’로 바로 만들 수 있어요.
+                    </p>
+                    <div style={{ marginTop: 12 }}>
+                      <Button
+                        variant="secondary"
+                        size="sm"
+                        onClick={() => {
+                          setTab("conditions");
+                          requestAnimationFrame(() => focusFirstReview());
+                        }}
+                        data-testid="empty-go-review"
+                      >
+                        확인할 조건으로 이동
+                      </Button>
+                    </div>
+                  </>
+                ) : (
+                  <p className="small">조건 요약을 확인하고 ‘이 조건으로 시간표 만들기’를 누르면 여기에 후보가 나와요.</p>
+                )}
               </div>
             )}
             {solving && (
