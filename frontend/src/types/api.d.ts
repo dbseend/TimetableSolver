@@ -636,7 +636,10 @@ export interface components {
             drop: string;
             /** Feasible */
             feasible: boolean;
-            /** Objective Delta */
+            /**
+             * Objective Delta
+             * @description Best objective without `drop` minus the best objective with no hard user constraints at all (<= 0; 0 = dropping it costs nothing). None when still infeasible.
+             */
             objective_delta?: number | null;
         };
         /** RowError */

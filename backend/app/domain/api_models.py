@@ -159,7 +159,11 @@ class Candidate(BaseModel):
 class Relaxation(BaseModel):
     drop: str
     feasible: bool
-    objective_delta: int | None = None
+    objective_delta: int | None = Field(
+        default=None,
+        description="Best objective without `drop` minus the best objective with no hard user "
+        "constraints at all (<= 0; 0 = dropping it costs nothing). None when still infeasible.",
+    )
 
 
 class Diagnosis(BaseModel):

@@ -7,6 +7,7 @@ from ortools.sat.python import cp_model
 from app.domain.api_models import (
     Candidate,
     Diagnosis,
+    Relaxation,
     SolveRequest,
     SolveResult,
     SolveStats,
@@ -14,6 +15,8 @@ from app.domain.api_models import (
 )
 from app.solver.model import build
 from app.validation.validator import check
+
+MAX_RELAX = 5
 
 _STATUS = {
     cp_model.OPTIMAL: "OPTIMAL",
@@ -43,7 +46,8 @@ def solve(req: SolveRequest, time_limit_s: float) -> SolveResult:
         if i == 0:
             status = _STATUS[code]
         if code == cp_model.INFEASIBLE and i == 0:
-            diagnosis = Diagnosis(core=_core(built, max(remaining, 0.1)))
+            core = _core(built, max(remaining, 0.1))
+            diagnosis = Diagnosis(core=core, relaxations=_relaxations(built, core, deadline))
         if code not in (cp_model.OPTIMAL, cp_model.FEASIBLE):
             break
         chosen = sorted(sid for sid, v in built.x.items() if solver.value(v))
@@ -94,6 +98,31 @@ def _core(built, time_limit_s: float) -> list[str]:
     model.add_assumptions(all_lits)
     by_index = {lit.index: cid for cid, lit in built.lits.items()}
     return [by_index[lit.index] for lit in core]
+
+
+def _best(built, lits, deadline: float) -> int | None:
+    built.model.clear_assumptions()
+    built.model.add_assumptions(lits)
+    solver = cp_model.CpSolver()
+    solver.parameters.max_time_in_seconds = max(deadline - time.perf_counter(), 0.01)
+    code = solver.solve(built.model)
+    ok = code in (cp_model.OPTIMAL, cp_model.FEASIBLE)
+    return round(solver.objective_value) if ok else None
+
+
+def _relaxations(built, core: list[str], deadline: float) -> list[Relaxation]:
+    """Drop each core constraint alone and re-solve (D21). Skipped for large cores."""
+    if not core or len(core) > MAX_RELAX:
+        return []
+    baseline = _best(built, [], deadline)  # no hard user constraints: always feasible
+    out = []
+    for cid in core:
+        best = _best(built, [lit for k, lit in built.lits.items() if k != cid], deadline)
+        delta = None if best is None or baseline is None else best - baseline
+        out.append(Relaxation(drop=cid, feasible=best is not None, objective_delta=delta))
+    built.model.clear_assumptions()
+    built.model.add_assumptions(list(built.lits.values()))
+    return out
 
 
 def _candidate(req: SolveRequest, chosen: list[str], pool_ids: list[str], objective: int):

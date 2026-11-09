@@ -170,3 +170,31 @@ def test_real_catalog_smoke():
         time_limit_s=5,
     )
     assert r.status in ("OPTIMAL", "FEASIBLE") and r.stats.solve_ms < 2000
+
+
+def test_relaxations_report_which_drop_helps_and_its_cost():
+    rules = [
+        hard("c1", "must_include", course_id="A"),
+        hard("c2", "day_off", days=["Mon"]),
+        hard("c3", "credit_range", min=0, max=9),
+    ]
+    r = run(MON, MON_S, rules)
+    assert r.status == "INFEASIBLE" and sorted(r.diagnosis.core) == ["c1", "c2"]
+    relax = {x.drop: x for x in r.diagnosis.relaxations}
+    assert relax["c2"].feasible and relax["c2"].objective_delta == 0  # all three still fit
+    assert relax["c1"].feasible and relax["c1"].objective_delta == -900  # Monday-only courses lost
+
+
+def test_solve_endpoint_returns_candidates():
+    from fastapi.testclient import TestClient
+
+    from app.main import app
+
+    body = {
+        "catalog": {"courses": MON, "sections": MON_S},
+        "pool": [{"course_id": "A"}, {"course_id": "B"}],
+        "time_limit_s": 999,  # capped by SOLVER_TIME_LIMIT_S
+    }
+    r = TestClient(app).post("/solve", json=body)
+    assert r.status_code == 200
+    assert r.json()["candidates"][0]["sections"] == ["A-01", "B-01"]

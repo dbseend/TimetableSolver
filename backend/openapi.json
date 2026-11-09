@@ -1470,6 +1470,7 @@
                 "type": "null"
               }
             ],
+            "description": "Best objective without `drop` minus the best objective with no hard user constraints at all (<= 0; 0 = dropping it costs nothing). None when still infeasible.",
             "title": "Objective Delta"
           }
         },

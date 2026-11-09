@@ -8,7 +8,7 @@
 | POST | /catalog/validate | 501 | 카탈로그 검증, 행 단위 오류 |
 | POST | /profile/parse | 501 | 이수내역 LLM 폴백 파싱. `consent: true` 필수, 최소 컬럼 |
 | POST | /constraints/parse | 501 | 자연어 → 제약 JSON. 길이 > `MAX_INPUT_CHARS` → 422 `input_too_long` |
-| POST | /solve | 501 | 후보 N개, 진단. 제약 id 중복 불가 |
+| POST | /solve | 동작 | 후보 N개, 불가능 시 최소 충돌 집합 + 완화안. 제약 id 중복 불가. 시간 제한은 `SOLVER_TIME_LIMIT_S`로 상한 |
 | POST | /explain | 501 | 결과 설명. 요청에 catalog + constraints + result 포함 |
 
 ## 오류 코드
