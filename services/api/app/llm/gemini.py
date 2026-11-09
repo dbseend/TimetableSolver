@@ -5,7 +5,7 @@
   headers: x-goog-api-key, Api-Revision: 2026-05-20
   body: {model, input, system_instruction(string), response_format:{type:"text", mime_type:"application/json", schema}}
   응답: status == "completed", steps[] 중 type=="model_output" 의 content[].text
-모델 ID는 LLM_MODEL 환경 변수로만 주입한다(하드코딩 금지). **실제 키로 호출 검증은 아직 하지 않았다.**
+모델 ID는 LLM_MODEL 환경 변수로만 주입한다(하드코딩 금지). 2026-11-09 실제 키로 live 호출 검증(docs/decisions/0006-llm-provider.md).
 사용자 원문·응답 원문을 로그에 남기지 않는다.
 """
 
@@ -80,6 +80,20 @@ RESPONSE_SCHEMA = {
         },
     },
     "required": ["drafts", "unsupported"],
+}
+
+
+# type별 params 키. 모델은 스키마의 모든 키를 null로 채워 보낼 수 있으므로 해당 type 키만 남기고,
+# 누락·null인 키는 null로 유지해 build_response가 미해결로 표시하게 한다(키를 지워 '해결됨'으로 보이게 하지 않음).
+PARAM_KEYS: dict[str, tuple[str, ...]] = {
+    "credit_range": ("min_units", "max_units"),
+    "must_include": ("course_id", "allowed_section_ids"),
+    "must_exclude": ("course_id",),
+    "day_off": ("days",),
+    "time_avoid": ("days", "start_minute", "end_minute"),
+    "category_min": ("category_ids", "min_units"),
+    "instructor_avoid": ("instructor_ids",),
+    "max_days_on_campus": ("max_days",),
 }
 
 
@@ -164,7 +178,12 @@ class GeminiProvider:
         for i, d in enumerate(data["drafts"]):
             if not isinstance(d, dict):
                 raise ProviderError("BAD_RESPONSE")
-            params = {k: v for k, v in (d.get("params") or {}).items() if v is not None}
+            raw_params = d.get("params") or {}
+            if not isinstance(raw_params, dict):
+                raise ProviderError("BAD_RESPONSE")
+            keys = PARAM_KEYS.get(str(d.get("type", "")))
+            # 알 수 없는 type은 값 있는 키만 넘겨 build_response가 미지원으로 거절하게 한다.
+            params = {k: raw_params.get(k) for k in keys} if keys else {k: v for k, v in raw_params.items() if v is not None}
             draft = {
                 "draft_id": f"d{i + 1}",
                 "type": d.get("type", ""),

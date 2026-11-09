@@ -49,5 +49,7 @@
 - 의존성은 호환 버전 확인 후 lockfile에 고정한다.
 
 ## 명령
-아직 구현 전이다. 단계1에서 실제 동작하는 dev/test/typecheck/build 명령을
-README에 작성하고 이 절에 간단히 갱신한다. 존재하지 않는 명령을 실행했다고 보고하지 않는다.
+자세한 내용은 README. 존재하지 않는 명령을 실행했다고 보고하지 않는다.
+- 백엔드(`services/api`): `uv run uvicorn app.main:app --host 127.0.0.1 --port 8000`, `uv run pytest -q`, `uv run ruff check .`
+- 프론트(`apps/web`): `npm run dev`, `npm test`, `npm run typecheck`, `npm run build`, `npm run e2e`
+- 계약 재생성: `uv run python scripts/export_openapi.py` 후 `npm run gen:api`

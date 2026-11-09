@@ -231,3 +231,31 @@ def test_gemini_request_shape_and_success():
     assert seen["headers"]["x-goog-api-key"] == "test-key"
     assert seen["body"]["model"] == "model-from-env"
     assert seen["body"]["response_format"]["mime_type"] == "application/json"
+
+
+def _gem_text(drafts):
+    text = json.dumps({"drafts": drafts, "unsupported": []})
+    return lambda r: httpx.Response(200, json={"status": "completed", "steps": [{"type": "model_output", "content": [{"type": "text", "text": text}]}]})
+
+
+def test_gemini_null_required_param_stays_unresolved():
+    """live 모델이 필수 값을 null로 주면 초안은 미해결이어야 한다(조용히 키를 지워 '해결됨'으로 보이면 안 됨)."""
+    drafts = [
+        {
+            "type": "must_include",
+            "action": "add",
+            "strength": "hard",
+            "source_text": "그 과목 꼭",
+            "params": {"course_id": None, "allowed_section_ids": None, "days": None, "min_units": None},
+            "question": "어느 과목인가요?",
+        },
+        {"type": "time_avoid", "action": "add", "strength": "soft", "source_text": "아침 싫어", "params": {"days": ["Mon"]}},
+    ]
+    r = req()
+    resp = build_response(r, gem(_gem_text(drafts)).parse(r), "live", "rid")
+    inc, avoid = resp.draft_constraints
+    assert inc.params == {"course_id": None, "allowed_section_ids": None}  # 해당 type 키만, 필수 키는 null 유지
+    assert "params.course_id" in inc.unresolved_fields
+    assert set(avoid.unresolved_fields) >= {"params.start_minute", "params.end_minute"}  # 누락된 필수 키
+    assert resp.status == "needs_clarification"
+    assert resp.questions[0].message == "어느 과목인가요?"

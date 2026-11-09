@@ -17,3 +17,7 @@ apps/web/playwright-report/
 # OS
 .DS_Store
 Thumbs.db
+
+# 실제 학교 자료(커밋 금지)
+local-data/
+*.tsbuildinfo
