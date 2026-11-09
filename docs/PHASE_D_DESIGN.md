@@ -51,7 +51,7 @@
 ### DD4. hard는 assumption literal, 기본 제약은 항상
 - 항상: 과목당 ≤1분반, 시간 충돌 없음, 풀 밖 과목 0.
 - 사용자 hard 제약마다 `a_i`를 만들고 `only_enforce_if(a_i)` + `add_assumptions`.
-- 진단(INFEASIBLE): `num_workers=1`로 다시 풀어 `sufficient_assumptions_for_infeasibility()` → `Diagnosis.core`. 최소성은 보장하지 않음(충분 집합).
+- 진단(INFEASIBLE): `num_workers=1`로 다시 풀어 `sufficient_assumptions_for_infeasibility()`로 충분 집합을 얻고, 구성원을 하나씩 빼 보는 deletion filter로 **최소 집합**까지 줄인다(풀이가 ms 단위라 가능). → `Diagnosis.core`.
 - 완화안(D21): core의 각 제약을 하나씩 끄고 재풀이 → `Relaxation{drop, feasible, objective_delta}`. core 크기 ≤ 5일 때만, 전체 시간 제한 안에서.
 
 ### DD5. 목적함수 스케일
@@ -107,13 +107,12 @@ top-N 순차 풀이. 해 `S*`마다 `Σ_{s∈S*} x_s ≤ |S*| − k` (`diversity
 
 ```
 backend/app/
+  core/periods.py     # 교시 규칙(로더·솔버·검증기 공용)
   solver/
-    prepare.py        # 풀·필터·분반별 상수(학점×2, 교시 점유, 창 겹침 분) 계산
-    model.py          # CP-SAT 변수·기본 제약·목적함수 조립
-    constraints/      # 타입별 1파일: encode_hard(ctx, c, lit), encode_soft(ctx, c) -> 항
-    solve.py          # top-N, 진단, 완화안, SolveResult 조립
+    model.py          # 후보 분반 필터 + CP-SAT 변수·기본 제약·hard 13종·목적함수 (구현됨)
+    solve.py          # top-N, 최소 core 진단, SolveResult 조립 (구현됨, 완화안은 D-d)
   validation/
-    validator.py      # 솔버를 import하지 않는 순수 Python 판정기 (C7 테스트 검사기를 승격)
+    validator.py      # 솔버를 import하지 않는 순수 Python 판정기 (구현됨, 결과 리포트에도 사용)
   catalog/
     repository.py     # Supabase 읽기/쓰기 (httpx)
   llm/
@@ -178,3 +177,30 @@ frontend/src/
 1. 학교 개설강좌를 Supabase에 올려 서비스해도 되는지(정책 확인).
 2. Supabase 프로젝트 생성 주체·리전(서울 `ap-northeast-2` 권장)과 무료/유료.
 3. 마감일 — 마일스톤 일정 배치용.
+
+## 9. 진행 상황
+
+### D-c 완료 (2026-11-09, `feat/phase-d`)
+- `solver/model.py`, `solver/solve.py`, `validation/validator.py`, `core/periods.py`. `/solve` 연결은 D-d.
+- hard 의미 확정 (검증기와 솔버가 같은 정의를 따로 구현):
+  - `time_prefer` hard = 지정 요일의 수업이 모두 창 안에 있어야 함.
+  - `instructor_prefer` hard = 그 교수 분반을 1개 이상 포함.
+  - `lunch_free` = 요일마다 창 안의 수업 분이 `창 길이 − min_free_minutes` 이하(분 단위 정확).
+  - `max_gap`, `max_consecutive` = 교시 단위(DD3). 연속 75분 2교시는 연강 150분.
+  - 카탈로그에 없는 `must_include` 과목 = INFEASIBLE, core에 그 제약.
+- soft 제약은 아직 목적함수에 없다(D-f). 대신 후보마다 검증기로 위반량을 계산해 `violated`로 보고한다.
+- 솔버 해는 반환 전에 검증기를 통과해야 한다(불일치 = 버그로 예외).
+- 테스트: 의미 단위 테스트, **완전 탐색 property test**(작은 랜덤 문제에서 가능/불가능 판정·최적값·core 최소성을 전수 비교), C7 6종 core 정확 일치, 실데이터 스모크(`data/private` 있을 때만).
+- 합성 생성기를 교시 정렬로 재생성(난수 호출 순서 유지로 C7 시나리오 불변).
+
+### 벤치마크 (MacBook, n=3 후보, hard 4종: 학점 15–18·금 공강·연강 150·점심, 10회)
+
+| 카탈로그 | 풀 | p50 | p95 |
+|---|---|---|---|
+| 합성 50 | 전체 | 5ms | 9ms |
+| 합성 200 | 전체 | 20ms | 21ms |
+| 합성 500 | 전체 | 53ms | 54ms |
+| 실데이터 2026-2 (819) | 전체 | 85ms | 86ms |
+| 모든 카탈로그 | 무작위 12과목 | 2ms | 4ms |
+
+→ 기본 시간 제한 5s는 충분하다. Render 무료 인스턴스(느린 CPU)에서 D-d 때 다시 잰다.

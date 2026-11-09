@@ -2552,8 +2552,8 @@
       "meetings": [
         {
           "day": "Fri",
-          "start": "13:00",
-          "end": "15:45"
+          "start": "13:30",
+          "end": "16:15"
         }
       ],
       "instructor": "가상교수 B26",
@@ -2583,8 +2583,8 @@
       "meetings": [
         {
           "day": "Thu",
-          "start": "19:00",
-          "end": "20:40"
+          "start": "19:30",
+          "end": "21:50"
         }
       ],
       "instructor": "가상교수 A59",
@@ -2596,8 +2596,8 @@
       "meetings": [
         {
           "day": "Fri",
-          "start": "14:00",
-          "end": "15:40"
+          "start": "13:30",
+          "end": "15:50"
         }
       ],
       "instructor": "가상교수 A79",
@@ -2610,7 +2610,12 @@
         {
           "day": "Mon",
           "start": "15:00",
-          "end": "16:40"
+          "end": "15:50"
+        },
+        {
+          "day": "Wed",
+          "start": "15:00",
+          "end": "15:50"
         }
       ],
       "instructor": "가상교수 A91",
@@ -2622,8 +2627,8 @@
       "meetings": [
         {
           "day": "Mon",
-          "start": "14:00",
-          "end": "16:45"
+          "start": "13:30",
+          "end": "16:15"
         }
       ],
       "instructor": "가상교수 B69",
@@ -2635,8 +2640,8 @@
       "meetings": [
         {
           "day": "Fri",
-          "start": "16:00",
-          "end": "16:50"
+          "start": "16:30",
+          "end": "17:20"
         }
       ],
       "instructor": "가상교수 B06",
@@ -2703,7 +2708,12 @@
         {
           "day": "Mon",
           "start": "15:00",
-          "end": "16:40"
+          "end": "15:50"
+        },
+        {
+          "day": "Wed",
+          "start": "15:00",
+          "end": "15:50"
         }
       ],
       "instructor": "가상교수 A36",
@@ -2714,9 +2724,14 @@
       "course_id": "SYN107",
       "meetings": [
         {
-          "day": "Tue",
+          "day": "Mon",
           "start": "09:00",
-          "end": "10:40"
+          "end": "09:50"
+        },
+        {
+          "day": "Wed",
+          "start": "09:00",
+          "end": "09:50"
         }
       ],
       "instructor": "가상교수 A55",
@@ -2746,8 +2761,8 @@
       "meetings": [
         {
           "day": "Tue",
-          "start": "13:00",
-          "end": "15:45"
+          "start": "12:00",
+          "end": "14:45"
         }
       ],
       "instructor": "가상교수 B61",
@@ -2777,8 +2792,8 @@
       "meetings": [
         {
           "day": "Tue",
-          "start": "14:00",
-          "end": "16:45"
+          "start": "13:30",
+          "end": "16:15"
         }
       ],
       "instructor": "가상교수 A96",
@@ -2790,8 +2805,8 @@
       "meetings": [
         {
           "day": "Fri",
-          "start": "13:00",
-          "end": "15:45"
+          "start": "13:30",
+          "end": "16:15"
         }
       ],
       "instructor": "가상교수 B58",
@@ -3045,8 +3060,8 @@
       "meetings": [
         {
           "day": "Wed",
-          "start": "13:00",
-          "end": "13:50"
+          "start": "13:30",
+          "end": "14:20"
         }
       ],
       "instructor": "가상교수 B58",
@@ -3058,8 +3073,8 @@
       "meetings": [
         {
           "day": "Tue",
-          "start": "16:00",
-          "end": "16:50"
+          "start": "16:30",
+          "end": "17:20"
         }
       ],
       "instructor": "가상교수 B58",
@@ -3071,8 +3086,8 @@
       "meetings": [
         {
           "day": "Thu",
-          "start": "16:00",
-          "end": "16:50"
+          "start": "16:30",
+          "end": "17:20"
         }
       ],
       "instructor": "가상교수 A29",
@@ -3151,8 +3166,8 @@
       "meetings": [
         {
           "day": "Mon",
-          "start": "19:00",
-          "end": "20:40"
+          "start": "19:30",
+          "end": "21:50"
         }
       ],
       "instructor": "가상교수 B34",
@@ -3164,8 +3179,8 @@
       "meetings": [
         {
           "day": "Thu",
-          "start": "16:00",
-          "end": "16:50"
+          "start": "16:30",
+          "end": "17:20"
         }
       ],
       "instructor": "가상교수 B03",
@@ -3288,8 +3303,8 @@
       "meetings": [
         {
           "day": "Thu",
-          "start": "16:00",
-          "end": "16:50"
+          "start": "16:30",
+          "end": "17:20"
         }
       ],
       "instructor": "가상교수 A24",
@@ -3462,9 +3477,14 @@
       "course_id": "SYN139",
       "meetings": [
         {
-          "day": "Tue",
+          "day": "Mon",
           "start": "12:00",
-          "end": "13:40"
+          "end": "12:50"
+        },
+        {
+          "day": "Wed",
+          "start": "12:00",
+          "end": "12:50"
         }
       ],
       "instructor": "가상교수 A76",
@@ -3566,8 +3586,8 @@
       "meetings": [
         {
           "day": "Tue",
-          "start": "19:00",
-          "end": "21:45"
+          "start": "19:30",
+          "end": "22:15"
         }
       ],
       "instructor": "가상교수 A52",
@@ -3579,8 +3599,8 @@
       "meetings": [
         {
           "day": "Mon",
-          "start": "13:00",
-          "end": "15:45"
+          "start": "12:00",
+          "end": "14:45"
         }
       ],
       "instructor": "가상교수 A61",
@@ -3610,8 +3630,8 @@
       "meetings": [
         {
           "day": "Fri",
-          "start": "14:00",
-          "end": "15:40"
+          "start": "13:30",
+          "end": "15:50"
         }
       ],
       "instructor": "가상교수 A48",
@@ -3624,7 +3644,12 @@
         {
           "day": "Mon",
           "start": "09:00",
-          "end": "10:40"
+          "end": "09:50"
+        },
+        {
+          "day": "Wed",
+          "start": "09:00",
+          "end": "09:50"
         }
       ],
       "instructor": "가상교수 B20",
@@ -3637,7 +3662,12 @@
         {
           "day": "Mon",
           "start": "12:00",
-          "end": "13:40"
+          "end": "12:50"
+        },
+        {
+          "day": "Wed",
+          "start": "12:00",
+          "end": "12:50"
         }
       ],
       "instructor": "가상교수 A79",
@@ -3649,8 +3679,8 @@
       "meetings": [
         {
           "day": "Fri",
-          "start": "13:00",
-          "end": "13:50"
+          "start": "13:30",
+          "end": "14:20"
         }
       ],
       "instructor": "가상교수 B91",
@@ -3688,8 +3718,8 @@
       "meetings": [
         {
           "day": "Wed",
-          "start": "14:00",
-          "end": "16:45"
+          "start": "13:30",
+          "end": "16:15"
         }
       ],
       "instructor": "가상교수 A51",
@@ -3773,8 +3803,8 @@
       "meetings": [
         {
           "day": "Tue",
-          "start": "14:00",
-          "end": "16:45"
+          "start": "13:30",
+          "end": "16:15"
         }
       ],
       "instructor": "가상교수 B89",
@@ -3822,8 +3852,8 @@
       "meetings": [
         {
           "day": "Fri",
-          "start": "13:00",
-          "end": "13:50"
+          "start": "13:30",
+          "end": "14:20"
         }
       ],
       "instructor": "가상교수 B84",
@@ -3853,8 +3883,8 @@
       "meetings": [
         {
           "day": "Mon",
-          "start": "13:00",
-          "end": "15:45"
+          "start": "12:00",
+          "end": "14:45"
         }
       ],
       "instructor": "가상교수 A47",
@@ -3974,8 +4004,8 @@
       "meetings": [
         {
           "day": "Tue",
-          "start": "19:00",
-          "end": "21:45"
+          "start": "19:30",
+          "end": "22:15"
         }
       ],
       "instructor": "가상교수 B68",
@@ -4206,8 +4236,8 @@
       "meetings": [
         {
           "day": "Wed",
-          "start": "13:00",
-          "end": "15:45"
+          "start": "12:00",
+          "end": "14:45"
         }
       ],
       "instructor": "가상교수 A40",
@@ -4236,9 +4266,14 @@
       "course_id": "SYN174",
       "meetings": [
         {
-          "day": "Wed",
+          "day": "Tue",
           "start": "12:00",
-          "end": "13:40"
+          "end": "12:50"
+        },
+        {
+          "day": "Thu",
+          "start": "12:00",
+          "end": "12:50"
         }
       ],
       "instructor": "가상교수 A39",
@@ -4250,8 +4285,8 @@
       "meetings": [
         {
           "day": "Thu",
-          "start": "13:00",
-          "end": "15:45"
+          "start": "12:00",
+          "end": "14:45"
         }
       ],
       "instructor": "가상교수 A95",
@@ -4293,9 +4328,14 @@
       "course_id": "SYN178",
       "meetings": [
         {
-          "day": "Wed",
+          "day": "Tue",
           "start": "16:30",
-          "end": "18:10"
+          "end": "17:20"
+        },
+        {
+          "day": "Thu",
+          "start": "16:30",
+          "end": "17:20"
         }
       ],
       "instructor": "가상교수 A83",
@@ -4320,8 +4360,8 @@
       "meetings": [
         {
           "day": "Fri",
-          "start": "10:00",
-          "end": "11:40"
+          "start": "10:30",
+          "end": "12:50"
         }
       ],
       "instructor": "가상교수 B47",
@@ -4383,7 +4423,12 @@
         {
           "day": "Mon",
           "start": "12:00",
-          "end": "13:40"
+          "end": "12:50"
+        },
+        {
+          "day": "Wed",
+          "start": "12:00",
+          "end": "12:50"
         }
       ],
       "instructor": "가상교수 B58",
@@ -4426,8 +4471,8 @@
       "meetings": [
         {
           "day": "Fri",
-          "start": "13:00",
-          "end": "15:45"
+          "start": "13:30",
+          "end": "16:15"
         }
       ],
       "instructor": "가상교수 B94",
@@ -4457,8 +4502,8 @@
       "meetings": [
         {
           "day": "Mon",
-          "start": "13:00",
-          "end": "13:50"
+          "start": "13:30",
+          "end": "14:20"
         }
       ],
       "instructor": "가상교수 B37",
@@ -4495,9 +4540,14 @@
       "course_id": "SYN191",
       "meetings": [
         {
-          "day": "Tue",
+          "day": "Mon",
           "start": "13:30",
-          "end": "15:10"
+          "end": "14:20"
+        },
+        {
+          "day": "Wed",
+          "start": "13:30",
+          "end": "14:20"
         }
       ],
       "instructor": "가상교수 A45",
@@ -4562,9 +4612,14 @@
       "course_id": "SYN194",
       "meetings": [
         {
+          "day": "Tue",
+          "start": "09:00",
+          "end": "09:50"
+        },
+        {
           "day": "Thu",
           "start": "09:00",
-          "end": "10:40"
+          "end": "09:50"
         }
       ],
       "instructor": "가상교수 A57",
@@ -4697,8 +4752,8 @@
       "meetings": [
         {
           "day": "Tue",
-          "start": "13:00",
-          "end": "13:50"
+          "start": "13:30",
+          "end": "14:20"
         }
       ],
       "instructor": "가상교수 A52",
@@ -4723,8 +4778,8 @@
       "meetings": [
         {
           "day": "Fri",
-          "start": "16:00",
-          "end": "16:50"
+          "start": "16:30",
+          "end": "17:20"
         }
       ],
       "instructor": "가상교수 B02",
@@ -4798,8 +4853,8 @@
       "meetings": [
         {
           "day": "Tue",
-          "start": "16:00",
-          "end": "16:50"
+          "start": "16:30",
+          "end": "17:20"
         }
       ],
       "instructor": "가상교수 A97",
@@ -4811,8 +4866,8 @@
       "meetings": [
         {
           "day": "Thu",
-          "start": "19:00",
-          "end": "20:40"
+          "start": "19:30",
+          "end": "21:50"
         }
       ],
       "instructor": "가상교수 A27",
@@ -4823,9 +4878,14 @@
       "course_id": "SYN204",
       "meetings": [
         {
-          "day": "Tue",
+          "day": "Mon",
           "start": "16:30",
-          "end": "18:10"
+          "end": "17:20"
+        },
+        {
+          "day": "Wed",
+          "start": "16:30",
+          "end": "17:20"
         }
       ],
       "instructor": "가상교수 B83",
@@ -4837,8 +4897,8 @@
       "meetings": [
         {
           "day": "Fri",
-          "start": "10:00",
-          "end": "11:40"
+          "start": "10:30",
+          "end": "12:50"
         }
       ],
       "instructor": "가상교수 B46",
@@ -4849,9 +4909,14 @@
       "course_id": "SYN205",
       "meetings": [
         {
-          "day": "Wed",
+          "day": "Tue",
           "start": "15:00",
-          "end": "16:40"
+          "end": "15:50"
+        },
+        {
+          "day": "Thu",
+          "start": "15:00",
+          "end": "15:50"
         }
       ],
       "instructor": "가상교수 A59",
@@ -4880,9 +4945,14 @@
       "course_id": "SYN207",
       "meetings": [
         {
+          "day": "Tue",
+          "start": "10:30",
+          "end": "11:20"
+        },
+        {
           "day": "Thu",
           "start": "10:30",
-          "end": "12:10"
+          "end": "11:20"
         }
       ],
       "instructor": "가상교수 B98",
@@ -4894,8 +4964,8 @@
       "meetings": [
         {
           "day": "Thu",
-          "start": "13:00",
-          "end": "13:50"
+          "start": "13:30",
+          "end": "14:20"
         }
       ],
       "instructor": "가상교수 A43",
@@ -4925,8 +4995,8 @@
       "meetings": [
         {
           "day": "Fri",
-          "start": "10:00",
-          "end": "11:40"
+          "start": "10:30",
+          "end": "12:50"
         }
       ],
       "instructor": "가상교수 B56",
@@ -4951,8 +5021,8 @@
       "meetings": [
         {
           "day": "Tue",
-          "start": "16:00",
-          "end": "16:50"
+          "start": "16:30",
+          "end": "17:20"
         }
       ],
       "instructor": "가상교수 A25",
@@ -4999,9 +5069,14 @@
       "course_id": "SYN213",
       "meetings": [
         {
-          "day": "Wed",
+          "day": "Tue",
           "start": "10:30",
-          "end": "12:10"
+          "end": "11:20"
+        },
+        {
+          "day": "Thu",
+          "start": "10:30",
+          "end": "11:20"
         }
       ],
       "instructor": "가상교수 B09",
@@ -5044,8 +5119,8 @@
       "meetings": [
         {
           "day": "Wed",
-          "start": "13:00",
-          "end": "13:50"
+          "start": "13:30",
+          "end": "14:20"
         }
       ],
       "instructor": "가상교수 A27",
@@ -5070,8 +5145,8 @@
       "meetings": [
         {
           "day": "Wed",
-          "start": "19:00",
-          "end": "21:45"
+          "start": "19:30",
+          "end": "22:15"
         }
       ],
       "instructor": "가상교수 B38",
@@ -5150,8 +5225,8 @@
       "meetings": [
         {
           "day": "Thu",
-          "start": "19:00",
-          "end": "21:45"
+          "start": "19:30",
+          "end": "22:15"
         }
       ],
       "instructor": "가상교수 A98",
@@ -5198,9 +5273,14 @@
       "course_id": "SYN219",
       "meetings": [
         {
-          "day": "Tue",
+          "day": "Mon",
           "start": "16:30",
-          "end": "18:10"
+          "end": "17:20"
+        },
+        {
+          "day": "Wed",
+          "start": "16:30",
+          "end": "17:20"
         }
       ],
       "instructor": "가상교수 A71",
@@ -5297,8 +5377,8 @@
       "meetings": [
         {
           "day": "Mon",
-          "start": "13:00",
-          "end": "15:45"
+          "start": "12:00",
+          "end": "14:45"
         }
       ],
       "instructor": "가상교수 A27",
@@ -5365,7 +5445,12 @@
         {
           "day": "Mon",
           "start": "10:30",
-          "end": "12:10"
+          "end": "11:20"
+        },
+        {
+          "day": "Wed",
+          "start": "10:30",
+          "end": "11:20"
         }
       ],
       "instructor": "가상교수 B19",
@@ -5431,8 +5516,8 @@
       "meetings": [
         {
           "day": "Tue",
-          "start": "14:00",
-          "end": "16:45"
+          "start": "13:30",
+          "end": "16:15"
         }
       ],
       "instructor": "가상교수 A67",
@@ -5444,8 +5529,8 @@
       "meetings": [
         {
           "day": "Fri",
-          "start": "13:00",
-          "end": "15:45"
+          "start": "13:30",
+          "end": "16:15"
         }
       ],
       "instructor": "가상교수 A13",
@@ -5511,8 +5596,8 @@
       "meetings": [
         {
           "day": "Fri",
-          "start": "13:00",
-          "end": "15:45"
+          "start": "13:30",
+          "end": "16:15"
         }
       ],
       "instructor": "가상교수 A63",
@@ -5536,9 +5621,14 @@
       "course_id": "SYN234",
       "meetings": [
         {
-          "day": "Tue",
+          "day": "Mon",
           "start": "12:00",
-          "end": "13:40"
+          "end": "12:50"
+        },
+        {
+          "day": "Wed",
+          "start": "12:00",
+          "end": "12:50"
         }
       ],
       "instructor": "가상교수 B89",
@@ -5612,8 +5702,8 @@
       "meetings": [
         {
           "day": "Mon",
-          "start": "14:00",
-          "end": "16:45"
+          "start": "13:30",
+          "end": "16:15"
         }
       ],
       "instructor": "가상교수 A77",
@@ -5625,8 +5715,8 @@
       "meetings": [
         {
           "day": "Tue",
-          "start": "13:00",
-          "end": "15:45"
+          "start": "12:00",
+          "end": "14:45"
         }
       ],
       "instructor": "가상교수 A54",
@@ -5692,8 +5782,8 @@
       "meetings": [
         {
           "day": "Fri",
-          "start": "13:00",
-          "end": "15:45"
+          "start": "13:30",
+          "end": "16:15"
         }
       ],
       "instructor": "가상교수 A44",
@@ -5777,8 +5867,8 @@
       "meetings": [
         {
           "day": "Fri",
-          "start": "10:00",
-          "end": "11:40"
+          "start": "10:30",
+          "end": "12:50"
         }
       ],
       "instructor": "가상교수 A20",
@@ -5808,8 +5898,8 @@
       "meetings": [
         {
           "day": "Mon",
-          "start": "13:00",
-          "end": "15:45"
+          "start": "12:00",
+          "end": "14:45"
         }
       ],
       "instructor": "가상교수 A45",
@@ -5893,8 +5983,8 @@
       "meetings": [
         {
           "day": "Mon",
-          "start": "19:00",
-          "end": "20:40"
+          "start": "19:30",
+          "end": "21:50"
         }
       ],
       "instructor": "가상교수 B69",
@@ -5906,8 +5996,8 @@
       "meetings": [
         {
           "day": "Thu",
-          "start": "19:00",
-          "end": "20:40"
+          "start": "19:30",
+          "end": "21:50"
         }
       ],
       "instructor": "가상교수 A95",
@@ -5919,8 +6009,8 @@
       "meetings": [
         {
           "day": "Fri",
-          "start": "14:00",
-          "end": "15:40"
+          "start": "13:30",
+          "end": "15:50"
         }
       ],
       "instructor": "가상교수 B17",
@@ -5931,9 +6021,14 @@
       "course_id": "SYN250",
       "meetings": [
         {
-          "day": "Tue",
+          "day": "Mon",
           "start": "16:30",
-          "end": "18:10"
+          "end": "17:20"
+        },
+        {
+          "day": "Wed",
+          "start": "16:30",
+          "end": "17:20"
         }
       ],
       "instructor": "가상교수 A16",
@@ -5958,8 +6053,8 @@
       "meetings": [
         {
           "day": "Mon",
-          "start": "19:00",
-          "end": "21:45"
+          "start": "19:30",
+          "end": "22:15"
         }
       ],
       "instructor": "가상교수 A20",
@@ -5971,8 +6066,8 @@
       "meetings": [
         {
           "day": "Fri",
-          "start": "14:00",
-          "end": "15:40"
+          "start": "13:30",
+          "end": "15:50"
         }
       ],
       "instructor": "가상교수 A11",
@@ -5984,8 +6079,8 @@
       "meetings": [
         {
           "day": "Fri",
-          "start": "10:00",
-          "end": "11:40"
+          "start": "10:30",
+          "end": "12:50"
         }
       ],
       "instructor": "가상교수 B93",
@@ -6208,8 +6303,8 @@
       "meetings": [
         {
           "day": "Mon",
-          "start": "19:00",
-          "end": "20:40"
+          "start": "19:30",
+          "end": "21:50"
         }
       ],
       "instructor": "가상교수 A56",
@@ -6221,8 +6316,8 @@
       "meetings": [
         {
           "day": "Wed",
-          "start": "19:00",
-          "end": "20:40"
+          "start": "19:30",
+          "end": "21:50"
         }
       ],
       "instructor": "가상교수 A84",
@@ -6234,8 +6329,8 @@
       "meetings": [
         {
           "day": "Thu",
-          "start": "19:00",
-          "end": "20:40"
+          "start": "19:30",
+          "end": "21:50"
         }
       ],
       "instructor": "가상교수 A59",
@@ -6246,9 +6341,14 @@
       "course_id": "SYN265",
       "meetings": [
         {
-          "day": "Wed",
+          "day": "Tue",
           "start": "15:00",
-          "end": "16:40"
+          "end": "15:50"
+        },
+        {
+          "day": "Thu",
+          "start": "15:00",
+          "end": "15:50"
         }
       ],
       "instructor": "가상교수 B31",
@@ -6260,8 +6360,8 @@
       "meetings": [
         {
           "day": "Mon",
-          "start": "14:00",
-          "end": "16:45"
+          "start": "13:30",
+          "end": "16:15"
         }
       ],
       "instructor": "가상교수 B08",
@@ -6273,8 +6373,8 @@
       "meetings": [
         {
           "day": "Thu",
-          "start": "19:00",
-          "end": "21:45"
+          "start": "19:30",
+          "end": "22:15"
         }
       ],
       "instructor": "가상교수 A92",
@@ -6322,8 +6422,8 @@
       "meetings": [
         {
           "day": "Fri",
-          "start": "14:00",
-          "end": "15:40"
+          "start": "13:30",
+          "end": "15:50"
         }
       ],
       "instructor": "가상교수 A20",
@@ -6335,8 +6435,8 @@
       "meetings": [
         {
           "day": "Mon",
-          "start": "13:00",
-          "end": "13:50"
+          "start": "13:30",
+          "end": "14:20"
         }
       ],
       "instructor": "가상교수 A87",
@@ -6392,8 +6492,8 @@
       "meetings": [
         {
           "day": "Thu",
-          "start": "19:00",
-          "end": "20:40"
+          "start": "19:30",
+          "end": "21:50"
         }
       ],
       "instructor": "가상교수 A88",
@@ -6467,8 +6567,8 @@
       "meetings": [
         {
           "day": "Fri",
-          "start": "16:00",
-          "end": "16:50"
+          "start": "16:30",
+          "end": "17:20"
         }
       ],
       "instructor": "가상교수 B31",
@@ -6480,8 +6580,8 @@
       "meetings": [
         {
           "day": "Thu",
-          "start": "19:00",
-          "end": "21:45"
+          "start": "19:30",
+          "end": "22:15"
         }
       ],
       "instructor": "가상교수 A21",
@@ -6560,8 +6660,8 @@
       "meetings": [
         {
           "day": "Tue",
-          "start": "14:00",
-          "end": "16:45"
+          "start": "13:30",
+          "end": "16:15"
         }
       ],
       "instructor": "가상교수 A54",
@@ -6663,8 +6763,8 @@
       "meetings": [
         {
           "day": "Thu",
-          "start": "19:00",
-          "end": "21:45"
+          "start": "19:30",
+          "end": "22:15"
         }
       ],
       "instructor": "가상교수 A76",
@@ -6676,8 +6776,8 @@
       "meetings": [
         {
           "day": "Fri",
-          "start": "13:00",
-          "end": "15:45"
+          "start": "13:30",
+          "end": "16:15"
         }
       ],
       "instructor": "가상교수 A43",
@@ -6707,8 +6807,8 @@
       "meetings": [
         {
           "day": "Tue",
-          "start": "16:00",
-          "end": "16:50"
+          "start": "16:30",
+          "end": "17:20"
         }
       ],
       "instructor": "가상교수 B25",
@@ -6720,8 +6820,8 @@
       "meetings": [
         {
           "day": "Tue",
-          "start": "19:00",
-          "end": "20:40"
+          "start": "19:30",
+          "end": "21:50"
         }
       ],
       "instructor": "가상교수 B20",
@@ -6733,8 +6833,8 @@
       "meetings": [
         {
           "day": "Wed",
-          "start": "19:00",
-          "end": "21:45"
+          "start": "19:30",
+          "end": "22:15"
         }
       ],
       "instructor": "가상교수 B02",
@@ -6782,8 +6882,8 @@
       "meetings": [
         {
           "day": "Fri",
-          "start": "10:00",
-          "end": "11:40"
+          "start": "10:30",
+          "end": "12:50"
         }
       ],
       "instructor": "가상교수 A07",
@@ -6795,8 +6895,8 @@
       "meetings": [
         {
           "day": "Fri",
-          "start": "14:00",
-          "end": "15:40"
+          "start": "13:30",
+          "end": "15:50"
         }
       ],
       "instructor": "가상교수 B90",
@@ -6808,8 +6908,8 @@
       "meetings": [
         {
           "day": "Mon",
-          "start": "19:00",
-          "end": "20:40"
+          "start": "19:30",
+          "end": "21:50"
         }
       ],
       "instructor": "가상교수 B59",
@@ -6875,8 +6975,8 @@
       "meetings": [
         {
           "day": "Mon",
-          "start": "14:00",
-          "end": "16:45"
+          "start": "13:30",
+          "end": "16:15"
         }
       ],
       "instructor": "가상교수 B80",
@@ -6888,8 +6988,8 @@
       "meetings": [
         {
           "day": "Thu",
-          "start": "14:00",
-          "end": "16:45"
+          "start": "13:30",
+          "end": "16:15"
         }
       ],
       "instructor": "가상교수 A29",
@@ -6901,8 +7001,8 @@
       "meetings": [
         {
           "day": "Tue",
-          "start": "13:00",
-          "end": "15:45"
+          "start": "12:00",
+          "end": "14:45"
         }
       ],
       "instructor": "가상교수 B19",
@@ -7052,9 +7152,14 @@
       "course_id": "SYN305",
       "meetings": [
         {
-          "day": "Tue",
+          "day": "Mon",
           "start": "10:30",
-          "end": "12:10"
+          "end": "11:20"
+        },
+        {
+          "day": "Wed",
+          "start": "10:30",
+          "end": "11:20"
         }
       ],
       "instructor": "가상교수 A71",
@@ -7067,7 +7172,12 @@
         {
           "day": "Mon",
           "start": "12:00",
-          "end": "13:40"
+          "end": "12:50"
+        },
+        {
+          "day": "Wed",
+          "start": "12:00",
+          "end": "12:50"
         }
       ],
       "instructor": "가상교수 A81",
@@ -7079,8 +7189,8 @@
       "meetings": [
         {
           "day": "Fri",
-          "start": "10:00",
-          "end": "11:40"
+          "start": "10:30",
+          "end": "12:50"
         }
       ],
       "instructor": "가상교수 A08",
@@ -7091,9 +7201,14 @@
       "course_id": "SYN307",
       "meetings": [
         {
-          "day": "Tue",
+          "day": "Mon",
           "start": "12:00",
-          "end": "13:40"
+          "end": "12:50"
+        },
+        {
+          "day": "Wed",
+          "start": "12:00",
+          "end": "12:50"
         }
       ],
       "instructor": "가상교수 A83",
@@ -7106,7 +7221,12 @@
         {
           "day": "Mon",
           "start": "09:00",
-          "end": "10:40"
+          "end": "09:50"
+        },
+        {
+          "day": "Wed",
+          "start": "09:00",
+          "end": "09:50"
         }
       ],
       "instructor": "가상교수 B65",
@@ -7220,9 +7340,14 @@
       "course_id": "SYN311",
       "meetings": [
         {
-          "day": "Tue",
+          "day": "Mon",
           "start": "16:30",
-          "end": "18:10"
+          "end": "17:20"
+        },
+        {
+          "day": "Wed",
+          "start": "16:30",
+          "end": "17:20"
         }
       ],
       "instructor": "가상교수 B65",
@@ -7234,8 +7359,8 @@
       "meetings": [
         {
           "day": "Thu",
-          "start": "16:00",
-          "end": "16:50"
+          "start": "16:30",
+          "end": "17:20"
         }
       ],
       "instructor": "가상교수 B97",
@@ -7265,8 +7390,8 @@
       "meetings": [
         {
           "day": "Mon",
-          "start": "19:00",
-          "end": "21:45"
+          "start": "19:30",
+          "end": "22:15"
         }
       ],
       "instructor": "가상교수 B17",
@@ -7278,8 +7403,8 @@
       "meetings": [
         {
           "day": "Wed",
-          "start": "14:00",
-          "end": "16:45"
+          "start": "13:30",
+          "end": "16:15"
         }
       ],
       "instructor": "가상교수 A42",
@@ -7345,8 +7470,8 @@
       "meetings": [
         {
           "day": "Tue",
-          "start": "13:00",
-          "end": "13:50"
+          "start": "13:30",
+          "end": "14:20"
         }
       ],
       "instructor": "가상교수 B55",
@@ -7358,8 +7483,8 @@
       "meetings": [
         {
           "day": "Fri",
-          "start": "13:00",
-          "end": "15:45"
+          "start": "13:30",
+          "end": "16:15"
         }
       ],
       "instructor": "가상교수 B38",
@@ -7371,8 +7496,8 @@
       "meetings": [
         {
           "day": "Tue",
-          "start": "19:00",
-          "end": "21:45"
+          "start": "19:30",
+          "end": "22:15"
         }
       ],
       "instructor": "가상교수 A69",
@@ -7402,8 +7527,8 @@
       "meetings": [
         {
           "day": "Fri",
-          "start": "14:00",
-          "end": "15:40"
+          "start": "13:30",
+          "end": "15:50"
         }
       ],
       "instructor": "가상교수 B38",
@@ -7428,8 +7553,8 @@
       "meetings": [
         {
           "day": "Fri",
-          "start": "13:00",
-          "end": "15:45"
+          "start": "13:30",
+          "end": "16:15"
         }
       ],
       "instructor": "가상교수 A71",
@@ -7441,8 +7566,8 @@
       "meetings": [
         {
           "day": "Wed",
-          "start": "14:00",
-          "end": "16:45"
+          "start": "13:30",
+          "end": "16:15"
         }
       ],
       "instructor": "가상교수 B71",
@@ -7490,8 +7615,8 @@
       "meetings": [
         {
           "day": "Thu",
-          "start": "13:00",
-          "end": "13:50"
+          "start": "13:30",
+          "end": "14:20"
         }
       ],
       "instructor": "가상교수 B86",
@@ -7503,8 +7628,8 @@
       "meetings": [
         {
           "day": "Thu",
-          "start": "13:00",
-          "end": "13:50"
+          "start": "13:30",
+          "end": "14:20"
         }
       ],
       "instructor": "가상교수 B65",
@@ -7516,8 +7641,8 @@
       "meetings": [
         {
           "day": "Fri",
-          "start": "13:00",
-          "end": "13:50"
+          "start": "13:30",
+          "end": "14:20"
         }
       ],
       "instructor": "가상교수 B60",
@@ -7583,8 +7708,8 @@
       "meetings": [
         {
           "day": "Fri",
-          "start": "14:00",
-          "end": "15:40"
+          "start": "13:30",
+          "end": "15:50"
         }
       ],
       "instructor": "가상교수 B89",
@@ -7614,8 +7739,8 @@
       "meetings": [
         {
           "day": "Fri",
-          "start": "14:00",
-          "end": "15:40"
+          "start": "13:30",
+          "end": "15:50"
         }
       ],
       "instructor": "가상교수 A69",
@@ -7627,8 +7752,8 @@
       "meetings": [
         {
           "day": "Wed",
-          "start": "16:00",
-          "end": "16:50"
+          "start": "16:30",
+          "end": "17:20"
         }
       ],
       "instructor": "가상교수 A97",
@@ -7675,9 +7800,14 @@
       "course_id": "SYN332",
       "meetings": [
         {
-          "day": "Tue",
+          "day": "Mon",
           "start": "10:30",
-          "end": "12:10"
+          "end": "11:20"
+        },
+        {
+          "day": "Wed",
+          "start": "10:30",
+          "end": "11:20"
         }
       ],
       "instructor": "가상교수 B59",
@@ -7689,8 +7819,8 @@
       "meetings": [
         {
           "day": "Tue",
-          "start": "19:00",
-          "end": "20:40"
+          "start": "19:30",
+          "end": "21:50"
         }
       ],
       "instructor": "가상교수 A64",
@@ -7702,8 +7832,8 @@
       "meetings": [
         {
           "day": "Fri",
-          "start": "14:00",
-          "end": "15:40"
+          "start": "13:30",
+          "end": "15:50"
         }
       ],
       "instructor": "가상교수 B32",
@@ -7714,9 +7844,14 @@
       "course_id": "SYN334",
       "meetings": [
         {
+          "day": "Tue",
+          "start": "13:30",
+          "end": "14:20"
+        },
+        {
           "day": "Thu",
           "start": "13:30",
-          "end": "15:10"
+          "end": "14:20"
         }
       ],
       "instructor": "가상교수 A32",
@@ -7728,8 +7863,8 @@
       "meetings": [
         {
           "day": "Fri",
-          "start": "14:00",
-          "end": "15:40"
+          "start": "13:30",
+          "end": "15:50"
         }
       ],
       "instructor": "가상교수 A81",
@@ -7740,9 +7875,14 @@
       "course_id": "SYN336",
       "meetings": [
         {
-          "day": "Wed",
+          "day": "Tue",
           "start": "13:30",
-          "end": "15:10"
+          "end": "14:20"
+        },
+        {
+          "day": "Thu",
+          "start": "13:30",
+          "end": "14:20"
         }
       ],
       "instructor": "가상교수 A54",
@@ -7790,8 +7930,8 @@
       "meetings": [
         {
           "day": "Tue",
-          "start": "14:00",
-          "end": "16:45"
+          "start": "13:30",
+          "end": "16:15"
         }
       ],
       "instructor": "가상교수 B09",
@@ -8090,9 +8230,14 @@
       "course_id": "SYN348",
       "meetings": [
         {
-          "day": "Tue",
+          "day": "Mon",
           "start": "13:30",
-          "end": "15:10"
+          "end": "14:20"
+        },
+        {
+          "day": "Wed",
+          "start": "13:30",
+          "end": "14:20"
         }
       ],
       "instructor": "가상교수 A44",
@@ -8139,9 +8284,14 @@
       "course_id": "SYN351",
       "meetings": [
         {
-          "day": "Tue",
+          "day": "Mon",
           "start": "09:00",
-          "end": "10:40"
+          "end": "09:50"
+        },
+        {
+          "day": "Wed",
+          "start": "09:00",
+          "end": "09:50"
         }
       ],
       "instructor": "가상교수 B14",
@@ -8202,8 +8352,8 @@
       "meetings": [
         {
           "day": "Mon",
-          "start": "19:00",
-          "end": "21:45"
+          "start": "19:30",
+          "end": "22:15"
         }
       ],
       "instructor": "가상교수 B93",
@@ -8323,8 +8473,8 @@
       "meetings": [
         {
           "day": "Thu",
-          "start": "19:00",
-          "end": "21:45"
+          "start": "19:30",
+          "end": "22:15"
         }
       ],
       "instructor": "가상교수 A77",
@@ -8336,8 +8486,8 @@
       "meetings": [
         {
           "day": "Wed",
-          "start": "19:00",
-          "end": "21:45"
+          "start": "19:30",
+          "end": "22:15"
         }
       ],
       "instructor": "가상교수 A13",
@@ -8384,9 +8534,14 @@
       "course_id": "SYN361",
       "meetings": [
         {
-          "day": "Wed",
+          "day": "Tue",
           "start": "15:00",
-          "end": "16:40"
+          "end": "15:50"
+        },
+        {
+          "day": "Thu",
+          "start": "15:00",
+          "end": "15:50"
         }
       ],
       "instructor": "가상교수 B38",
@@ -8398,8 +8553,8 @@
       "meetings": [
         {
           "day": "Fri",
-          "start": "14:00",
-          "end": "15:40"
+          "start": "13:30",
+          "end": "15:50"
         }
       ],
       "instructor": "가상교수 B55",
@@ -8411,8 +8566,8 @@
       "meetings": [
         {
           "day": "Mon",
-          "start": "16:00",
-          "end": "16:50"
+          "start": "16:30",
+          "end": "17:20"
         }
       ],
       "instructor": "가상교수 B96",
@@ -8424,8 +8579,8 @@
       "meetings": [
         {
           "day": "Mon",
-          "start": "13:00",
-          "end": "13:50"
+          "start": "13:30",
+          "end": "14:20"
         }
       ],
       "instructor": "가상교수 A78",
@@ -8575,9 +8730,14 @@
       "course_id": "SYN369",
       "meetings": [
         {
-          "day": "Tue",
+          "day": "Mon",
           "start": "13:30",
-          "end": "15:10"
+          "end": "14:20"
+        },
+        {
+          "day": "Wed",
+          "start": "13:30",
+          "end": "14:20"
         }
       ],
       "instructor": "가상교수 A62",
@@ -8643,8 +8803,8 @@
       "meetings": [
         {
           "day": "Fri",
-          "start": "10:00",
-          "end": "11:40"
+          "start": "10:30",
+          "end": "12:50"
         }
       ],
       "instructor": "가상교수 B30",
@@ -8656,8 +8816,8 @@
       "meetings": [
         {
           "day": "Fri",
-          "start": "14:00",
-          "end": "15:40"
+          "start": "13:30",
+          "end": "15:50"
         }
       ],
       "instructor": "가상교수 A92",
@@ -8669,8 +8829,8 @@
       "meetings": [
         {
           "day": "Fri",
-          "start": "14:00",
-          "end": "15:40"
+          "start": "13:30",
+          "end": "15:50"
         }
       ],
       "instructor": "가상교수 A02",
@@ -8695,8 +8855,8 @@
       "meetings": [
         {
           "day": "Wed",
-          "start": "16:00",
-          "end": "16:50"
+          "start": "16:30",
+          "end": "17:20"
         }
       ],
       "instructor": "가상교수 B04",
@@ -8708,8 +8868,8 @@
       "meetings": [
         {
           "day": "Tue",
-          "start": "14:00",
-          "end": "16:45"
+          "start": "13:30",
+          "end": "16:15"
         }
       ],
       "instructor": "가상교수 A07",
@@ -8721,8 +8881,8 @@
       "meetings": [
         {
           "day": "Fri",
-          "start": "14:00",
-          "end": "15:40"
+          "start": "13:30",
+          "end": "15:50"
         }
       ],
       "instructor": "가상교수 A31",
@@ -8733,9 +8893,14 @@
       "course_id": "SYN375",
       "meetings": [
         {
-          "day": "Wed",
+          "day": "Tue",
           "start": "16:30",
-          "end": "18:10"
+          "end": "17:20"
+        },
+        {
+          "day": "Thu",
+          "start": "16:30",
+          "end": "17:20"
         }
       ],
       "instructor": "가상교수 A21",
@@ -8800,9 +8965,14 @@
       "course_id": "SYN377",
       "meetings": [
         {
+          "day": "Tue",
+          "start": "09:00",
+          "end": "09:50"
+        },
+        {
           "day": "Thu",
           "start": "09:00",
-          "end": "10:40"
+          "end": "09:50"
         }
       ],
       "instructor": "가상교수 B99",
@@ -8815,7 +8985,12 @@
         {
           "day": "Mon",
           "start": "12:00",
-          "end": "13:40"
+          "end": "12:50"
+        },
+        {
+          "day": "Wed",
+          "start": "12:00",
+          "end": "12:50"
         }
       ],
       "instructor": "가상교수 B52",
@@ -8863,8 +9038,8 @@
       "meetings": [
         {
           "day": "Wed",
-          "start": "13:00",
-          "end": "15:45"
+          "start": "12:00",
+          "end": "14:45"
         }
       ],
       "instructor": "가상교수 B78",
@@ -8962,7 +9137,12 @@
         {
           "day": "Mon",
           "start": "12:00",
-          "end": "13:40"
+          "end": "12:50"
+        },
+        {
+          "day": "Wed",
+          "start": "12:00",
+          "end": "12:50"
         }
       ],
       "instructor": "가상교수 A90",
@@ -8973,9 +9153,14 @@
       "course_id": "SYN384",
       "meetings": [
         {
-          "day": "Wed",
+          "day": "Tue",
           "start": "09:00",
-          "end": "10:40"
+          "end": "09:50"
+        },
+        {
+          "day": "Thu",
+          "start": "09:00",
+          "end": "09:50"
         }
       ],
       "instructor": "가상교수 B01",
@@ -9004,9 +9189,14 @@
       "course_id": "SYN386",
       "meetings": [
         {
+          "day": "Tue",
+          "start": "13:30",
+          "end": "14:20"
+        },
+        {
           "day": "Thu",
           "start": "13:30",
-          "end": "15:10"
+          "end": "14:20"
         }
       ],
       "instructor": "가상교수 B62",
@@ -9017,9 +9207,14 @@
       "course_id": "SYN387",
       "meetings": [
         {
-          "day": "Wed",
+          "day": "Tue",
           "start": "13:30",
-          "end": "15:10"
+          "end": "14:20"
+        },
+        {
+          "day": "Thu",
+          "start": "13:30",
+          "end": "14:20"
         }
       ],
       "instructor": "가상교수 B80",
@@ -9085,8 +9280,8 @@
       "meetings": [
         {
           "day": "Mon",
-          "start": "13:00",
-          "end": "13:50"
+          "start": "13:30",
+          "end": "14:20"
         }
       ],
       "instructor": "가상교수 B34",
@@ -9153,7 +9348,12 @@
         {
           "day": "Mon",
           "start": "12:00",
-          "end": "13:40"
+          "end": "12:50"
+        },
+        {
+          "day": "Wed",
+          "start": "12:00",
+          "end": "12:50"
         }
       ],
       "instructor": "가상교수 B19",
@@ -9164,9 +9364,14 @@
       "course_id": "SYN395",
       "meetings": [
         {
-          "day": "Wed",
+          "day": "Tue",
           "start": "10:30",
-          "end": "12:10"
+          "end": "11:20"
+        },
+        {
+          "day": "Thu",
+          "start": "10:30",
+          "end": "11:20"
         }
       ],
       "instructor": "가상교수 B21",
@@ -9177,9 +9382,14 @@
       "course_id": "SYN396",
       "meetings": [
         {
-          "day": "Wed",
+          "day": "Tue",
           "start": "16:30",
-          "end": "18:10"
+          "end": "17:20"
+        },
+        {
+          "day": "Thu",
+          "start": "16:30",
+          "end": "17:20"
         }
       ],
       "instructor": "가상교수 A32",
@@ -9190,9 +9400,14 @@
       "course_id": "SYN396",
       "meetings": [
         {
-          "day": "Wed",
+          "day": "Tue",
           "start": "10:30",
-          "end": "12:10"
+          "end": "11:20"
+        },
+        {
+          "day": "Thu",
+          "start": "10:30",
+          "end": "11:20"
         }
       ],
       "instructor": "가상교수 A86",
@@ -9205,7 +9420,12 @@
         {
           "day": "Mon",
           "start": "10:30",
-          "end": "12:10"
+          "end": "11:20"
+        },
+        {
+          "day": "Wed",
+          "start": "10:30",
+          "end": "11:20"
         }
       ],
       "instructor": "가상교수 A28",
@@ -9217,8 +9437,8 @@
       "meetings": [
         {
           "day": "Fri",
-          "start": "16:00",
-          "end": "16:50"
+          "start": "16:30",
+          "end": "17:20"
         }
       ],
       "instructor": "가상교수 B03",
@@ -9230,8 +9450,8 @@
       "meetings": [
         {
           "day": "Tue",
-          "start": "14:00",
-          "end": "16:45"
+          "start": "13:30",
+          "end": "16:15"
         }
       ],
       "instructor": "가상교수 A50",
@@ -9278,9 +9498,14 @@
       "course_id": "SYN400",
       "meetings": [
         {
-          "day": "Wed",
+          "day": "Tue",
           "start": "16:30",
-          "end": "18:10"
+          "end": "17:20"
+        },
+        {
+          "day": "Thu",
+          "start": "16:30",
+          "end": "17:20"
         }
       ],
       "instructor": "가상교수 A05",
@@ -9305,8 +9530,8 @@
       "meetings": [
         {
           "day": "Wed",
-          "start": "16:00",
-          "end": "16:50"
+          "start": "16:30",
+          "end": "17:20"
         }
       ],
       "instructor": "가상교수 A11",
@@ -9336,8 +9561,8 @@
       "meetings": [
         {
           "day": "Wed",
-          "start": "14:00",
-          "end": "16:45"
+          "start": "13:30",
+          "end": "16:15"
         }
       ],
       "instructor": "가상교수 B92",
@@ -9380,8 +9605,8 @@
       "meetings": [
         {
           "day": "Fri",
-          "start": "10:00",
-          "end": "11:40"
+          "start": "10:30",
+          "end": "12:50"
         }
       ],
       "instructor": "가상교수 A72",
@@ -9394,7 +9619,12 @@
         {
           "day": "Mon",
           "start": "13:30",
-          "end": "15:10"
+          "end": "14:20"
+        },
+        {
+          "day": "Wed",
+          "start": "13:30",
+          "end": "14:20"
         }
       ],
       "instructor": "가상교수 A98",
@@ -9406,8 +9636,8 @@
       "meetings": [
         {
           "day": "Tue",
-          "start": "19:00",
-          "end": "21:45"
+          "start": "19:30",
+          "end": "22:15"
         }
       ],
       "instructor": "가상교수 B63",
@@ -9436,9 +9666,14 @@
       "course_id": "SYN409",
       "meetings": [
         {
-          "day": "Tue",
+          "day": "Mon",
           "start": "16:30",
-          "end": "18:10"
+          "end": "17:20"
+        },
+        {
+          "day": "Wed",
+          "start": "16:30",
+          "end": "17:20"
         }
       ],
       "instructor": "가상교수 B11",
@@ -9449,9 +9684,14 @@
       "course_id": "SYN409",
       "meetings": [
         {
+          "day": "Tue",
+          "start": "16:30",
+          "end": "17:20"
+        },
+        {
           "day": "Thu",
           "start": "16:30",
-          "end": "18:10"
+          "end": "17:20"
         }
       ],
       "instructor": "가상교수 A77",
@@ -9553,8 +9793,8 @@
       "meetings": [
         {
           "day": "Thu",
-          "start": "19:00",
-          "end": "21:45"
+          "start": "19:30",
+          "end": "22:15"
         }
       ],
       "instructor": "가상교수 A25",
@@ -9602,8 +9842,8 @@
       "meetings": [
         {
           "day": "Wed",
-          "start": "19:00",
-          "end": "20:40"
+          "start": "19:30",
+          "end": "21:50"
         }
       ],
       "instructor": "가상교수 A36",
@@ -9614,9 +9854,14 @@
       "course_id": "SYN417",
       "meetings": [
         {
-          "day": "Wed",
+          "day": "Tue",
           "start": "15:00",
-          "end": "16:40"
+          "end": "15:50"
+        },
+        {
+          "day": "Thu",
+          "start": "15:00",
+          "end": "15:50"
         }
       ],
       "instructor": "가상교수 A76",
@@ -9646,8 +9891,8 @@
       "meetings": [
         {
           "day": "Tue",
-          "start": "13:00",
-          "end": "15:45"
+          "start": "12:00",
+          "end": "14:45"
         }
       ],
       "instructor": "가상교수 B82",
@@ -9973,8 +10218,8 @@
       "meetings": [
         {
           "day": "Mon",
-          "start": "19:00",
-          "end": "20:40"
+          "start": "19:30",
+          "end": "21:50"
         }
       ],
       "instructor": "가상교수 A70",
@@ -9985,9 +10230,14 @@
       "course_id": "SYN432",
       "meetings": [
         {
-          "day": "Wed",
+          "day": "Tue",
           "start": "13:30",
-          "end": "15:10"
+          "end": "14:20"
+        },
+        {
+          "day": "Thu",
+          "start": "13:30",
+          "end": "14:20"
         }
       ],
       "instructor": "가상교수 B34",
@@ -10018,7 +10268,12 @@
         {
           "day": "Mon",
           "start": "15:00",
-          "end": "16:40"
+          "end": "15:50"
+        },
+        {
+          "day": "Wed",
+          "start": "15:00",
+          "end": "15:50"
         }
       ],
       "instructor": "가상교수 A66",
@@ -10048,8 +10303,8 @@
       "meetings": [
         {
           "day": "Tue",
-          "start": "16:00",
-          "end": "16:50"
+          "start": "16:30",
+          "end": "17:20"
         }
       ],
       "instructor": "가상교수 B33",
@@ -10092,8 +10347,8 @@
       "meetings": [
         {
           "day": "Fri",
-          "start": "10:00",
-          "end": "11:40"
+          "start": "10:30",
+          "end": "12:50"
         }
       ],
       "instructor": "가상교수 A39",
@@ -10195,8 +10450,8 @@
       "meetings": [
         {
           "day": "Wed",
-          "start": "19:00",
-          "end": "21:45"
+          "start": "19:30",
+          "end": "22:15"
         }
       ],
       "instructor": "가상교수 A39",
@@ -10317,7 +10572,12 @@
         {
           "day": "Mon",
           "start": "13:30",
-          "end": "15:10"
+          "end": "14:20"
+        },
+        {
+          "day": "Wed",
+          "start": "13:30",
+          "end": "14:20"
         }
       ],
       "instructor": "가상교수 A59",
@@ -10348,7 +10608,12 @@
         {
           "day": "Mon",
           "start": "15:00",
-          "end": "16:40"
+          "end": "15:50"
+        },
+        {
+          "day": "Wed",
+          "start": "15:00",
+          "end": "15:50"
         }
       ],
       "instructor": "가상교수 A78",

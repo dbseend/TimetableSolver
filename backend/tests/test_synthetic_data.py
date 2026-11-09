@@ -179,3 +179,16 @@ def test_scenario_is_valid_and_minimally_infeasible(sc):
 def test_at_least_five_scenarios():
     assert len(SCEN["scenarios"]) >= 5
     assert len({s["id"] for s in SCEN["scenarios"]}) == len(SCEN["scenarios"])
+
+
+@pytest.mark.parametrize("sc", SCEN["scenarios"], ids=lambda s: s["id"])
+def test_solver_diagnoses_expected_conflict(sc):
+    from app.solver.solve import solve
+
+    pool = [{"course_id": c} for c in COURSES]
+    req = SolveRequest.model_validate(
+        {"catalog": CATALOG, "pool": pool, "constraints": sc["constraints"]}
+    )
+    result = solve(req, time_limit_s=5)
+    assert result.status == sc["expected_status"]
+    assert sorted(result.diagnosis.core) == sorted(sc["expected_conflict_ids"])
