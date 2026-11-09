@@ -1,0 +1,19 @@
+# ADR 0004: LLM 제공자로 Gemini API 사용
+- 상태: 채택 (Phase C, 설정만. 호출 구현은 Phase D)
+- 결정: `LLM_PROVIDER=gemini`, 기본 모델 `gemini-3.5-flash-lite`.
+  - 근거: 공식 모델 페이지(https://aistudio.google.com/docs/models, 2026-11-09 확인)에서 Stable 표기, "가장 비용 효율적인 3.5 모델"로 신규 프로젝트에 권장. 가격은 해당 페이지에 없으므로 배포 전 가격 페이지에서 재확인 `[확인 필요]`.
+  - `gemini-2.5-*`는 deprecated(2026-12-01부터 자동 라우팅)이므로 쓰지 않는다.
+- 선택 이유
+  - 무료 등급으로 학생 프로젝트 예산 안에서 개발·평가 가능.
+  - JSON Schema 기반 구조화 출력(`response_schema`)을 지원해 닫힌 제약 어휘(`constraint_json_schema()`)를 그대로 강제할 수 있다.
+  - 작업이 짧은 문장 → JSON 변환·설명 생성이라 Flash-Lite 급으로 충분하다. 품질이 모자라면 `LLM_MODEL`만 바꾼다.
+- 레이트리밋 제약
+  - 무료 등급의 RPM/RPD 한도는 모델·계정별로 다르고 공식 모델 페이지에 수치가 없다. AI Studio 콘솔에서 확인 `[확인 필요]`.
+  - 서버 측 `DAILY_LLM_CALL_LIMIT`(기본 200)로 일일 호출을 자체 제한하고, 429는 사용자에게 "잠시 후 재시도"로 안내한다(Phase D).
+  - 평가(100문장 × 반복) 실행은 응답 캐시(`**/llm_cache/`, gitignore)로 재호출을 줄인다.
+- 구조화 출력 사용 계획 (Phase D)
+  - `response_mime_type=application/json` + `constraint_json_schema()` 전달 → 응답을 `constraints_adapter`로 재검증. 스키마 불일치는 1회 재시도 후 오류.
+  - LLM에게 시간표를 만들게 하지 않는다. 제약 JSON 생성과 설명 문장에만 사용.
+- 안전
+  - 키는 서버 환경변수(`LLM_API_KEY`)에만. 키가 없거나 `LLM_PROVIDER=none`이면 `Settings.llm_enabled=False` → LLM 기능만 비활성, 서버는 정상 기동.
+  - 무료 등급은 입력이 제품 개선에 쓰일 수 있으므로 이수내역 원문은 보내지 않는다(ADR 0002, PLAN §9.3).

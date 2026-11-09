@@ -1,0 +1,35 @@
+# --- secrets / env ---
+.env
+.env.*
+!.env.example
+
+# --- python ---
+.venv/
+venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+.ruff_cache/
+.hypothesis/
+.mypy_cache/
+
+# --- node ---
+node_modules/
+dist/
+coverage/
+*.tsbuildinfo
+.vercel/
+
+# --- data: real data must NEVER be committed (see data/README.md) ---
+data/private/
+data/raw/
+data/**/*.xlsx
+data/**/*.xls
+
+# --- LLM response caches (may contain user text) ---
+**/llm_cache/
+
+# --- os / editor ---
+.DS_Store
+.idea/
+.vscode/
