@@ -1,0 +1,1011 @@
+{
+  "courses": [
+    {
+      "id": "SYN101",
+      "name": "가상과목 알파 1",
+      "credit": 3,
+      "category": "교양",
+      "prerequisites": []
+    },
+    {
+      "id": "SYN102",
+      "name": "가상과목 베타 1",
+      "credit": 3,
+      "category": "교양",
+      "prerequisites": []
+    },
+    {
+      "id": "SYN103",
+      "name": "가상과목 감마 1",
+      "credit": 3,
+      "category": "교양",
+      "prerequisites": []
+    },
+    {
+      "id": "SYN104",
+      "name": "가상과목 델타 1",
+      "credit": 3,
+      "category": "전선",
+      "prerequisites": []
+    },
+    {
+      "id": "SYN105",
+      "name": "가상과목 엡실론 1",
+      "credit": 2,
+      "category": "전선",
+      "prerequisites": []
+    },
+    {
+      "id": "SYN106",
+      "name": "가상과목 제타 1",
+      "credit": 1,
+      "category": "전필",
+      "prerequisites": []
+    },
+    {
+      "id": "SYN107",
+      "name": "가상과목 에타 1",
+      "credit": 3,
+      "category": "전선",
+      "prerequisites": []
+    },
+    {
+      "id": "SYN108",
+      "name": "가상과목 세타 1",
+      "credit": 3,
+      "category": "전필",
+      "prerequisites": []
+    },
+    {
+      "id": "SYN109",
+      "name": "가상과목 이오타 1",
+      "credit": 3,
+      "category": "기타",
+      "prerequisites": []
+    },
+    {
+      "id": "SYN110",
+      "name": "가상과목 카파 1",
+      "credit": 3,
+      "category": "전필",
+      "prerequisites": []
+    },
+    {
+      "id": "SYN111",
+      "name": "가상과목 알파 2",
+      "credit": 3,
+      "category": "전선",
+      "prerequisites": []
+    },
+    {
+      "id": "SYN112",
+      "name": "가상과목 베타 2",
+      "credit": 2,
+      "category": "전선",
+      "prerequisites": []
+    },
+    {
+      "id": "SYN113",
+      "name": "가상과목 감마 2",
+      "credit": 1,
+      "category": "전선",
+      "prerequisites": []
+    },
+    {
+      "id": "SYN114",
+      "name": "가상과목 델타 2",
+      "credit": 3,
+      "category": "기타",
+      "prerequisites": []
+    },
+    {
+      "id": "SYN115",
+      "name": "가상과목 엡실론 2",
+      "credit": 3,
+      "category": "전선",
+      "prerequisites": []
+    },
+    {
+      "id": "SYN116",
+      "name": "가상과목 제타 2",
+      "credit": 2,
+      "category": "교양",
+      "prerequisites": []
+    },
+    {
+      "id": "SYN117",
+      "name": "가상과목 에타 2",
+      "credit": 3,
+      "category": "전필",
+      "prerequisites": []
+    },
+    {
+      "id": "SYN118",
+      "name": "가상과목 세타 2",
+      "credit": 3,
+      "category": "전필",
+      "prerequisites": []
+    },
+    {
+      "id": "SYN119",
+      "name": "가상과목 이오타 2",
+      "credit": 3,
+      "category": "교양",
+      "prerequisites": []
+    },
+    {
+      "id": "SYN120",
+      "name": "가상과목 카파 2",
+      "credit": 3,
+      "category": "전선",
+      "prerequisites": []
+    },
+    {
+      "id": "SYN121",
+      "name": "가상과목 알파 3",
+      "credit": 3,
+      "category": "전선",
+      "prerequisites": []
+    },
+    {
+      "id": "SYN122",
+      "name": "가상과목 베타 3",
+      "credit": 2,
+      "category": "전선",
+      "prerequisites": []
+    },
+    {
+      "id": "SYN123",
+      "name": "가상과목 감마 3",
+      "credit": 3,
+      "category": "전선",
+      "prerequisites": []
+    },
+    {
+      "id": "SYN124",
+      "name": "가상과목 델타 3",
+      "credit": 3,
+      "category": "교양",
+      "prerequisites": []
+    },
+    {
+      "id": "SYN125",
+      "name": "가상과목 엡실론 3",
+      "credit": 3,
+      "category": "전필",
+      "prerequisites": []
+    },
+    {
+      "id": "SYN126",
+      "name": "가상과목 제타 3",
+      "credit": 3,
+      "category": "교양",
+      "prerequisites": []
+    },
+    {
+      "id": "SYN127",
+      "name": "가상과목 에타 3",
+      "credit": 1,
+      "category": "교양",
+      "prerequisites": []
+    },
+    {
+      "id": "SYN128",
+      "name": "가상과목 세타 3",
+      "credit": 1,
+      "category": "기타",
+      "prerequisites": [
+        "SYN105"
+      ]
+    },
+    {
+      "id": "SYN129",
+      "name": "가상과목 이오타 3",
+      "credit": 3,
+      "category": "전선",
+      "prerequisites": []
+    },
+    {
+      "id": "SYN130",
+      "name": "가상과목 카파 3",
+      "credit": 3,
+      "category": "교양",
+      "prerequisites": []
+    },
+    {
+      "id": "SYN131",
+      "name": "가상과목 알파 4",
+      "credit": 2,
+      "category": "교양",
+      "prerequisites": []
+    },
+    {
+      "id": "SYN132",
+      "name": "가상과목 베타 4",
+      "credit": 3,
+      "category": "전선",
+      "prerequisites": [
+        "SYN104"
+      ]
+    },
+    {
+      "id": "SYN133",
+      "name": "가상과목 감마 4",
+      "credit": 1,
+      "category": "교양",
+      "prerequisites": []
+    }
+  ],
+  "sections": [
+    {
+      "id": "SYN101-01",
+      "course_id": "SYN101",
+      "meetings": [
+        {
+          "day": "Mon",
+          "start": "12:00",
+          "end": "13:15"
+        },
+        {
+          "day": "Wed",
+          "start": "12:00",
+          "end": "13:15"
+        }
+      ],
+      "instructor": "가상교수 A18",
+      "capacity": 20
+    },
+    {
+      "id": "SYN102-01",
+      "course_id": "SYN102",
+      "meetings": [
+        {
+          "day": "Tue",
+          "start": "09:00",
+          "end": "10:15"
+        },
+        {
+          "day": "Thu",
+          "start": "09:00",
+          "end": "10:15"
+        }
+      ],
+      "instructor": "가상교수 A14",
+      "capacity": 30
+    },
+    {
+      "id": "SYN103-01",
+      "course_id": "SYN103",
+      "meetings": [
+        {
+          "day": "Mon",
+          "start": "12:00",
+          "end": "13:15"
+        },
+        {
+          "day": "Wed",
+          "start": "12:00",
+          "end": "13:15"
+        }
+      ],
+      "instructor": "가상교수 A01",
+      "capacity": 40
+    },
+    {
+      "id": "SYN104-01",
+      "course_id": "SYN104",
+      "meetings": [
+        {
+          "day": "Mon",
+          "start": "16:30",
+          "end": "17:45"
+        },
+        {
+          "day": "Wed",
+          "start": "16:30",
+          "end": "17:45"
+        }
+      ],
+      "instructor": "가상교수 A06",
+      "capacity": 20
+    },
+    {
+      "id": "SYN105-01",
+      "course_id": "SYN105",
+      "meetings": [
+        {
+          "day": "Fri",
+          "start": "14:00",
+          "end": "15:40"
+        }
+      ],
+      "instructor": "가상교수 A02",
+      "capacity": 20
+    },
+    {
+      "id": "SYN106-01",
+      "course_id": "SYN106",
+      "meetings": [
+        {
+          "day": "Wed",
+          "start": "18:00",
+          "end": "18:50"
+        }
+      ],
+      "instructor": "가상교수 A15",
+      "capacity": 60
+    },
+    {
+      "id": "SYN106-02",
+      "course_id": "SYN106",
+      "meetings": [
+        {
+          "day": "Thu",
+          "start": "18:00",
+          "end": "18:50"
+        }
+      ],
+      "instructor": "가상교수 A03",
+      "capacity": 60
+    },
+    {
+      "id": "SYN106-03",
+      "course_id": "SYN106",
+      "meetings": [
+        {
+          "day": "Mon",
+          "start": "09:00",
+          "end": "09:50"
+        }
+      ],
+      "instructor": "가상교수 A03",
+      "capacity": 60
+    },
+    {
+      "id": "SYN107-01",
+      "course_id": "SYN107",
+      "meetings": [
+        {
+          "day": "Tue",
+          "start": "12:00",
+          "end": "13:15"
+        },
+        {
+          "day": "Thu",
+          "start": "12:00",
+          "end": "13:15"
+        }
+      ],
+      "instructor": "가상교수 A03",
+      "capacity": 40
+    },
+    {
+      "id": "SYN108-01",
+      "course_id": "SYN108",
+      "meetings": [
+        {
+          "day": "Fri",
+          "start": "09:00",
+          "end": "11:45"
+        }
+      ],
+      "instructor": "가상교수 A01",
+      "capacity": 30
+    },
+    {
+      "id": "SYN109-01",
+      "course_id": "SYN109",
+      "meetings": [
+        {
+          "day": "Tue",
+          "start": "16:30",
+          "end": "17:45"
+        },
+        {
+          "day": "Thu",
+          "start": "16:30",
+          "end": "17:45"
+        }
+      ],
+      "instructor": "가상교수 A01",
+      "capacity": 30
+    },
+    {
+      "id": "SYN110-01",
+      "course_id": "SYN110",
+      "meetings": [
+        {
+          "day": "Wed",
+          "start": "19:00",
+          "end": "21:45"
+        }
+      ],
+      "instructor": "가상교수 A19",
+      "capacity": 20
+    },
+    {
+      "id": "SYN111-01",
+      "course_id": "SYN111",
+      "meetings": [
+        {
+          "day": "Mon",
+          "start": "10:30",
+          "end": "11:45"
+        },
+        {
+          "day": "Wed",
+          "start": "10:30",
+          "end": "11:45"
+        }
+      ],
+      "instructor": "가상교수 A01",
+      "capacity": 40
+    },
+    {
+      "id": "SYN112-01",
+      "course_id": "SYN112",
+      "meetings": [
+        {
+          "day": "Mon",
+          "start": "10:30",
+          "end": "12:10"
+        }
+      ],
+      "instructor": "가상교수 A18",
+      "capacity": 60
+    },
+    {
+      "id": "SYN112-02",
+      "course_id": "SYN112",
+      "meetings": [
+        {
+          "day": "Mon",
+          "start": "12:00",
+          "end": "13:40"
+        }
+      ],
+      "instructor": "가상교수 A13",
+      "capacity": 40
+    },
+    {
+      "id": "SYN113-01",
+      "course_id": "SYN113",
+      "meetings": [
+        {
+          "day": "Mon",
+          "start": "09:00",
+          "end": "09:50"
+        }
+      ],
+      "instructor": "가상교수 A04",
+      "capacity": 40
+    },
+    {
+      "id": "SYN113-02",
+      "course_id": "SYN113",
+      "meetings": [
+        {
+          "day": "Thu",
+          "start": "16:00",
+          "end": "16:50"
+        }
+      ],
+      "instructor": "가상교수 A10",
+      "capacity": 30
+    },
+    {
+      "id": "SYN113-03",
+      "course_id": "SYN113",
+      "meetings": [
+        {
+          "day": "Wed",
+          "start": "13:00",
+          "end": "13:50"
+        }
+      ],
+      "instructor": "가상교수 A19",
+      "capacity": 30
+    },
+    {
+      "id": "SYN114-01",
+      "course_id": "SYN114",
+      "meetings": [
+        {
+          "day": "Tue",
+          "start": "15:00",
+          "end": "16:15"
+        },
+        {
+          "day": "Thu",
+          "start": "15:00",
+          "end": "16:15"
+        }
+      ],
+      "instructor": "가상교수 A06",
+      "capacity": 30
+    },
+    {
+      "id": "SYN115-01",
+      "course_id": "SYN115",
+      "meetings": [
+        {
+          "day": "Tue",
+          "start": "09:00",
+          "end": "10:15"
+        },
+        {
+          "day": "Thu",
+          "start": "09:00",
+          "end": "10:15"
+        }
+      ],
+      "instructor": "가상교수 A18",
+      "capacity": 20
+    },
+    {
+      "id": "SYN116-01",
+      "course_id": "SYN116",
+      "meetings": [
+        {
+          "day": "Fri",
+          "start": "14:00",
+          "end": "15:40"
+        }
+      ],
+      "instructor": "가상교수 A13",
+      "capacity": 20
+    },
+    {
+      "id": "SYN116-02",
+      "course_id": "SYN116",
+      "meetings": [
+        {
+          "day": "Thu",
+          "start": "09:00",
+          "end": "10:40"
+        }
+      ],
+      "instructor": "가상교수 A06",
+      "capacity": 30
+    },
+    {
+      "id": "SYN116-03",
+      "course_id": "SYN116",
+      "meetings": [
+        {
+          "day": "Fri",
+          "start": "14:00",
+          "end": "15:40"
+        }
+      ],
+      "instructor": "가상교수 A17",
+      "capacity": 30
+    },
+    {
+      "id": "SYN117-01",
+      "course_id": "SYN117",
+      "meetings": [
+        {
+          "day": "Tue",
+          "start": "16:30",
+          "end": "17:45"
+        },
+        {
+          "day": "Thu",
+          "start": "16:30",
+          "end": "17:45"
+        }
+      ],
+      "instructor": "가상교수 A18",
+      "capacity": 20
+    },
+    {
+      "id": "SYN118-01",
+      "course_id": "SYN118",
+      "meetings": [
+        {
+          "day": "Mon",
+          "start": "10:30",
+          "end": "11:45"
+        },
+        {
+          "day": "Wed",
+          "start": "10:30",
+          "end": "11:45"
+        }
+      ],
+      "instructor": "가상교수 A08",
+      "capacity": 30
+    },
+    {
+      "id": "SYN119-01",
+      "course_id": "SYN119",
+      "meetings": [
+        {
+          "day": "Tue",
+          "start": "16:30",
+          "end": "17:45"
+        },
+        {
+          "day": "Thu",
+          "start": "16:30",
+          "end": "17:45"
+        }
+      ],
+      "instructor": "가상교수 A07",
+      "capacity": 30
+    },
+    {
+      "id": "SYN120-01",
+      "course_id": "SYN120",
+      "meetings": [
+        {
+          "day": "Tue",
+          "start": "09:00",
+          "end": "10:15"
+        },
+        {
+          "day": "Thu",
+          "start": "09:00",
+          "end": "10:15"
+        }
+      ],
+      "instructor": "가상교수 A13",
+      "capacity": 20
+    },
+    {
+      "id": "SYN121-01",
+      "course_id": "SYN121",
+      "meetings": [
+        {
+          "day": "Tue",
+          "start": "09:00",
+          "end": "10:15"
+        },
+        {
+          "day": "Thu",
+          "start": "09:00",
+          "end": "10:15"
+        }
+      ],
+      "instructor": "가상교수 A15",
+      "capacity": 30
+    },
+    {
+      "id": "SYN121-02",
+      "course_id": "SYN121",
+      "meetings": [
+        {
+          "day": "Mon",
+          "start": "16:30",
+          "end": "17:45"
+        },
+        {
+          "day": "Wed",
+          "start": "16:30",
+          "end": "17:45"
+        }
+      ],
+      "instructor": "가상교수 A04",
+      "capacity": 30
+    },
+    {
+      "id": "SYN121-03",
+      "course_id": "SYN121",
+      "meetings": [
+        {
+          "day": "Mon",
+          "start": "15:00",
+          "end": "16:15"
+        },
+        {
+          "day": "Wed",
+          "start": "15:00",
+          "end": "16:15"
+        }
+      ],
+      "instructor": "가상교수 A16",
+      "capacity": 40
+    },
+    {
+      "id": "SYN122-01",
+      "course_id": "SYN122",
+      "meetings": [
+        {
+          "day": "Thu",
+          "start": "19:00",
+          "end": "20:40"
+        }
+      ],
+      "instructor": "가상교수 A18",
+      "capacity": 60
+    },
+    {
+      "id": "SYN122-02",
+      "course_id": "SYN122",
+      "meetings": [
+        {
+          "day": "Tue",
+          "start": "09:00",
+          "end": "10:40"
+        }
+      ],
+      "instructor": "가상교수 A17",
+      "capacity": 30
+    },
+    {
+      "id": "SYN122-03",
+      "course_id": "SYN122",
+      "meetings": [
+        {
+          "day": "Wed",
+          "start": "12:00",
+          "end": "13:40"
+        }
+      ],
+      "instructor": "가상교수 A12",
+      "capacity": 40
+    },
+    {
+      "id": "SYN123-01",
+      "course_id": "SYN123",
+      "meetings": [
+        {
+          "day": "Mon",
+          "start": "10:30",
+          "end": "11:45"
+        },
+        {
+          "day": "Wed",
+          "start": "10:30",
+          "end": "11:45"
+        }
+      ],
+      "instructor": "가상교수 A03",
+      "capacity": 40
+    },
+    {
+      "id": "SYN124-01",
+      "course_id": "SYN124",
+      "meetings": [
+        {
+          "day": "Mon",
+          "start": "15:00",
+          "end": "16:15"
+        },
+        {
+          "day": "Wed",
+          "start": "15:00",
+          "end": "16:15"
+        }
+      ],
+      "instructor": "가상교수 A14",
+      "capacity": 30
+    },
+    {
+      "id": "SYN124-02",
+      "course_id": "SYN124",
+      "meetings": [
+        {
+          "day": "Tue",
+          "start": "15:00",
+          "end": "16:15"
+        },
+        {
+          "day": "Thu",
+          "start": "15:00",
+          "end": "16:15"
+        }
+      ],
+      "instructor": "가상교수 A15",
+      "capacity": 40
+    },
+    {
+      "id": "SYN125-01",
+      "course_id": "SYN125",
+      "meetings": [
+        {
+          "day": "Fri",
+          "start": "13:00",
+          "end": "15:45"
+        }
+      ],
+      "instructor": "가상교수 A01",
+      "capacity": 40
+    },
+    {
+      "id": "SYN125-02",
+      "course_id": "SYN125",
+      "meetings": [
+        {
+          "day": "Tue",
+          "start": "15:00",
+          "end": "16:15"
+        },
+        {
+          "day": "Thu",
+          "start": "15:00",
+          "end": "16:15"
+        }
+      ],
+      "instructor": "가상교수 A14",
+      "capacity": 40
+    },
+    {
+      "id": "SYN126-01",
+      "course_id": "SYN126",
+      "meetings": [
+        {
+          "day": "Fri",
+          "start": "13:00",
+          "end": "15:45"
+        }
+      ],
+      "instructor": "가상교수 A10",
+      "capacity": 60
+    },
+    {
+      "id": "SYN127-01",
+      "course_id": "SYN127",
+      "meetings": [
+        {
+          "day": "Tue",
+          "start": "18:00",
+          "end": "18:50"
+        }
+      ],
+      "instructor": "가상교수 A13",
+      "capacity": 60
+    },
+    {
+      "id": "SYN128-01",
+      "course_id": "SYN128",
+      "meetings": [
+        {
+          "day": "Wed",
+          "start": "16:00",
+          "end": "16:50"
+        }
+      ],
+      "instructor": "가상교수 A19",
+      "capacity": 60
+    },
+    {
+      "id": "SYN129-01",
+      "course_id": "SYN129",
+      "meetings": [
+        {
+          "day": "Mon",
+          "start": "09:00",
+          "end": "10:15"
+        },
+        {
+          "day": "Wed",
+          "start": "09:00",
+          "end": "10:15"
+        }
+      ],
+      "instructor": "가상교수 A18",
+      "capacity": 40
+    },
+    {
+      "id": "SYN130-01",
+      "course_id": "SYN130",
+      "meetings": [
+        {
+          "day": "Mon",
+          "start": "19:00",
+          "end": "21:45"
+        }
+      ],
+      "instructor": "가상교수 A12",
+      "capacity": 60
+    },
+    {
+      "id": "SYN130-02",
+      "course_id": "SYN130",
+      "meetings": [
+        {
+          "day": "Tue",
+          "start": "13:30",
+          "end": "14:45"
+        },
+        {
+          "day": "Thu",
+          "start": "13:30",
+          "end": "14:45"
+        }
+      ],
+      "instructor": "가상교수 A09",
+      "capacity": 30
+    },
+    {
+      "id": "SYN130-03",
+      "course_id": "SYN130",
+      "meetings": [
+        {
+          "day": "Mon",
+          "start": "12:00",
+          "end": "13:15"
+        },
+        {
+          "day": "Wed",
+          "start": "12:00",
+          "end": "13:15"
+        }
+      ],
+      "instructor": "가상교수 A11",
+      "capacity": 20
+    },
+    {
+      "id": "SYN131-01",
+      "course_id": "SYN131",
+      "meetings": [
+        {
+          "day": "Fri",
+          "start": "14:00",
+          "end": "15:40"
+        }
+      ],
+      "instructor": "가상교수 A03",
+      "capacity": 20
+    },
+    {
+      "id": "SYN131-02",
+      "course_id": "SYN131",
+      "meetings": [
+        {
+          "day": "Wed",
+          "start": "13:30",
+          "end": "15:10"
+        }
+      ],
+      "instructor": "가상교수 A04",
+      "capacity": 30
+    },
+    {
+      "id": "SYN132-01",
+      "course_id": "SYN132",
+      "meetings": [
+        {
+          "day": "Mon",
+          "start": "15:00",
+          "end": "16:15"
+        },
+        {
+          "day": "Wed",
+          "start": "15:00",
+          "end": "16:15"
+        }
+      ],
+      "instructor": "가상교수 A08",
+      "capacity": 40
+    },
+    {
+      "id": "SYN133-01",
+      "course_id": "SYN133",
+      "meetings": [
+        {
+          "day": "Thu",
+          "start": "18:00",
+          "end": "18:50"
+        }
+      ],
+      "instructor": "가상교수 A17",
+      "capacity": 60
+    },
+    {
+      "id": "SYN133-02",
+      "course_id": "SYN133",
+      "meetings": [
+        {
+          "day": "Mon",
+          "start": "13:00",
+          "end": "13:50"
+        }
+      ],
+      "instructor": "가상교수 A08",
+      "capacity": 40
+    }
+  ]
+}
