@@ -1,0 +1,254 @@
+{
+  "catalog": "catalog_50.json",
+  "note": "합성 데이터 전용. expected_conflict_ids는 최소 충돌 집합(하나를 빼면 가능).",
+  "scenarios": [
+    {
+      "id": "fri_dayoff_vs_friday_only_course",
+      "description": "금요일 공강(hard) + 금요일에만 열리는 SYN108 필수 포함",
+      "constraints": [
+        {
+          "id": "c1",
+          "type": "day_off",
+          "params": {
+            "days": [
+              "Fri"
+            ]
+          },
+          "strength": "hard",
+          "weight": 10
+        },
+        {
+          "id": "c2",
+          "type": "must_include",
+          "params": {
+            "course_id": "SYN108"
+          },
+          "strength": "hard",
+          "weight": 10
+        },
+        {
+          "id": "c3",
+          "type": "time_prefer",
+          "params": {
+            "days": [
+              "Mon",
+              "Tue",
+              "Wed",
+              "Thu",
+              "Fri"
+            ],
+            "start": "10:00",
+            "end": "16:00"
+          },
+          "strength": "soft",
+          "weight": 4
+        }
+      ],
+      "expected_conflict_ids": [
+        "c1",
+        "c2"
+      ],
+      "expected_status": "INFEASIBLE"
+    },
+    {
+      "id": "two_required_single_sections_overlap",
+      "description": "단일 분반 필수 과목 SYN101·SYN103이 월수 12:00–13:15에 겹침",
+      "constraints": [
+        {
+          "id": "c1",
+          "type": "must_include",
+          "params": {
+            "course_id": "SYN101"
+          },
+          "strength": "hard",
+          "weight": 10
+        },
+        {
+          "id": "c2",
+          "type": "must_include",
+          "params": {
+            "course_id": "SYN103"
+          },
+          "strength": "hard",
+          "weight": 10
+        },
+        {
+          "id": "c3",
+          "type": "credit_range",
+          "params": {
+            "min": 0,
+            "max": 21
+          },
+          "strength": "hard",
+          "weight": 10
+        }
+      ],
+      "expected_conflict_ids": [
+        "c1",
+        "c2"
+      ],
+      "expected_status": "INFEASIBLE"
+    },
+    {
+      "id": "lunch_free_vs_lunchtime_required",
+      "description": "점심 12–13시 60분 확보(hard) + 화목 12:00–13:15 단일 분반 SYN107 필수",
+      "constraints": [
+        {
+          "id": "c1",
+          "type": "lunch_free",
+          "params": {
+            "start": "12:00",
+            "end": "13:00",
+            "min_free_minutes": 60
+          },
+          "strength": "hard",
+          "weight": 10
+        },
+        {
+          "id": "c2",
+          "type": "must_include",
+          "params": {
+            "course_id": "SYN107"
+          },
+          "strength": "hard",
+          "weight": 10
+        },
+        {
+          "id": "c3",
+          "type": "instructor_prefer",
+          "params": {
+            "instructor": "가상교수 A01"
+          },
+          "strength": "soft",
+          "weight": 3
+        }
+      ],
+      "expected_conflict_ids": [
+        "c1",
+        "c2"
+      ],
+      "expected_status": "INFEASIBLE"
+    },
+    {
+      "id": "credit_min_exceeds_friday_only_max",
+      "description": "월–목 공강(hard)이면 금요일 과목만 남아 최대 학점이 하한 18에 못 미침",
+      "constraints": [
+        {
+          "id": "c1",
+          "type": "day_off",
+          "params": {
+            "days": [
+              "Mon",
+              "Tue",
+              "Wed",
+              "Thu"
+            ]
+          },
+          "strength": "hard",
+          "weight": 10
+        },
+        {
+          "id": "c2",
+          "type": "credit_range",
+          "params": {
+            "min": 18,
+            "max": 21
+          },
+          "strength": "hard",
+          "weight": 10
+        },
+        {
+          "id": "c3",
+          "type": "max_gap",
+          "params": {
+            "minutes": 90
+          },
+          "strength": "soft",
+          "weight": 5
+        }
+      ],
+      "expected_conflict_ids": [
+        "c1",
+        "c2"
+      ],
+      "expected_status": "INFEASIBLE"
+    },
+    {
+      "id": "category_min_exceeds_offered",
+      "description": "'기타' 카테고리 개설 학점 합(7) < 요구 9",
+      "constraints": [
+        {
+          "id": "c1",
+          "type": "category_min",
+          "params": {
+            "category": "기타",
+            "credits": 9
+          },
+          "strength": "hard",
+          "weight": 10
+        },
+        {
+          "id": "c2",
+          "type": "day_off",
+          "params": {
+            "days": [
+              "Fri"
+            ]
+          },
+          "strength": "soft",
+          "weight": 6
+        }
+      ],
+      "expected_conflict_ids": [
+        "c1"
+      ],
+      "expected_status": "INFEASIBLE"
+    },
+    {
+      "id": "morning_avoid_vs_morning_required",
+      "description": "오전 10:30 이전 수업 회피(hard) + 화목 09:00 단일 분반 SYN102 필수",
+      "constraints": [
+        {
+          "id": "c1",
+          "type": "time_avoid",
+          "params": {
+            "days": [
+              "Mon",
+              "Tue",
+              "Wed",
+              "Thu",
+              "Fri"
+            ],
+            "start": "08:00",
+            "end": "10:30"
+          },
+          "strength": "hard",
+          "weight": 10
+        },
+        {
+          "id": "c2",
+          "type": "must_include",
+          "params": {
+            "course_id": "SYN102"
+          },
+          "strength": "hard",
+          "weight": 10
+        },
+        {
+          "id": "c3",
+          "type": "must_exclude",
+          "params": {
+            "course_id": "SYN120"
+          },
+          "strength": "hard",
+          "weight": 10
+        }
+      ],
+      "expected_conflict_ids": [
+        "c1",
+        "c2"
+      ],
+      "expected_status": "INFEASIBLE"
+    }
+  ]
+}

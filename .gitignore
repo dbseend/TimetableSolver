@@ -2,22 +2,35 @@
 __pycache__/
 *.pyc
 .venv/
+venv/
 .pytest_cache/
 .ruff_cache/
 .hypothesis/
+.mypy_cache/
 # Node
 node_modules/
 dist/
+coverage/
+*.tsbuildinfo
+.vercel/
 apps/web/test-results/
 apps/web/playwright-report/
 # env / secrets
 .env
 .env.*
 !.env.example
-# OS
+# OS / editor
 .DS_Store
 Thumbs.db
+.idea/
+.vscode/
+.claude/
 
 # 실제 학교 자료(커밋 금지)
 local-data/
-*.tsbuildinfo
+data/private/
+data/raw/
+data/**/*.xlsx
+data/**/*.xls
+# LLM 응답 캐시(사용자 문장 포함 가능)
+**/llm_cache/
