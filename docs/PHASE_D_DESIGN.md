@@ -211,3 +211,13 @@ frontend/src/
 - 프론트 (D-b 일부 포함): 세션 상태(localStorage, 실패 시 메모리), 준비 화면(합성 샘플·카탈로그 JSON 업로드·과목 검색·관심 과목과 우선순위), 선호 화면(제약 JSON 직접 편집, D-e에서 칩으로 교체), 결과 화면(후보 카드 + 시간표 그리드 + 못 지킨 soft 선호 + 진단 패널과 "이 조건 빼고 다시 풀기").
 - 브라우저 확인: 합성 50 → 관심 과목 9개 → 예시 제약 → 후보 3개(16학점, 금요일 비움). 금 공강 + 금요일 전용 필수 과목 → 진단 2개(무관한 학점 제약 제외) → 완화 후 18학점 후보.
 - 남은 것: 실데이터 업로드는 변환 JSON만 받는다(.xls 직접 업로드는 D-a의 `/catalog`로). soft 최적화는 D-f. 수동 분반 선택·충돌 표시(GD1-a의 일부)는 아직 없다.
+
+### D-e 완료 (2026-11-09, `feat/phase-d`)
+- 스파이크: Gemini가 `const`를 무시해 타입명을 지어냄 → `const`→`enum` 변환으로 원래 스키마 유지(평탄 스키마 대안은 불필요한 params로 검증 실패).
+- `app/llm/`: `provider.py`(Gemini, 디스크 캐시 `backend/llm_cache/`, 프로세스 메모리 일일 한도), `parse_constraints.py`(프롬프트 `prompts/parse_constraints.md`, 검증 실패 시 오류를 담아 최대 2회 재요청, id 재번호), `entities.py`(정확·포함·difflib, 확신 없으면 후보만).
+- 서버 보정: LLM이 교수를 must_include/exclude에 넣으면 instructor_* 로 변환.
+- `CatalogSummary.course_names` → `courses[{id,name}]` (API 변경). 과목·교수 목록은 서버 매칭에만 쓰고 LLM에는 카테고리만 보낸다.
+- 시드 40문장(개발셋, 프롬프트 튜닝에 사용): 프롬프트 v1 F1 0.93·완전 일치 29/40 → v2 **F1 0.99, 강도 일치 58/60, 완전 일치 37/40**. 응답은 `tests/fixtures/seed_llm_responses.json`에 고정, 골든 테스트가 네트워크 없이 재생(프롬프트가 바뀌면 지문 불일치로 실패 → `scripts/record_seed_llm.py`로 재기록). **평가 수치가 아니다.**
+- 시드 라벨 a06을 가이드 §1에 맞게 hard로 수정.
+- UI: 선호 문장 입력(Gemini 전송 고지) → 칩(강도 토글, 중요도, 삭제, 모호성 경고) → 모호한 과목은 후보 버튼으로 선택. JSON 편집은 접힌 고급 메뉴.
+- 브라우저 확인(실제 Gemini): 문장 1개 → 칩 5개, "알파" 후보 4개 → 선택 → 후보 시간표(9시 회피·알파 1 포함·15학점).

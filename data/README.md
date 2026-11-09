@@ -54,7 +54,7 @@ data/
 <!-- hashes:start -->
 | 파일 | sha256 |
 |---|---|
-| `eval/seed_labels.jsonl` | `93f9899627855a12f6773d3be5c1f5948cf7c010dcf3b0cc2cddf44656d96599` |
+| `eval/seed_labels.jsonl` | `77845cc04aeac9d25289d71c33b36365b3070185ddf9cc8d15baf75c6a7ba44a` |
 | `synthetic/catalog_200.json` | `b9273ff592da5561ae21b1d46a8f5a510a1a4622c9a75953261cd92092446bb6` |
 | `synthetic/catalog_50.json` | `d07e87abecb2a96c38b8e80ba317657306a1648f099f6185c0854651994af035` |
 | `synthetic/catalog_500.json` | `674ad49f2888761f62fac2976710b5f5a34bb4c8dd2c4ae635eabb8c5185ba38` |

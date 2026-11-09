@@ -1,6 +1,7 @@
 import logging
 import time
 from collections.abc import Awaitable, Callable
+from pathlib import Path
 
 from fastapi import FastAPI, Request, Response
 from fastapi.middleware.cors import CORSMiddleware
@@ -10,8 +11,19 @@ from app.api import api_router
 from app.core.config import Settings, get_settings
 from app.core.errors import register_error_handlers
 from app.core.logging import configure_logging
+from app.llm.provider import CachedProvider, GeminiProvider, Provider
 
 logger = logging.getLogger("app.request")
+
+LLM_CACHE_DIR = Path(__file__).resolve().parent.parent / "llm_cache"  # gitignored
+
+
+def make_llm(settings: Settings) -> Provider | None:
+    """None when LLM features are off (no key or LLM_PROVIDER=none); the API still runs."""
+    if not settings.llm_enabled or not settings.llm_model:
+        return None
+    gemini = GeminiProvider(settings.llm_api_key.get_secret_value(), settings.llm_model)
+    return CachedProvider(gemini, LLM_CACHE_DIR, settings.daily_llm_call_limit)
 
 
 def create_app(settings: Settings | None = None) -> FastAPI:
@@ -20,6 +32,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
 
     app = FastAPI(title="TimetableSolver API", version=__version__)
     app.state.settings = settings
+    app.state.llm = make_llm(settings)
 
     app.add_middleware(
         CORSMiddleware,

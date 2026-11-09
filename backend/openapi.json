@@ -98,6 +98,7 @@
         "type": "object"
       },
       "CatalogSummary": {
+        "description": "What the parser needs to resolve names. Only `categories` is shown to the LLM; courses and\ninstructors are matched on the server.",
         "properties": {
           "categories": {
             "items": {
@@ -106,11 +107,11 @@
             "title": "Categories",
             "type": "array"
           },
-          "course_names": {
+          "courses": {
             "items": {
-              "type": "string"
+              "$ref": "#/components/schemas/CourseRef"
             },
-            "title": "Course Names",
+            "title": "Courses",
             "type": "array"
           },
           "instructors": {
@@ -403,6 +404,26 @@
           "category"
         ],
         "title": "Course",
+        "type": "object"
+      },
+      "CourseRef": {
+        "properties": {
+          "id": {
+            "minLength": 1,
+            "title": "Id",
+            "type": "string"
+          },
+          "name": {
+            "minLength": 1,
+            "title": "Name",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "name"
+        ],
+        "title": "CourseRef",
         "type": "object"
       },
       "CourseRefParams": {
@@ -2040,6 +2061,16 @@
             },
             "description": "Validation error"
           },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "LLM rate or daily limit reached"
+          },
           "501": {
             "content": {
               "application/json": {
@@ -2049,6 +2080,26 @@
               }
             },
             "description": "Not implemented yet"
+          },
+          "502": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "LLM failed or returned invalid output"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "LLM disabled (no provider or key)"
           }
         },
         "summary": "Parse Constraints",

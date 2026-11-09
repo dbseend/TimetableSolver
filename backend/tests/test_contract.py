@@ -21,7 +21,6 @@ EMPTY_RESULT = {
 STUB_REQUESTS = {
     "/catalog/validate": {"courses": [], "sections": []},
     "/profile/parse": {"consent": True, "rows": []},
-    "/constraints/parse": {"text": "금요일 공강이면 좋겠다"},
     "/explain": {
         "catalog": {"courses": [], "sections": []},
         "result": EMPTY_RESULT,

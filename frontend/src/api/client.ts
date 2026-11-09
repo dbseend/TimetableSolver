@@ -8,6 +8,18 @@ export type PoolItem = S["PoolItem"];
 export type SolveRequest = S["SolveRequest"];
 export type SolveResult = S["SolveResult"];
 export type Constraint = NonNullable<SolveRequest["constraints"]>[number];
+export type ParseRequest = S["ConstraintsParseRequest"];
+export type ParseResponse = S["ConstraintsParseResponse"];
+
+/** Error with the API's machine-readable code (e.g. llm_disabled). */
+export class ApiError extends Error {
+  constructor(
+    public code: string,
+    message: string,
+  ) {
+    super(message);
+  }
+}
 
 const BASE = (import.meta.env.VITE_API_BASE_URL as string | undefined) ?? "http://localhost:8000";
 
@@ -17,9 +29,8 @@ export async function getHealth(signal?: AbortSignal): Promise<Health> {
   return (await res.json()) as Health;
 }
 
-/** Throws an Error carrying the API's unified error message. */
-export async function postSolve(body: SolveRequest, signal?: AbortSignal): Promise<SolveResult> {
-  const res = await fetch(`${BASE}/solve`, {
+async function post<T>(path: string, body: unknown, signal?: AbortSignal): Promise<T> {
+  const res = await fetch(`${BASE}${path}`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(body),
@@ -29,7 +40,14 @@ export async function postSolve(body: SolveRequest, signal?: AbortSignal): Promi
   if (!res.ok) {
     const err = (data as S["ErrorResponse"] | null)?.error;
     const where = err?.details?.map((d) => (d as { loc?: unknown[] }).loc?.join(".")).join(", ");
-    throw new Error(err ? `${err.message}${where ? ` (${where})` : ""}` : `solve ${res.status}`);
+    const message = err ? `${err.message}${where ? ` (${where})` : ""}` : `${path} ${res.status}`;
+    throw new ApiError(err?.code ?? "http_error", message);
   }
-  return data as SolveResult;
+  return data as T;
 }
+
+export const postSolve = (body: SolveRequest, signal?: AbortSignal) =>
+  post<SolveResult>("/solve", body, signal);
+
+export const postParse = (body: ParseRequest, signal?: AbortSignal) =>
+  post<ParseResponse>("/constraints/parse", body, signal);

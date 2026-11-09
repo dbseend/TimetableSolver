@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { postSolve, type Catalog, type Constraint, type SolveResult } from "../api/client";
 import TimetableGrid, { blocksFor } from "../components/TimetableGrid";
+import { summarize } from "../constraints";
 import { useSession } from "../state";
 import { parseConstraints } from "./Preferences";
 
@@ -11,10 +12,6 @@ const STATUS: Record<SolveResult["status"], string> = {
   UNKNOWN: "시간 제한 안에 답을 찾지 못했다",
 };
 
-function describe(c: Constraint | undefined, id: string): string {
-  if (!c) return id;
-  return c.source_text ?? `${c.type} ${JSON.stringify(c.params)}`;
-}
 
 function totalCredits(catalog: Catalog, sectionIds: string[]): number {
   const courses = new Map(catalog.courses.map((c) => [c.id, c]));
@@ -30,6 +27,8 @@ export default function Results() {
   const parsed = parseConstraints(constraintsText);
   const constraints = ("value" in parsed ? parsed.value : []) as Constraint[];
   const byId = new Map(constraints.map((c) => [c.id, c]));
+  const describe = (c: Constraint | undefined, id: string) =>
+    c ? (c.source_text ?? summarize(c, catalog)) : id;
 
   const blocker = !catalog
     ? "준비 단계에서 개설강좌를 불러온다."

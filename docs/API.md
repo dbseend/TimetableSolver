@@ -7,7 +7,7 @@
 | GET | /health | 동작 | `{status, version}` |
 | POST | /catalog/validate | 501 | 카탈로그 검증, 행 단위 오류 |
 | POST | /profile/parse | 501 | 이수내역 LLM 폴백 파싱. `consent: true` 필수, 최소 컬럼 |
-| POST | /constraints/parse | 501 | 자연어 → 제약 JSON. 길이 > `MAX_INPUT_CHARS` → 422 `input_too_long` |
+| POST | /constraints/parse | 동작 | 자연어 → 제약 JSON + 모호성 + 엔티티 후보. 길이 > `MAX_INPUT_CHARS` → 422 `input_too_long`. LLM 꺼짐 503 `llm_disabled`, 한도 429 `llm_daily_limit`/`llm_rate_limited`, 실패 502 `llm_unavailable`/`llm_invalid_output` |
 | POST | /solve | 동작 | 후보 N개, 불가능 시 최소 충돌 집합 + 완화안. 제약 id 중복 불가. 시간 제한은 `SOLVER_TIME_LIMIT_S`로 상한 |
 | POST | /explain | 501 | 결과 설명. 요청에 catalog + constraints + result 포함 |
 

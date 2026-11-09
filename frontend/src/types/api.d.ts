@@ -143,12 +143,16 @@ export interface components {
             /** Sections */
             sections: components["schemas"]["Section"][];
         };
-        /** CatalogSummary */
+        /**
+         * CatalogSummary
+         * @description What the parser needs to resolve names. Only `categories` is shown to the LLM; courses and
+         *     instructors are matched on the server.
+         */
         CatalogSummary: {
             /** Categories */
             categories?: string[];
-            /** Course Names */
-            course_names?: string[];
+            /** Courses */
+            courses?: components["schemas"]["CourseRef"][];
             /** Instructors */
             instructors?: string[];
         };
@@ -229,6 +233,13 @@ export interface components {
             name: string;
             /** Prerequisites */
             prerequisites?: string[];
+        };
+        /** CourseRef */
+        CourseRef: {
+            /** Id */
+            id: string;
+            /** Name */
+            name: string;
         };
         /** CourseRefParams */
         CourseRefParams: {
@@ -864,8 +875,35 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
+            /** @description LLM rate or daily limit reached */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
             /** @description Not implemented yet */
             501: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description LLM failed or returned invalid output */
+            502: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description LLM disabled (no provider or key) */
+            503: {
                 headers: {
                     [name: string]: unknown;
                 };

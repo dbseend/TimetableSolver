@@ -11,6 +11,9 @@
   - 무료 등급의 RPM/RPD 한도는 모델·계정별로 다르고 공식 모델 페이지에 수치가 없다. AI Studio 콘솔에서 확인 `[확인 필요]`.
   - 서버 측 `DAILY_LLM_CALL_LIMIT`(기본 200)로 일일 호출을 자체 제한하고, 429는 사용자에게 "잠시 후 재시도"로 안내한다(Phase D).
   - 평가(100문장 × 반복) 실행은 응답 캐시(`**/llm_cache/`, gitignore)로 재호출을 줄인다.
+- 구조화 출력 (D-e에서 확인, 2026-11-09)
+  - Gemini는 `response_json_schema`의 `const`를 지키지 않고 타입명을 지어냈다(`avoid_days` 등). `const`를 값 1개짜리 `enum`으로 바꾸고 `discriminator`를 빼면 원래 스키마 그대로 유효한 출력을 낸다(`app/llm/parse_constraints.py`의 `llm_schema`).
+  - SDK: `google-genai==3.0.0`. 테스트는 `LLM_PROVIDER=none`(tests/conftest.py)으로 외부 호출을 막는다.
 - 구조화 출력 사용 계획 (Phase D)
   - `response_mime_type=application/json` + `constraint_json_schema()` 전달 → 응답을 `constraints_adapter`로 재검증. 스키마 불일치는 1회 재시도 후 오류.
   - LLM에게 시간표를 만들게 하지 않는다. 제약 JSON 생성과 설명 문장에만 사용.

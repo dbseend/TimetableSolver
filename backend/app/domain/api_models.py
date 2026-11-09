@@ -73,8 +73,16 @@ class ProfileParseResponse(BaseModel):
 # ---- /constraints/parse ----------------------------------------------------------------
 
 
+class CourseRef(BaseModel):
+    id: str = Field(min_length=1)
+    name: str = Field(min_length=1)
+
+
 class CatalogSummary(BaseModel):
-    course_names: list[str] = Field(default_factory=list)
+    """What the parser needs to resolve names. Only `categories` is shown to the LLM; courses and
+    instructors are matched on the server."""
+
+    courses: list[CourseRef] = Field(default_factory=list)
     instructors: list[str] = Field(default_factory=list)
     categories: list[str] = Field(default_factory=list)
 
