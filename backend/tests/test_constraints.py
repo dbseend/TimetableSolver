@@ -137,7 +137,7 @@ def test_credit_range_must_be_ordered():
 
 
 def test_days_must_be_nonempty_unique_and_weekdays():
-    for days in ([], ["Fri", "Fri"], ["Sat"]):
+    for days in ([], ["Fri", "Fri"], ["Sun"]):
         bad = make("day_off")
         bad["params"]["days"] = days
         with pytest.raises(ValidationError):
@@ -151,8 +151,8 @@ def test_lunch_free_cannot_exceed_window():
         constraint_adapter.validate_python(bad)
 
 
-def test_max_days_bounded_by_weekdays():
+def test_max_days_bounded_by_days():
     bad = make("max_days_on_campus")
-    bad["params"]["max_days"] = 6
+    bad["params"]["max_days"] = 7
     with pytest.raises(ValidationError):
         constraint_adapter.validate_python(bad)

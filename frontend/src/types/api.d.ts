@@ -521,7 +521,7 @@ export interface components {
              * Day
              * @enum {string}
              */
-            day: "Mon" | "Tue" | "Wed" | "Thu" | "Fri";
+            day: "Mon" | "Tue" | "Wed" | "Thu" | "Fri" | "Sat";
             /** End */
             end: string;
             /** Start */
@@ -642,8 +642,12 @@ export interface components {
         Section: {
             /** Capacity */
             capacity?: number | null;
+            /** Category */
+            category?: string | null;
             /** Course Id */
             course_id: string;
+            /** Credit */
+            credit?: number | null;
             /** Id */
             id: string;
             /** Instructor */
@@ -738,7 +742,7 @@ export interface components {
         /** TimeWindowParams */
         TimeWindowParams: {
             /** Days */
-            days: ("Mon" | "Tue" | "Wed" | "Thu" | "Fri")[];
+            days: ("Mon" | "Tue" | "Wed" | "Thu" | "Fri" | "Sat")[];
             /** End */
             end: string;
             /** Start */
@@ -754,7 +758,7 @@ export interface components {
         /** _DaysParams */
         _DaysParams: {
             /** Days */
-            days: ("Mon" | "Tue" | "Wed" | "Thu" | "Fri")[];
+            days: ("Mon" | "Tue" | "Wed" | "Thu" | "Fri" | "Sat")[];
         };
     };
     responses: never;

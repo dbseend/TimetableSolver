@@ -22,7 +22,7 @@ class Meeting(BaseModel):
 class Course(BaseModel):
     id: str = Field(min_length=1)
     name: str = Field(min_length=1)
-    credit: int = Field(ge=0, le=10)
+    credit: float = Field(ge=0, le=10, multiple_of=0.5)  # 0.5 steps exist (e.g. 0.5-credit 교필)
     category: str = Field(min_length=1)
     prerequisites: list[str] = Field(default_factory=list)
 
@@ -33,6 +33,10 @@ class Section(BaseModel):
     meetings: list[Meeting] = Field(default_factory=list)
     instructor: str | None = None
     capacity: int | None = Field(default=None, ge=0)
+    # Per-section overrides for courses whose sections differ (e.g. internships with variable
+    # credits, a course that is 전필 for one section and 전선 for another). None = course value.
+    credit: float | None = Field(default=None, ge=0, le=10, multiple_of=0.5)
+    category: str | None = Field(default=None, min_length=1)
 
 
 class Profile(BaseModel):
@@ -58,3 +62,11 @@ class Catalog(BaseModel):
         if any(s.course_id not in known for s in self.sections):
             raise ValueError("section references an unknown course")
         return self
+
+    def credit_and_category(self, section: Section) -> tuple[float, str]:
+        """Effective values for a section: its override, else its course's."""
+        course = next(c for c in self.courses if c.id == section.course_id)
+        return (
+            course.credit if section.credit is None else section.credit,
+            section.category or course.category,
+        )

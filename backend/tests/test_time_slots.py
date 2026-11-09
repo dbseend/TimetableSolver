@@ -12,7 +12,7 @@ from app.core.time_slots import (
 
 
 def test_grid_dimensions():
-    assert N_SLOTS == (DAY_END_MIN - DAY_START_MIN) // SLOT_MIN == 28
+    assert N_SLOTS == (DAY_END_MIN - DAY_START_MIN) // SLOT_MIN == 32
 
 
 @pytest.mark.parametrize("s,m", [("00:00", 0), ("09:30", 570), ("23:59", 1439)])
@@ -53,10 +53,16 @@ def test_different_days_do_not_overlap():
         ("Mon", "10:00", "10:00"),  # empty
         ("Mon", "11:00", "10:00"),  # reversed
         ("Mon", "07:00", "09:00"),  # before grid
-        ("Mon", "21:00", "22:30"),  # after grid
-        ("Sat", "09:00", "10:00"),  # unsupported day
+        ("Mon", "07:30", "08:30"),  # straddles grid start
+        ("Sun", "09:00", "10:00"),  # unsupported day
     ],
 )
 def test_meeting_slots_rejects_invalid(day, start, end):
     with pytest.raises(ValueError):
         meeting_slots(day, start, end)
+
+
+def test_saturday_and_late_classes_fit_grid():
+    assert meeting_slots("Sat", "09:00", "10:15") == frozenset({(5, 2), (5, 3), (5, 4)})
+    last = meeting_slots("Fri", "22:30", "23:45")  # 10th period
+    assert max(t for _, t in last) == N_SLOTS - 1

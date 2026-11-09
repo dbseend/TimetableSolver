@@ -57,7 +57,7 @@ class ProfileRow(BaseModel):
 
     code: str | None = None
     name: str = Field(min_length=1)
-    credit: int | None = Field(default=None, ge=0, le=10)
+    credit: float | None = Field(default=None, ge=0, le=10, multiple_of=0.5)
 
 
 class ProfileParseRequest(BaseModel):

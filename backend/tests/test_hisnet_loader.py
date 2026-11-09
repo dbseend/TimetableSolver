@@ -60,8 +60,8 @@ def test_parse_reports_bad_rows_without_echoing_them():
     text = "\n".join(
         [
             HEADER,
-            row("전선", "SYN1", "01", "가상과목", "0.5", "가상교수 비밀", "Mon1"),
-            row("전선", "SYN2", "01", "가상과목", "3", "가상교수 비밀", "Sat1"),
+            row("전선", "SYN1", "01", "가상과목", "0.3", "가상교수 비밀", "Mon1"),
+            row("전선", "SYN2", "01", "가상과목", "3", "가상교수 비밀", "Sun1"),
             row("전선", "SYN3", "01", "가상과목", "3", "", "Mon1"),
             row("전선", "SYN3", "02", "다른이름", "3", "", "Mon2"),
         ]
@@ -70,6 +70,27 @@ def test_parse_reports_bad_rows_without_echoing_them():
     assert [e.index for e in errors] == [0, 1, 3]
     assert all("비밀" not in e.message for e in errors)
     assert [c.id for c in catalog.courses] == ["SYN3"]
+
+
+def test_parse_keeps_saturday_half_credits_and_section_overrides():
+    text = "\n".join(
+        [
+            HEADER,
+            row("교필", "SYN1", "01", "가상 채플", ".5", "", ""),
+            row("교선", "SYN2", "01", "가상 토요", "3", "", "Sat1,Sat2"),
+            row("전선", "SYN3", "01", "가상 실습", "6", "", ""),
+            row("전선", "SYN3", "02", "가상 실습", "8", "", ""),
+            row("전필", "SYN3", "03", "가상 실습", "6", "", ""),
+        ]
+    )
+    catalog, errors = parse(text)
+    assert errors == []
+    assert catalog.courses[0].credit == 0.5
+    s = {x.id: x for x in catalog.sections}
+    assert s["SYN2-01"].meetings[0].model_dump() == {"day": "Sat", "start": "09:00", "end": "11:45"}
+    assert (s["SYN3-01"].credit, s["SYN3-01"].category) == (None, None)
+    assert catalog.credit_and_category(s["SYN3-02"]) == (8, "전선")
+    assert catalog.credit_and_category(s["SYN3-03"]) == (6, "전필")
 
 
 def test_parse_requires_header():

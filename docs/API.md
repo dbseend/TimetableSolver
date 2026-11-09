@@ -19,4 +19,9 @@ credit_range, must_include, must_exclude, day_off, time_avoid, time_prefer, max_
 공통: `id`, `strength`(hard|soft), `weight`(1–10, 기본 5), `source_text`. 알 수 없는 필드는 거부.
 
 ## 시간 격자
-월–금, 08:00–22:00, 30분 슬롯 28개. 시작은 내림, 종료는 올림.
+월–토, 08:00–24:00, 30분 슬롯 32개. 시작은 내림, 종료는 올림. (2026-2 실데이터: 1교시 09:00, 10교시 22:30–23:45, 토요일 수업 있음)
+
+## 카탈로그 값
+- `Course.credit`: 0–10, 0.5 단위 (0.5학점 과목 존재). 솔버는 ×2 정수로 다룬다.
+- `Section.credit`, `Section.category`: 같은 과목인데 분반마다 다른 경우의 덮어쓰기. `null`이면 과목 값. 유효값은 `Catalog.credit_and_category(section)`.
+- `max_days_on_campus.max_days`: 0–6.

@@ -23,7 +23,7 @@ FIRST_PERIOD_MIN = 9 * 60
 PERIOD_STEP_MIN = 90
 
 
-def period_len(credit: int) -> int:
+def period_len(credit: float) -> int:
     # shortcut: credits other than 2 and 3 are unconfirmed; >=3 -> 75, else 50 (50min per credit
     # rule, Academic Regulation art. 42). Revisit if real 1- or 4+-credit timings differ.
     return 75 if credit >= 3 else 50
@@ -42,7 +42,7 @@ def period_start(n: int) -> int:
     return FIRST_PERIOD_MIN + (n - 1) * PERIOD_STEP_MIN
 
 
-def parse_time(value: str, credit: int = 3) -> list[dict]:
+def parse_time(value: str, credit: float = 3) -> list[dict]:
     """'Mon1,Thu1,Thu2' or '월1,목1 Mon1,Thu1' -> meetings; consecutive periods merge."""
     tokens = [t for t in re.split(r"[,\s]+", value) if t]
     korean = [m for t in tokens if (m := _KO_SLOT.match(t))]
@@ -96,10 +96,12 @@ def parse(text: str) -> tuple[Catalog | None, list[RowError]]:
         try:
             code = row["과목코드"]
             course = Course(
-                id=code, name=row["과목명"], credit=int(row["학점"]), category=row["구분"]
+                id=code, name=row["과목명"], credit=float(row["학점"]), category=row["구분"]
             )
-            if code in courses and courses[code] != course:
-                raise ValueError(f"course {code} differs between sections")
+            # the first section defines the course; later sections keep differences as overrides
+            base = courses.get(code, course)
+            if base.name != course.name:
+                raise ValueError(f"course {code} has different names between sections")
             capacity = row.get("정원", "")
             sections.append(
                 Section(
@@ -108,6 +110,8 @@ def parse(text: str) -> tuple[Catalog | None, list[RowError]]:
                     meetings=parse_time(row["시간"], course.credit),
                     instructor=row.get("교수") or _instructor(row.get("개설정보", "")),
                     capacity=int(capacity) if capacity.isdigit() else None,
+                    credit=None if course.credit == base.credit else course.credit,
+                    category=None if course.category == base.category else course.category,
                 )
             )
             courses.setdefault(code, course)

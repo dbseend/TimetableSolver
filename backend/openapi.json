@@ -374,8 +374,9 @@
           "credit": {
             "maximum": 10.0,
             "minimum": 0.0,
+            "multipleOf": 0.5,
             "title": "Credit",
-            "type": "integer"
+            "type": "number"
           },
           "id": {
             "minLength": 1,
@@ -1104,7 +1105,7 @@
         "additionalProperties": false,
         "properties": {
           "max_days": {
-            "maximum": 5.0,
+            "maximum": 6.0,
             "minimum": 0.0,
             "title": "Max Days",
             "type": "integer"
@@ -1176,7 +1177,8 @@
               "Tue",
               "Wed",
               "Thu",
-              "Fri"
+              "Fri",
+              "Sat"
             ],
             "title": "Day",
             "type": "string"
@@ -1406,7 +1408,8 @@
               {
                 "maximum": 10.0,
                 "minimum": 0.0,
-                "type": "integer"
+                "multipleOf": 0.5,
+                "type": "number"
               },
               {
                 "type": "null"
@@ -1497,10 +1500,36 @@
             ],
             "title": "Capacity"
           },
+          "category": {
+            "anyOf": [
+              {
+                "minLength": 1,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Category"
+          },
           "course_id": {
             "minLength": 1,
             "title": "Course Id",
             "type": "string"
+          },
+          "credit": {
+            "anyOf": [
+              {
+                "maximum": 10.0,
+                "minimum": 0.0,
+                "multipleOf": 0.5,
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Credit"
           },
           "id": {
             "minLength": 1,
@@ -1812,7 +1841,8 @@
                 "Tue",
                 "Wed",
                 "Thu",
-                "Fri"
+                "Fri",
+                "Sat"
               ],
               "type": "string"
             },
@@ -1868,7 +1898,8 @@
                 "Tue",
                 "Wed",
                 "Thu",
-                "Fri"
+                "Fri",
+                "Sat"
               ],
               "type": "string"
             },

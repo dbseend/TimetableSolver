@@ -2,8 +2,8 @@
 
 All internal computation uses (day_index, slot_index). Only the API boundary uses "HH:MM".
 
-The grid is configurable here. [확인 필요] The real campus timetable system (30-minute grid vs
-period blocks) must be confirmed against real data in phase C.
+Grid: Mon-Sat, 08:00-24:00, 30-minute slots. Real 2026-2 data uses periods 1-10 (09:00 + 90min
+steps, last class ends 23:45) and has a few Saturday classes (docs/academic_rules.md §1).
 
 Rounding rule for times that are not aligned to the grid: the start is rounded DOWN and the end
 is rounded UP, so a meeting always occupies every slot it touches (conservative for conflicts).
@@ -12,13 +12,13 @@ is rounded UP, so a meeting always occupies every slot it touches (conservative 
 import re
 from typing import Literal
 
-Day = Literal["Mon", "Tue", "Wed", "Thu", "Fri"]
-DAYS: tuple[Day, ...] = ("Mon", "Tue", "Wed", "Thu", "Fri")
+Day = Literal["Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]
+DAYS: tuple[Day, ...] = ("Mon", "Tue", "Wed", "Thu", "Fri", "Sat")
 
 DAY_START_MIN = 8 * 60  # 08:00
-DAY_END_MIN = 22 * 60  # 22:00
+DAY_END_MIN = 24 * 60  # 24:00 (end of day; exclusive)
 SLOT_MIN = 30
-N_SLOTS = (DAY_END_MIN - DAY_START_MIN) // SLOT_MIN  # 28
+N_SLOTS = (DAY_END_MIN - DAY_START_MIN) // SLOT_MIN  # 32
 
 _HHMM = re.compile(r"^([01]\d|2[0-3]):([0-5]\d)$")
 
@@ -58,7 +58,7 @@ def meeting_slots(day: str, start: str, end: str) -> frozenset[tuple[int, int]]:
     if s < DAY_START_MIN or e > DAY_END_MIN:
         raise ValueError(
             f"meeting {start}-{end} outside grid {format_hhmm(DAY_START_MIN)}-"
-            f"{format_hhmm(DAY_END_MIN)}"
+            f"{DAY_END_MIN // 60:02d}:{DAY_END_MIN % 60:02d}"
         )
     first = (s - DAY_START_MIN) // SLOT_MIN
     last_exclusive = -(-(e - DAY_START_MIN) // SLOT_MIN)  # ceil division
