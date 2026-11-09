@@ -1,0 +1,78 @@
+import pytest
+from fastapi.testclient import TestClient
+
+from app.core.config import Settings
+from app.main import app, create_app
+
+client = TestClient(app)
+
+EMPTY_RESULT = {
+    "status": "INFEASIBLE",
+    "candidates": [],
+    "stats": {"solve_ms": 0, "n_sections_after_filter": 0},
+}
+
+STUB_REQUESTS = {
+    "/catalog/validate": {"courses": [], "sections": []},
+    "/profile/parse": {"consent": True, "rows": []},
+    "/constraints/parse": {"text": "금요일 공강이면 좋겠다"},
+    "/solve": {"catalog": {"courses": [], "sections": []}},
+    "/explain": {
+        "catalog": {"courses": [], "sections": []},
+        "result": EMPTY_RESULT,
+    },
+}
+
+
+def test_openapi_exposes_the_contract():
+    paths = app.openapi()["paths"]
+    assert "/health" in paths
+    for p in STUB_REQUESTS:
+        assert "post" in paths[p], p
+
+
+@pytest.mark.parametrize("path,body", STUB_REQUESTS.items())
+def test_stubs_return_unified_501(path, body):
+    r = client.post(path, json=body)
+    assert r.status_code == 501
+    assert r.json()["error"]["code"] == "not_implemented"
+
+
+def test_validation_error_never_echoes_input():
+    body = {
+        "catalog": {
+            "courses": [],
+            "sections": [{"id": "SECRET-SECTION", "course_id": "nope", "meetings": []}],
+        }
+    }
+    r = client.post("/solve", json=body)
+    assert r.status_code == 422
+    err = r.json()["error"]
+    assert err["code"] == "validation_error"
+    assert all(set(d) <= {"loc", "msg", "type"} for d in err["details"])
+    assert "input" not in r.text
+
+
+def test_profile_parse_requires_consent():
+    r = client.post("/profile/parse", json={"consent": False, "rows": []})
+    assert r.status_code == 422
+
+
+def test_duplicate_constraint_ids_rejected():
+    c = {
+        "id": "c1",
+        "type": "day_off",
+        "strength": "soft",
+        "params": {"days": ["Fri"]},
+    }
+    r = client.post(
+        "/solve", json={"catalog": {"courses": [], "sections": []}, "constraints": [c, c]}
+    )
+    assert r.status_code == 422
+
+
+def test_input_length_guard():
+    small = TestClient(create_app(Settings(_env_file=None, max_input_chars=10)))
+    r = small.post("/constraints/parse", json={"text": "x" * 11})
+    assert r.status_code == 422
+    assert r.json()["error"]["code"] == "input_too_long"
