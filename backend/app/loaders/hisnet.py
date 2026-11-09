@@ -17,12 +17,17 @@ from app.core.time_slots import format_hhmm
 from app.domain.api_models import RowError
 from app.domain.models import Catalog, Course, Section
 
-# shortcut: period n starts at 09:00 + (n-1)*90min and lasts 75min (hypothesis from the 2026
-# switch to a 09:00 first period). Replace with the official table once it is confirmed
-# (docs/academic_rules.md §1).
+# Period n starts at 09:00 + (n-1)*90min; a class lasts 75min for 3-credit courses and 50min
+# for 2-credit ones (confirmed by the user for 2026-2, docs/academic_rules.md §1).
 FIRST_PERIOD_MIN = 9 * 60
 PERIOD_STEP_MIN = 90
-PERIOD_LEN_MIN = 75
+
+
+def period_len(credit: int) -> int:
+    # shortcut: credits other than 2 and 3 are unconfirmed; >=3 -> 75, else 50 (50min per credit
+    # rule, Academic Regulation art. 42). Revisit if real 1- or 4+-credit timings differ.
+    return 75 if credit >= 3 else 50
+
 
 _SLOT = re.compile(r"^(Mon|Tue|Wed|Thu|Fri|Sat|Sun)(\d{1,2})$")
 _KO_SLOT = re.compile(r"^([월화수목금토일])(\d{1,2})$")
@@ -37,7 +42,7 @@ def period_start(n: int) -> int:
     return FIRST_PERIOD_MIN + (n - 1) * PERIOD_STEP_MIN
 
 
-def parse_time(value: str) -> list[dict]:
+def parse_time(value: str, credit: int = 3) -> list[dict]:
     """'Mon1,Thu1,Thu2' or '월1,목1 Mon1,Thu1' -> meetings; consecutive periods merge."""
     tokens = [t for t in re.split(r"[,\s]+", value) if t]
     korean = [m for t in tokens if (m := _KO_SLOT.match(t))]
@@ -63,7 +68,7 @@ def parse_time(value: str) -> list[dict]:
             if p is not None and p == run[-1] + 1:
                 run.append(p)
                 continue
-            end = period_start(run[-1]) + PERIOD_LEN_MIN
+            end = period_start(run[-1]) + period_len(credit)
             meetings.append(
                 {"day": day, "start": format_hhmm(period_start(run[0])), "end": format_hhmm(end)}
             )
@@ -100,7 +105,7 @@ def parse(text: str) -> tuple[Catalog | None, list[RowError]]:
                 Section(
                     id=f"{code}-{row['분반']}",
                     course_id=code,
-                    meetings=parse_time(row["시간"]),
+                    meetings=parse_time(row["시간"], course.credit),
                     instructor=row.get("교수") or _instructor(row.get("개설정보", "")),
                     capacity=int(capacity) if capacity.isdigit() else None,
                 )

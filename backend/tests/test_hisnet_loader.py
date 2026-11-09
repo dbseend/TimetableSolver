@@ -24,6 +24,12 @@ def test_parse_time_merges_consecutive_periods():
     assert parse_time("") == []
 
 
+def test_class_length_depends_on_credit():
+    assert parse_time("Mon1", 3) == [{"day": "Mon", "start": "09:00", "end": "10:15"}]
+    assert parse_time("Mon1", 2) == [{"day": "Mon", "start": "09:00", "end": "09:50"}]
+    assert parse_time("Mon1,Mon2", 2) == [{"day": "Mon", "start": "09:00", "end": "11:20"}]
+
+
 @pytest.mark.parametrize("bad", ["Mon0", "Monday1", "1Mon"])
 def test_parse_time_rejects_bad_tokens(bad):
     with pytest.raises(ValueError):
