@@ -1,5 +1,5 @@
-import { useMemo, useState, type ChangeEvent } from "react";
-import type { Catalog } from "../api/client";
+import { useEffect, useMemo, useState, type ChangeEvent } from "react";
+import { getCatalog, getSemesters, type Catalog, type Semester } from "../api/client";
 import { useSession } from "../state";
 
 const SAMPLES = {
@@ -11,11 +11,40 @@ export default function Prepare() {
   const { catalog, setCatalog, pool, setPool } = useSession();
   const [error, setError] = useState<string | null>(null);
   const [query, setQuery] = useState("");
+  const [semesters, setSemesters] = useState<Semester[]>([]);
+  const [loadingCatalogId, setLoadingCatalogId] = useState<string | null>(null);
+
+  useEffect(() => {
+    let active = true;
+    getSemesters()
+      .then((items) => {
+        if (active && Array.isArray(items)) setSemesters(items);
+      })
+      .catch(() => {
+        // DB not configured or unreachable: local samples & file upload remain available
+      });
+    return () => {
+      active = false;
+    };
+  }, []);
 
   function use(c: Catalog) {
     setCatalog(c);
     setPool([]);
     setError(null);
+  }
+
+  async function onSelectSemester(id: string) {
+    try {
+      setLoadingCatalogId(id);
+      setError(null);
+      const data = await getCatalog(id);
+      use(data);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "카탈로그를 불러오지 못했습니다.");
+    } finally {
+      setLoadingCatalogId(null);
+    }
   }
 
   async function onFile(e: ChangeEvent<HTMLInputElement>) {
@@ -45,6 +74,21 @@ export default function Prepare() {
       <h2>1. 수강 정보 준비</h2>
 
       <h3>개설강좌</h3>
+      {(semesters ?? []).length > 0 && (
+        <p>
+          <span style={{ marginRight: 8, fontWeight: 500 }}>학기 선택:</span>
+          {semesters.map((s) => (
+            <button
+              key={s.id}
+              onClick={() => onSelectSemester(s.id)}
+              disabled={loadingCatalogId === s.id}
+              style={{ marginRight: 6 }}
+            >
+              {loadingCatalogId === s.id ? "불러오는 중..." : `${s.label} (${s.id})`}
+            </button>
+          ))}
+        </p>
+      )}
       <p>
         {Object.entries(SAMPLES).map(([label, load]) => (
           <button key={label} onClick={async () => use((await load()).default as Catalog)}>

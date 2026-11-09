@@ -1,0 +1,12 @@
+# ADR 0005: Supabase 카탈로그 저장 및 RLS/접근 제어
+- 상태: 채택
+- 맥락:
+  - 매번 개설강좌 JSON 파일을 직접 업로드하는 번거로움을 줄이기 위해 학기별 카탈로그(`semesters`, `catalogs`)를 Supabase(Postgres)에 저장하고 백엔드 API(`GET /semesters`, `GET /catalog/{id}`)를 통해 제공한다.
+  - 현재 프로토타입 단계에서는 공개(publishable/anon) 키와 읽기 전용 RLS 정책(`for select to anon, authenticated using (true)`)을 적용하고 합성 50분반 데이터(`synthetic-50`)만 적재하여 운영한다.
+- 결정:
+  - 프론트엔드는 Supabase에 직접 붙지 않고 FastAPI 백엔드 단일 계약(`openapi.json`)을 유지한다.
+  - 백엔드는 `SUPABASE_URL` 및 `SUPABASE_KEY` 환경변수로 PostgREST를 호출(`httpx`)하여 카탈로그를 조회하고 메모리에 캐싱한다.
+  - **보안 및 실데이터 전환 규칙**: 현재 적용된 공개 publishable/anon 키와 anon 읽기 정책은 합성 데이터일 때만 안전하다. 학교 실제 개설강좌 데이터를 Supabase에 적재하기 전에는 반드시 anon 읽기 정책을 제거하고, 백엔드만 `service_role` (또는 비공개 secret key)로 접근하도록 RLS 정책을 전환해야 한다.
+- 결과:
+  - DB 미설정(`SUPABASE_URL`/`KEY` 부재) 시에도 파일 업로드 및 로컬 샘플 기능으로 완전 대체 가능하다.
+  - 실데이터 적재 시 공개 유출 위험을 방지하고 학교 데이터 취급 정책을 준수할 수 있다.

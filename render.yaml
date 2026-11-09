@@ -19,3 +19,7 @@ services:
         sync: false
       - key: ALLOWED_ORIGIN_REGEX
         sync: false
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_KEY
+        sync: false

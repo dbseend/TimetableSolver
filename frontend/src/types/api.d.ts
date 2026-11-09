@@ -4,6 +4,23 @@
  */
 
 export interface paths {
+    "/catalog": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Catalog By Query */
+        get: operations["get_catalog_by_query_catalog_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/catalog/validate": {
         parameters: {
             query?: never;
@@ -15,6 +32,23 @@ export interface paths {
         put?: never;
         /** Validate Catalog */
         post: operations["validate_catalog_catalog_validate_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/catalog/{semester_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Catalog By Id */
+        get: operations["get_catalog_by_id_catalog__semester_id__get"];
+        put?: never;
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -92,6 +126,23 @@ export interface paths {
          * @description LLM fallback for completed-course parsing. Requires explicit consent and minimal columns.
          */
         post: operations["parse_profile_profile_parse_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/semesters": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Semesters */
+        get: operations["list_semesters_semesters_get"];
+        put?: never;
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -687,6 +738,23 @@ export interface components {
             /** Meetings */
             meetings?: components["schemas"]["Meeting"][];
         };
+        /** Semester */
+        Semester: {
+            /** Id */
+            id: string;
+            /**
+             * Is Synthetic
+             * @default false
+             */
+            is_synthetic: boolean;
+            /** Label */
+            label: string;
+        };
+        /** SemestersResponse */
+        SemestersResponse: {
+            /** Semesters */
+            semesters: components["schemas"]["Semester"][];
+        };
         /**
          * SolveRequest
          * @description The solver picks courses only from `pool` (plus must_include targets), never the whole
@@ -807,6 +875,73 @@ export interface components {
 }
 export type $defs = Record<string, never>;
 export interface operations {
+    get_catalog_by_query_catalog_get: {
+        parameters: {
+            query: {
+                semester: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Catalog"];
+                };
+            };
+            /** @description Catalog not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not implemented yet */
+            501: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Database query failed */
+            502: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Database disabled */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
     validate_catalog_catalog_validate_post: {
         parameters: {
             query?: never;
@@ -840,6 +975,73 @@ export interface operations {
             };
             /** @description Not implemented yet */
             501: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    get_catalog_by_id_catalog__semester_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                semester_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Catalog"];
+                };
+            };
+            /** @description Catalog not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not implemented yet */
+            501: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Database query failed */
+            502: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Database disabled */
+            503: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -1013,6 +1215,62 @@ export interface operations {
             };
             /** @description Not implemented yet */
             501: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    list_semesters_semesters_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SemestersResponse"];
+                };
+            };
+            /** @description Validation error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not implemented yet */
+            501: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Database query failed */
+            502: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Database disabled */
+            503: {
                 headers: {
                     [name: string]: unknown;
                 };

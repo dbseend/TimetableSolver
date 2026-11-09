@@ -2,6 +2,8 @@ import type { components } from "../types/api";
 
 type S = components["schemas"];
 export type Health = S["HealthResponse"];
+export type Semester = S["Semester"];
+export type SemestersResponse = S["SemestersResponse"];
 export type Catalog = S["Catalog"];
 export type Section = S["Section"];
 export type PoolItem = S["PoolItem"];
@@ -28,6 +30,26 @@ export async function getHealth(signal?: AbortSignal): Promise<Health> {
   const res = await fetch(`${BASE}/health`, { signal });
   if (!res.ok) throw new Error(`health ${res.status}`);
   return (await res.json()) as Health;
+}
+
+export async function getSemesters(signal?: AbortSignal): Promise<Semester[]> {
+  const res = await fetch(`${BASE}/semesters`, { signal });
+  const data = await res.json().catch(() => null);
+  if (!res.ok) {
+    const err = (data as S["ErrorResponse"] | null)?.error;
+    throw new ApiError(err?.code ?? "http_error", err?.message ?? `semesters ${res.status}`);
+  }
+  return Array.isArray((data as SemestersResponse)?.semesters) ? (data as SemestersResponse).semesters : [];
+}
+
+export async function getCatalog(id: string, signal?: AbortSignal): Promise<Catalog> {
+  const res = await fetch(`${BASE}/catalog/${encodeURIComponent(id)}`, { signal });
+  const data = await res.json().catch(() => null);
+  if (!res.ok) {
+    const err = (data as S["ErrorResponse"] | null)?.error;
+    throw new ApiError(err?.code ?? "http_error", err?.message ?? `catalog ${res.status}`);
+  }
+  return data as Catalog;
 }
 
 async function post<T>(path: string, body: unknown, signal?: AbortSignal): Promise<T> {

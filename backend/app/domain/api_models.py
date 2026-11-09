@@ -28,6 +28,19 @@ class HealthResponse(BaseModel):
     version: str
 
 
+# ---- /semesters ------------------------------------------------------------------------
+
+
+class Semester(BaseModel):
+    id: str = Field(min_length=1)
+    label: str = Field(min_length=1)
+    is_synthetic: bool = False
+
+
+class SemestersResponse(BaseModel):
+    semesters: list[Semester]
+
+
 # ---- /catalog/validate -----------------------------------------------------------------
 
 
