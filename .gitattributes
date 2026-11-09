@@ -1,0 +1,11 @@
+# 줄바꿈 정책: 저장소와 작업 트리 모두 LF.
+# core.autocrlf 설정(Windows 기본 true)과 무관하게 체크아웃·git archive 결과 바이트가 같도록 한다.
+# (main 비교 때 autocrlf가 데이터 파일을 CRLF로 바꿔 파일 해시 테스트가 실패한 사례: docs/MAIN_COMPARISON.md §6.1)
+* text=auto eol=lf
+
+# 바이트 그대로 보존(줄바꿈·인코딩 변환 금지)
+*.png binary
+*.jpg binary
+# 포털 HTML 내보내기 합성 픽스처(CP949). 변환되면 인코딩 감지 테스트의 의미가 바뀐다.
+*.xls binary
+*.xlsx binary

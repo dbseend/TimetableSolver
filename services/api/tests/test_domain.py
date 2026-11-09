@@ -1,5 +1,6 @@
 """D(데이터·시간 경계)와 V(독립 검증기) 인수 테스트."""
 
+import os
 import subprocess
 import sys
 
@@ -229,5 +230,7 @@ def test_V12_no_soft(tiny):
 
 def test_validator_does_not_import_ortools():
     code = "import sys, app.domain.validator, app.domain.facts; print('ortools' in sys.modules)"
-    out = subprocess.run([sys.executable, "-c", code], capture_output=True, text=True, check=True)
+    # 자식 프로세스 출력은 UTF-8로 명시(Windows 기본 CP949에 의존하지 않음)
+    env = {**os.environ, "PYTHONIOENCODING": "utf-8"}
+    out = subprocess.run([sys.executable, "-c", code], capture_output=True, text=True, encoding="utf-8", check=True, env=env)
     assert out.stdout.strip() == "False"

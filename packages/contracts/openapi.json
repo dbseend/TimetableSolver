@@ -1908,11 +1908,40 @@
       "Section": {
         "additionalProperties": false,
         "properties": {
+          "category_ids": {
+            "anyOf": [
+              {
+                "items": {
+                  "maxLength": 128,
+                  "minLength": 1,
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Category Ids"
+          },
           "course_id": {
             "maxLength": 128,
             "minLength": 1,
             "title": "Course Id",
             "type": "string"
+          },
+          "credit_units": {
+            "anyOf": [
+              {
+                "maximum": 3000.0,
+                "minimum": 0.0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Credit Units"
           },
           "delivery_mode": {
             "enum": [

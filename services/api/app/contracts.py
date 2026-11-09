@@ -64,6 +64,9 @@ class Section(Strict):
     meetings: list[Meeting] = Field(default_factory=list, max_length=10)
     support_status: Literal["supported", "unsupported"] = "supported"
     issue_codes: list[str] = Field(default_factory=list)
+    # 분반별 값(docs/decisions/0008). null이면 Course 값을 상속한다. 같은 과목의 분반마다 학점·이수구분이 다른 경우에만 채운다.
+    credit_units: Annotated[StrictInt, Field(ge=0, le=3000)] | None = None
+    category_ids: list[Id] | None = None
 
 
 class Catalog(Strict):

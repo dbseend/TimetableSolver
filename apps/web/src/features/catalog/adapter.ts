@@ -267,6 +267,9 @@ interface SectionAcc {
   issueCodes: Set<string>;
   timedRows: number;
   untimedRows: number;
+  /** 이 분반의 학점·이수구분 원문(분반 첫 행 기준). 과목 대표값과 다르면 분반 값으로 보존(0008). */
+  units: number | null;
+  catLabel: string;
 }
 
 interface CourseAcc {
@@ -349,22 +352,25 @@ export function importCatalog(rows: string[][], cfg: AdapterConfig): ImportResul
     } else if (get(r, "org") && c.org && get(r, "org") !== c.org) {
       issues.push({ severity: "warning", row: rowNo, code: "ORG_INCONSISTENT", message: `${code}: 분반마다 개설 소속이 달라 첫 값(${c.org})만 기록했습니다.` });
     }
-    if (c && !c.bad && (c.units !== units || c.categoryLabel !== catLabel || c.name !== name)) {
+    if (!c.bad && units === null) {
       c.bad = true;
-      issues.push({
-        severity: "error",
-        row: rowNo,
-        code: "COURSE_INCONSISTENT",
-        message: `${code}: 행마다 과목명·학점·이수구분이 달라 자동 병합하지 않습니다. 과목을 제외합니다.`,
-      });
+      issues.push({ severity: "error", row: rowNo, code: "CREDIT_INVALID", message: `${code}: 학점 '${get(r, "credit")}'을(를) 해석할 수 없습니다(0.01학점 단위까지). 과목을 제외합니다.` });
+    }
+    // 과목명이 다르면 같은 과목인지 알 수 없으므로 자동 병합하지 않는다. 학점·이수구분 차이는 분반 값으로 보존한다(0008).
+    if (!c.bad && c.name !== name) {
+      c.bad = true;
+      issues.push({ severity: "error", row: rowNo, code: "COURSE_INCONSISTENT", message: `${code}: 행마다 과목명이 달라 자동 병합하지 않습니다. 과목을 제외합니다.` });
     }
 
     // --- section
     const sid = `${termId}:${code}:${label}`;
     let s = sections.get(sid);
     if (!s) {
-      s = { courseId: code, label, firstRow: rowNo, delivery: null, instructorIds: [], meetings: [], issueCodes: new Set(), timedRows: 0, untimedRows: 0 };
+      s = { courseId: code, label, firstRow: rowNo, delivery: null, instructorIds: [], meetings: [], issueCodes: new Set(), timedRows: 0, untimedRows: 0, units, catLabel };
       sections.set(sid, s);
+    } else if (s.units !== units || s.catLabel !== catLabel) {
+      // 같은 분반의 여러 행(여러 수업시간)에서 학점·이수구분이 다르면 어느 값인지 알 수 없다 → 분반 미지원.
+      s.issueCodes.add("SECTION_VALUE_INCONSISTENT");
     }
 
     const rawDelivery = get(r, "delivery_mode");
@@ -423,11 +429,35 @@ export function importCatalog(rows: string[][], cfg: AdapterConfig): ImportResul
     }
   }
 
+  // --- 과목 대표값: 분반 값의 최빈값(동률이면 먼저 나온 분반). 대표값과 다른 분반만 분반 값을 갖는다(0008).
+  const mapCat = (label: string) => (label ? (cfg.categoryMap[label] ?? label) : null);
+  const rep = new Map<string, { units: number; catLabel: string }>();
+  for (const c of courses.values()) {
+    if (c.bad) continue;
+    const secs = [...sections.values()].filter((x) => x.courseId === c.id);
+    const mode = <T,>(vals: T[]): T => {
+      const n = new Map<T, number>();
+      for (const v of vals) n.set(v, (n.get(v) ?? 0) + 1);
+      return vals.reduce((best, v) => (n.get(v)! > n.get(best)! ? v : best), vals[0]);
+    };
+    const r = { units: mode(secs.map((x) => x.units ?? c.units!)), catLabel: mode(secs.map((x) => x.catLabel)) };
+    rep.set(c.id, r);
+    const diff = secs.filter((x) => x.units !== r.units || x.catLabel !== r.catLabel).length;
+    if (diff)
+      issues.push({
+        severity: "warning",
+        row: c.firstRow,
+        code: "SECTION_VALUES_PRESERVED",
+        message: `${c.id}: 분반마다 학점·이수구분이 달라 분반 ${diff}개에 분반별 값을 보존했습니다(과목 대표값 ${r.units / 100}학점·${r.catLabel || "구분 없음"}).`,
+      });
+  }
+
   // --- finalize sections
   const outSections: Section[] = [];
   for (const [sid, s] of sections) {
     const course = courses.get(s.courseId)!;
     if (course.bad) continue;
+    const r = rep.get(course.id)!;
     const delivery = s.delivery ?? "in_person";
     if (s.timedRows && s.untimedRows) s.issueCodes.add("PARTIAL_TIME");
     if (!s.meetings.length && !s.issueCodes.size && delivery !== "online_async") s.issueCodes.add("TIME_TBD");
@@ -458,6 +488,8 @@ export function importCatalog(rows: string[][], cfg: AdapterConfig): ImportResul
       meetings,
       support_status: unsupported ? "unsupported" : "supported",
       issue_codes: [...s.issueCodes].sort(),
+      credit_units: s.units !== null && s.units !== r.units ? s.units : null,
+      category_ids: s.catLabel !== r.catLabel ? (mapCat(s.catLabel) ? [mapCat(s.catLabel)!] : []) : null,
     });
   }
 
@@ -467,14 +499,15 @@ export function importCatalog(rows: string[][], cfg: AdapterConfig): ImportResul
       stats.excludedCourses++;
       continue;
     }
-    const catId = c.categoryLabel ? (cfg.categoryMap[c.categoryLabel] ?? c.categoryLabel) : null;
-    outCourses.push({ id: c.id, name: c.name, credit_units: c.units!, category_ids: catId ? [catId] : [], equivalence_group_id: null });
+    const r = rep.get(c.id)!;
+    const catId = mapCat(r.catLabel);
+    outCourses.push({ id: c.id, name: c.name, credit_units: r.units, category_ids: catId ? [catId] : [], equivalence_group_id: null });
   }
   const usedInstructors = new Set(outSections.flatMap((s) => s.instructor_ids));
   if ([...instructors.keys()].some((k) => k.startsWith("name:")))
     issues.push({ severity: "warning", row: null, code: "INSTRUCTOR_ID_FROM_NAME", message: "교수 ID 열이 없어 이름으로 식별합니다. 동명이인은 구분되지 않습니다." });
 
-  const catIds = new Set(outCourses.flatMap((c) => c.category_ids));
+  const catIds = new Set([...outCourses.flatMap((c) => c.category_ids), ...outSections.flatMap((x) => x.category_ids ?? [])]);
   const groups: Record<string, string[]> = {};
   for (const [g, cats] of Object.entries(cfg.categoryGroups)) {
     const kept = cats.filter((x) => catIds.has(x));

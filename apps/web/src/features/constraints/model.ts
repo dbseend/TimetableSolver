@@ -2,6 +2,7 @@
 import type { Catalog, Constraint, ConstraintType, DraftConstraint, ParseRequest } from "../../lib/types";
 import { DAY_KO } from "../../lib/types";
 import { fmtCredits, fmtMin } from "../../lib/time";
+import { allCategoryIds, sectionCategories } from "../../lib/catalog";
 
 export const TYPE_LABEL: Record<ConstraintType, string> = {
   credit_range: "학점 범위",
@@ -102,13 +103,19 @@ export function buildEntities(catalog: Catalog): ParseRequest["entities"] {
   const coursesSecs = new Map<string, string[]>();
   for (const s of catalog.sections) coursesSecs.set(s.course_id, [...(coursesSecs.get(s.course_id) ?? []), s.id]);
   return {
-    courses: catalog.courses.map((c) => ({ id: c.id, name: c.name, category_ids: c.category_ids, section_ids: coursesSecs.get(c.id) ?? [] })),
+    // 과목 분류 = 과목 값 ∪ 분반별 값(분반마다 이수구분이 다른 과목도 해석기가 모든 분류를 알도록)
+    courses: catalog.courses.map((c) => ({
+      id: c.id,
+      name: c.name,
+      category_ids: [...new Set([...c.category_ids, ...catalog.sections.filter((s) => s.course_id === c.id).flatMap((s) => sectionCategories(catalog, s))])],
+      section_ids: coursesSecs.get(c.id) ?? [],
+    })),
     instructors: catalog.instructors.map((i) => {
       const secs = catalog.sections.filter((s) => s.instructor_ids.includes(i.id));
       return { id: i.id, name: i.name, course_ids: [...new Set(secs.map((s) => s.course_id))], section_ids: secs.map((s) => s.id) };
     }),
     category_groups: catalog.category_groups,
-    category_ids: [...new Set(catalog.courses.flatMap((c) => c.category_ids))].sort(),
+    category_ids: allCategoryIds(catalog),
   };
 }
 

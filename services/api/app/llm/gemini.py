@@ -18,6 +18,7 @@ import httpx
 
 from app.contracts import ParseRequest
 from app.llm.base import ProviderError, ProviderOutput
+from app.llm.entities import select_entities
 
 ENDPOINT = "https://generativelanguage.googleapis.com/v1beta/interactions"
 API_REVISION = "2026-05-20"
@@ -107,9 +108,11 @@ class GeminiProvider:
         self._client = client
 
     def _payload(self, req: ParseRequest) -> dict:
+        courses, instructors, narrowed = select_entities(req)
         entities = {
-            "courses": [{"id": c.id, "name": c.name, "category_ids": c.category_ids} for c in req.entities.courses],
-            "instructors": [{"id": i.id, "name": i.name, "course_ids": i.course_ids} for i in req.entities.instructors],
+            "courses": [{"id": c.id, "name": c.name, "category_ids": c.category_ids} for c in courses],
+            "instructors": [{"id": i.id, "name": i.name, "course_ids": i.course_ids} for i in instructors],
+            "note": "문장과 관련된 후보만 보냈다. 목록에 없으면 null과 질문을 반환하라." if narrowed else "전체 목록",
             "category_groups": req.entities.category_groups,
             "existing_constraints": [c.model_dump() for c in req.existing_constraints],
         }

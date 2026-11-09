@@ -71,7 +71,7 @@ export function App() {
     if (!s.loaded) return;
     setMajorBusy(true);
     setMajorError(null);
-    const next = courseIds ? applyMajor(s.loaded.catalog, courseIds) : clearMajor(s.loaded.catalog);
+    const next = courseIds ? applyMajor(s.loaded.catalog, courseIds, types) : clearMajor(s.loaded.catalog);
     try {
       const v = await api.validateCatalog(next);
       if (!v.valid || !v.catalog || !v.catalog_revision) throw new Error(v.errors.map((e) => e.message).join(", "));

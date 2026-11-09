@@ -2,7 +2,8 @@ import { useMemo, useState } from "react";
 import type { LoadedCatalog } from "../../app/state";
 import { fmtCredits } from "../../lib/time";
 import { Alert, Badge, Button, Card } from "../../ui";
-import { majorCandidates, MY_MAJOR_GROUP } from "./major";
+import { majorCandidates, majorSections, MY_MAJOR_GROUP } from "./major";
+import { allCategoryIds, sectionVariation } from "../../lib/catalog";
 
 /**
  * 내 전공 과목 확인. 개설 소속·전공 유형은 후보를 좁히는 보조 정보이고,
@@ -95,7 +96,7 @@ export function MajorPanel({
               <fieldset className="field" style={{ border: 0, padding: 0, margin: 0 }}>
                 <legend className="small strong">2. 전공 유형 이수구분</legend>
                 <div className="row">
-                  {[...new Set([...loaded.majorTypeCategories, ...c.courses.flatMap((x) => x.category_ids)])].sort().map((t) => (
+                  {[...new Set([...loaded.majorTypeCategories, ...allCategoryIds(c)])].sort().map((t) => (
                     <label key={t} className="check">
                       <input
                         type="checkbox"
@@ -131,9 +132,15 @@ export function MajorPanel({
                           }}
                         />
                         <span>
-                          {course(id)?.name} <span className="muted">({id} · {course(id)?.category_ids.join(", ")})</span>
+                          {course(id)?.name}{" "}
+                          <span className="muted">
+                            ({id} · {sectionVariation(c, id).categories.map((x) => x.join("·")).join(" / ")})
+                          </span>
+                          {majorSections(c, id, types).length < c.sections.filter((x) => x.course_id === id).length && (
+                            <span className="warn xs"> · 분반 {majorSections(c, id, types).length}개만 전공 유형</span>
+                          )}
                         </span>
-                        <span className="num">{course(id) ? fmtCredits(course(id)!.credit_units) : ""}학점</span>
+                        <span className="num">{sectionVariation(c, id).units.map((u) => fmtCredits(u)).join("/")}학점</span>
                       </li>
                     ))}
                   </ul>

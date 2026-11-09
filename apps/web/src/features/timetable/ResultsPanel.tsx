@@ -2,6 +2,7 @@ import { type KeyboardEvent, useState } from "react";
 import type { Candidate, Catalog, Constraint, SolveResponse } from "../../lib/types";
 import { DAY_KO } from "../../lib/types";
 import { fmtCredits, fmtMin } from "../../lib/time";
+import { sectionUnits } from "../../lib/catalog";
 import { Badge, Icon, Segmented } from "../../ui";
 import { describe, STRENGTH_LABEL, TYPE_LABEL } from "../constraints/model";
 import { axisFor, courseColor, instructorNames, SectionDetail, TimetableGrid } from "./TimetableGrid";
@@ -169,7 +170,7 @@ export function ResultsPanel({
                 </span>
                 {instructorNames(catalog, s) && <span className="muted"> · {instructorNames(catalog, s)}</span>}
               </span>
-              <span className="num strong">{fmtCredits(c.credit_units)}학점</span>
+              <span className="num strong">{fmtCredits(sectionUnits(catalog, s))}학점</span>
             </li>
           );
         })}

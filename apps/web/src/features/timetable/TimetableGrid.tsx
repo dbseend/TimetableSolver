@@ -1,6 +1,7 @@
 import type { Catalog, Day, Section } from "../../lib/types";
 import { DAY_KO, DAYS } from "../../lib/types";
 import { fmtCredits, fmtMin } from "../../lib/time";
+import { sectionCategories, sectionUnits } from "../../lib/catalog";
 
 /** 절제된 색(배경/글자/테두리). 글자색은 배경 대비 WCAG AA 이상. */
 const PALETTE: [string, string, string][] = [
@@ -140,12 +141,17 @@ export function SectionDetail({ catalog, sectionId, onClose }: { catalog: Catalo
         </button>
       </div>
       <span className="small">
-        {s.section_label}분반 · {c ? fmtCredits(c.credit_units) : "-"}학점 · {instructorNames(catalog, s) || "교수 정보 없음"}
+        {s.section_label}분반 · {fmtCredits(sectionUnits(catalog, s))}학점{s.credit_units != null && " (이 분반 학점)"} · {instructorNames(catalog, s) || "교수 정보 없음"}
       </span>
       <span className="small num">
         {s.meetings.length ? s.meetings.map((m) => `${DAY_KO[m.day]} ${fmtMin(m.start_minute)}–${fmtMin(m.end_minute)}${m.room ? ` (${m.room})` : ""}`).join(" · ") : "시간 없음(비동기)"}
       </span>
-      {c && c.category_ids.length > 0 && <span className="xs muted">분류: {c.category_ids.join(", ")}</span>}
+      {sectionCategories(catalog, s).length > 0 && (
+        <span className="xs muted">
+          분류: {sectionCategories(catalog, s).join(", ")}
+          {s.category_ids != null && " (이 분반 이수구분)"}
+        </span>
+      )}
     </div>
   );
 }

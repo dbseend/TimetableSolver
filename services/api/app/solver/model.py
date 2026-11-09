@@ -106,7 +106,7 @@ def build_model(
             if len(covering) > 1:
                 m.add_at_most_one(covering)
 
-    units = {s.id: idx.course_by_id[s.course_id].credit_units for s in sections}
+    units = {s.id: idx.units_of(s.id) for s in sections}  # 분반별 유효 학점(0008)
     total = sum(units[s.id] * x[s.id] for s in sections)
 
     # 요일 활성(동기 수업) / 등교일(campus_required) 변수: OR 동치
@@ -139,7 +139,7 @@ def build_model(
             sat[c.id] = _or_equiv(m, hit, n + ".hit").Not()
         elif c.type == "category_min":
             cats = set(p.category_ids)
-            expr = sum(units[s.id] * x[s.id] for s in sections if cats.intersection(idx.course_by_id[s.course_id].category_ids))
+            expr = sum(units[s.id] * x[s.id] for s in sections if cats.intersection(idx.categories_of(s.id)))
             sat[c.id] = _linear_ge_equiv(m, expr, p.min_units, n)
         elif c.type == "instructor_avoid":
             bad = set(p.instructor_ids)

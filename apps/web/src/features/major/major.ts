@@ -9,6 +9,7 @@
  * API 계약은 바꾸지 않는다: 확인된 과목에 category id를 하나 더 붙인 Catalog를 서버가 다시 검증한다.
  */
 import type { Catalog, Constraint } from "../../lib/types";
+import { sectionCategories } from "../../lib/catalog";
 
 export const MY_MAJOR_CATEGORY = "내전공";
 export const MY_MAJOR_GROUP = "내 전공";
@@ -22,21 +23,35 @@ export interface MajorDefinition {
   confirmedAt: string;
 }
 
-/** 개설 소속·전공 유형으로 좁힌 후보(확인 전 제안일 뿐). */
+/** 개설 소속·전공 유형으로 좁힌 후보(확인 전 제안일 뿐). 분반 중 하나라도 유효 이수구분이 전공 유형이면 후보. */
 export function majorCandidates(catalog: Catalog, courseOrgs: Record<string, string>, orgs: string[], types: string[]): string[] {
   return catalog.courses
-    .filter((c) => (orgs.length === 0 || orgs.includes(courseOrgs[c.id] ?? "")) && c.category_ids.some((x) => types.includes(x)))
+    .filter((c) => orgs.length === 0 || orgs.includes(courseOrgs[c.id] ?? ""))
+    .filter((c) => catalog.sections.some((s) => s.course_id === c.id && sectionCategories(catalog, s).some((x) => types.includes(x))))
     .map((c) => c.id)
     .sort();
 }
 
-/** 확인된 과목에 `내전공` 분류와 `내 전공` 그룹을 붙인다. 이전 설정은 지운다. */
-export function applyMajor(catalog: Catalog, courseIds: string[]): Catalog {
+/** 과목 안에서 '내 전공'이 되는 분반(유효 이수구분이 선택한 전공 유형인 분반). 예: 전선/교선 분반이 섞인 과목의 교선 분반은 제외. */
+export function majorSections(catalog: Catalog, courseId: string, types: string[]): string[] {
+  return catalog.sections.filter((s) => s.course_id === courseId && sectionCategories(catalog, s).some((x) => types.includes(x))).map((s) => s.id);
+}
+
+/**
+ * 확인된 과목에 `내전공` 분류와 `내 전공` 그룹을 붙인다. 이전 설정은 지운다.
+ * 분반별 이수구분(0008)과 충돌하지 않도록 **분반 단위**로 적용한다:
+ * - 분반 값이 있으면 그 분반 값에만 붙인다(분반 값이 과목 값을 대체하므로 과목에만 붙이면 빠진다).
+ * - 분반 값이 없으면 과목 값을 상속하므로, 과목 값이 전공 유형일 때만 과목에 붙인다.
+ */
+export function applyMajor(catalog: Catalog, courseIds: string[], types: string[]): Catalog {
   const set = new Set(courseIds);
   const base = clearMajor(catalog);
+  const add = (cats: string[]) => (cats.includes(MY_MAJOR_CATEGORY) ? cats : [...cats, MY_MAJOR_CATEGORY]);
+  const qualifies = (cats: string[]) => cats.some((x) => types.includes(x));
   return {
     ...base,
-    courses: base.courses.map((c) => (set.has(c.id) ? { ...c, category_ids: [...c.category_ids, MY_MAJOR_CATEGORY] } : c)),
+    courses: base.courses.map((c) => (set.has(c.id) && qualifies(c.category_ids) ? { ...c, category_ids: add(c.category_ids) } : c)),
+    sections: base.sections.map((s) => (set.has(s.course_id) && s.category_ids != null && qualifies(s.category_ids) ? { ...s, category_ids: add(s.category_ids) } : s)),
     category_groups: { ...base.category_groups, [MY_MAJOR_GROUP]: [MY_MAJOR_CATEGORY] },
   };
 }
@@ -44,9 +59,11 @@ export function applyMajor(catalog: Catalog, courseIds: string[]): Catalog {
 export function clearMajor(catalog: Catalog): Catalog {
   const groups = { ...catalog.category_groups };
   delete groups[MY_MAJOR_GROUP];
+  const strip = (cats: string[]) => cats.filter((x) => x !== MY_MAJOR_CATEGORY);
   return {
     ...catalog,
-    courses: catalog.courses.map((c) => (c.category_ids.includes(MY_MAJOR_CATEGORY) ? { ...c, category_ids: c.category_ids.filter((x) => x !== MY_MAJOR_CATEGORY) } : c)),
+    courses: catalog.courses.map((c) => (c.category_ids.includes(MY_MAJOR_CATEGORY) ? { ...c, category_ids: strip(c.category_ids) } : c)),
+    sections: catalog.sections.map((s) => (s.category_ids?.includes(MY_MAJOR_CATEGORY) ? { ...s, category_ids: strip(s.category_ids) } : s)),
     category_groups: groups,
   };
 }

@@ -57,8 +57,21 @@ def canonical_json(obj: object) -> str:
     return json.dumps(obj, sort_keys=True, separators=(",", ":"), ensure_ascii=False)
 
 
+SECTION_OPTIONAL_KEYS = ("credit_units", "category_ids")
+
+
 def catalog_revision(catalog: Catalog) -> str:
-    return hashlib.sha256(canonical_json(catalog.model_dump(mode="json")).encode("utf-8")).hexdigest()
+    """정규화된 카탈로그 '내용'의 SHA-256. 파일 바이트·줄바꿈과 무관하다(입력 파일이 아니라 검증된 모델을 직렬화).
+
+    분반별 선택 필드(0008)가 null이면 직렬화에서 빼서, 이 필드가 생기기 전 카탈로그의 revision이 바뀌지 않게 한다.
+    값이 있으면 포함되므로 분반별 학점·이수구분이 다르면 revision도 다르다.
+    """
+    body = catalog.model_dump(mode="json")
+    for s in body["sections"]:
+        for k in SECTION_OPTIONAL_KEYS:
+            if s.get(k) is None:
+                s.pop(k, None)
+    return hashlib.sha256(canonical_json(body).encode("utf-8")).hexdigest()
 
 
 @dataclass
@@ -83,10 +96,19 @@ class CatalogIndex:
         for s in catalog.sections:
             idx.section_by_id[s.id] = s
             idx.sections_by_course.setdefault(s.course_id, []).append(s)
+            if s.category_ids is not None:
+                idx.category_ids.update(s.category_ids)
         return idx
 
     def units_of(self, section_id: str) -> int:
-        return self.course_by_id[self.section_by_id[section_id].course_id].credit_units
+        """선택한 분반의 유효 학점: 분반 값이 있으면 그 값, 없으면 과목 값. Meeting 수와 무관(분반당 1회)."""
+        s = self.section_by_id[section_id]
+        return s.credit_units if s.credit_units is not None else self.course_by_id[s.course_id].credit_units
+
+    def categories_of(self, section_id: str) -> list[str]:
+        """선택한 분반의 유효 이수구분: 분반 값이 있으면 그 값(과목 값을 대체), 없으면 과목 값."""
+        s = self.section_by_id[section_id]
+        return s.category_ids if s.category_ids is not None else self.course_by_id[s.course_id].category_ids
 
 
 def validate_catalog_semantics(catalog: Catalog) -> tuple[list[RowIssue], list[RowIssue]]:
@@ -118,6 +140,16 @@ def validate_catalog_semantics(catalog: Catalog) -> tuple[list[RowIssue], list[R
         for iid in s.instructor_ids:
             if iid not in inst_seen:
                 err(f"{p}.instructor_ids", "UNKNOWN_INSTRUCTOR", f"존재하지 않는 교수 참조: {iid}")
+        course = next((c for c in catalog.courses if c.id == s.course_id), None)
+        if course is not None:
+            if s.credit_units is not None and s.credit_units == course.credit_units:
+                warnings.append(
+                    RowIssue(path=f"{p}.credit_units", code="REDUNDANT_SECTION_OVERRIDE", message="분반 학점이 과목 학점과 같습니다(null로 두면 상속)")
+                )
+            if s.category_ids is not None and s.category_ids == course.category_ids:
+                warnings.append(
+                    RowIssue(path=f"{p}.category_ids", code="REDUNDANT_SECTION_OVERRIDE", message="분반 이수구분이 과목 값과 같습니다(null로 두면 상속)")
+                )
         if s.support_status == "unsupported":
             if not s.issue_codes:
                 err(f"{p}.issue_codes", "UNSUPPORTED_WITHOUT_REASON", "미지원 분반에는 문제 코드가 필요합니다")

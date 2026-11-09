@@ -2,6 +2,7 @@ import { useState } from "react";
 import type { Catalog, Constraint, ConstraintType, Day } from "../../lib/types";
 import { DAY_KO, DAYS } from "../../lib/types";
 import { creditToUnits, parseHHMM } from "../../lib/time";
+import { allCategoryIds } from "../../lib/catalog";
 import { Badge, Button, IconButton } from "../../ui";
 import { describe, STRENGTH_LABEL, SUPPORTED_TYPES, TYPE_LABEL } from "./model";
 
@@ -103,7 +104,7 @@ export function ConstraintForm({ catalog, onAdd }: { catalog: Catalog; onAdd: (c
   const [maxDays, setMaxDays] = useState("4");
   const [error, setError] = useState<string | null>(null);
 
-  const categoryIds = [...new Set(catalog.courses.flatMap((c) => c.category_ids))].sort();
+  const categoryIds = allCategoryIds(catalog);
   const courseSections = catalog.sections.filter((s) => s.course_id === course);
 
   function build(): NewConstraint | string {

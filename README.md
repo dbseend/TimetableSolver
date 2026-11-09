@@ -64,6 +64,8 @@ npx playwright install chromium   # 최초 1회
 npm run e2e           # 전용 백엔드(127.0.0.1:8010, fixture 해석기)와 Vite(5174)를 자동 기동해 E2E — Gemini를 호출하지 않음
 ```
 
+CI: `.github/workflows/ci.yml`(백엔드 Ubuntu/Windows × Python 3.12/3.13, 계약 드리프트, 프론트, E2E). 줄바꿈은 `.gitattributes`로 LF 고정.
+
 계약 변경 시 타입 재생성:
 
 ```powershell

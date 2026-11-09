@@ -115,9 +115,8 @@ def evaluate_constraint(c, idx: CatalogIndex, chosen: list[str]) -> ConstraintEv
     elif t == "category_min":
         unit = "credit_units"
         cats = set(p.category_ids)
-        # 과목 단위로 합집합 집계: 여러 카테고리에 속해도 1회만.
-        courses = {s.course_id for s in sections}
-        total = sum(idx.course_by_id[cid].credit_units for cid in courses if cats.intersection(idx.course_by_id[cid].category_ids))
+        # 선택한 분반의 유효 학점·유효 이수구분으로 집계. 분반당 1회(여러 카테고리·여러 Meeting이어도 중복 없음).
+        total = sum(idx.units_of(s.id) for s in sections if cats.intersection(idx.categories_of(s.id)))
         violation = max(0, p.min_units - total)
         satisfied = violation == 0
         evidence.append(f"해당 카테고리 선택 학점 {total / 100:g} / 최소 {p.min_units / 100:g}")

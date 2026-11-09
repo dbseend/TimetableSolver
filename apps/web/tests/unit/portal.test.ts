@@ -48,6 +48,7 @@ describe("per-day period table (user-provided school table)", () => {
 });
 
 describe("portal HTML export (.xls extension, CP949) — synthetic fixture", () => {
+  // 의도적으로 바이트로 읽는다: CP949 인코딩 감지·디코딩을 검증하기 위함(.gitattributes에서 binary로 고정).
   const buf = readFileSync(new URL("../../../../fixtures/catalogs/synthetic-portal-export.xls", import.meta.url));
   const dec = decodeTableFile(buf.buffer.slice(buf.byteOffset, buf.byteOffset + buf.byteLength));
 

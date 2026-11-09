@@ -7,7 +7,7 @@ type Full<T, K extends keyof T> = Omit<T, K> & { [P in K]-?: Exclude<T[P], undef
 export type Meeting = Full<S["Meeting"], "room">;
 export type Instructor = S["Instructor"];
 export type Course = Full<S["Course"], "category_ids" | "equivalence_group_id">;
-export type Section = Omit<Full<S["Section"], "instructor_ids" | "support_status" | "issue_codes">, "meetings"> & { meetings: Meeting[] };
+export type Section = Omit<Full<S["Section"], "instructor_ids" | "support_status" | "issue_codes" | "credit_units" | "category_ids">, "meetings"> & { meetings: Meeting[] };
 export type Catalog = Omit<
   Full<S["Catalog"], "schema_version" | "timezone" | "data_origin" | "category_groups" | "instructors">,
   "courses" | "sections"

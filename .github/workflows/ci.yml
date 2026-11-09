@@ -1,0 +1,110 @@
+# 현재 구조(services/api + apps/web) 기준 CI. 외부 LLM은 호출하지 않는다(fixture 모드, 키 없음).
+# Windows에서도 돌려 인코딩(CP949 기본값)·줄바꿈 문제를 잡는다. PYTHONUTF8는 일부러 켜지 않는다.
+name: ci
+
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+
+permissions:
+  contents: read
+
+env:
+  LLM_PROVIDER: fixture
+  ENABLE_DEMO_FIXTURES: "1"
+
+jobs:
+  backend:
+    name: backend (${{ matrix.os }}, py${{ matrix.python }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+        python: ["3.12", "3.13"]
+    defaults:
+      run:
+        working-directory: services/api
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+      - run: uv python install ${{ matrix.python }}
+      - run: uv sync --frozen --python ${{ matrix.python }}
+      - run: uv run --frozen ruff check .
+      - run: uv run --frozen ruff format --check .
+      - run: uv run --frozen pytest -q
+
+  contract:
+    name: contract drift (OpenAPI → TS types)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+      - run: uv sync --frozen
+        working-directory: services/api
+      - run: uv run --frozen python scripts/export_openapi.py
+        working-directory: services/api
+      - run: npm ci
+        working-directory: apps/web
+      - run: npm run gen:api
+        working-directory: apps/web
+      - name: generated files must be committed
+        run: git diff --exit-code -- packages/contracts/openapi.json apps/web/src/generated/api-types.ts
+
+  frontend:
+    name: frontend (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    defaults:
+      run:
+        working-directory: apps/web
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+      - run: npm ci
+      - run: npm run typecheck
+      - run: npm test
+      - run: npm run build
+      - name: no secret-looking strings in bundle
+        shell: bash
+        run: "! grep -E 'GEMINI|API_KEY|x-goog' dist/assets/*.js"
+
+  e2e:
+    name: e2e (real FastAPI fixture backend + Vite)
+    runs-on: ubuntu-latest
+    needs: [backend, frontend]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+      - run: uv sync --frozen
+        working-directory: services/api
+      - run: npm ci
+        working-directory: apps/web
+      - run: npx playwright install --with-deps chromium
+        working-directory: apps/web
+      - run: npm run e2e
+        working-directory: apps/web
+      - if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-traces
+          path: apps/web/test-results
+          retention-days: 7

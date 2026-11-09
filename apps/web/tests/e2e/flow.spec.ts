@@ -291,3 +291,41 @@ test("내 전공 최소 학점: 과목 확인 전에는 차단, 확인한 과목
   await expect(page.getByTestId("results")).toBeVisible({ timeout: 30_000 });
   await expect(page.getByTestId("selected-sections")).toContainText("합성과목 가");
 });
+
+test("분반별 학점·이수구분 보존: 시간 있는 분반 복구, 선택 분반 값으로 계산·표시", async ({ page }) => {
+  await page.goto("/");
+  const csv = [
+    "구분,과목코드,분반,과목명(CourseName),학점,개설정보,시간(Period),강의실",
+    '전선,MIX101,01,"분반별구분과목\n(Mixed)",3,"가학부 주간\n가교수","월1,목1",R1',
+    '전필,MIX101,02,"분반별구분과목\n(Mixed)",3,"가학부 주간\n나교수","화1,금1",R2',
+    '전필,MIX101,03,"분반별구분과목\n(Mixed)",3,"가학부 주간\n다교수","화2,금2",R3',
+    '자선,VAR101,01,"가변학점실습\n(Var)",6,"가학부 주간\n라교수",,',
+    '자선,VAR101,02,"가변학점실습\n(Var)",2,"가학부 주간\n마교수",,',
+    '교선,GEN101,01,"교양과목\n(Gen)",2,"교양학부 주간\n바교수","수2",R4',
+  ].join("\n");
+  await page.getByTestId("catalog-file").setInputFiles({ name: "mixed.csv", mimeType: "text/csv", buffer: Buffer.from(csv, "utf-8") });
+  await expect(page.getByTestId("portal-detected")).toBeVisible();
+  await page.getByTestId("term-id").fill("2026-2");
+  await page.getByTestId("period-confirm").check();
+  await page.getByTestId("import-submit").click();
+  // 과목 3개 모두 가져옴(이전 모델이면 MIX101·VAR101 제외), 가변학점 분반은 시간 미정이라 미지원 유지
+  await expect(page.getByTestId("catalog-status")).toContainText("과목 3");
+  await expect(page.getByTestId("catalog-status")).toContainText("분반 6 (미지원 2)");
+  await expect(page.getByTestId("exclusion-reasons")).toContainText("수업시간 미정");
+  await expect(page.getByTestId("exclusion-reasons")).not.toContainText("자동 병합 안 함");
+  // 학점 3~3, 전선 분반만 → 01분반이 선택되어야 함(이수구분 '전선'은 01분반에만)
+  await page.getByTestId("constraint-list").getByLabel("삭제").first().click();
+  await addManual(page, "credit_range", "hard", async (p) => {
+    await p.getByTestId("cmin").fill("3");
+    await p.getByTestId("cmax").fill("3");
+  });
+  await addManual(page, "must_include", "hard", async (p) => {
+    await p.getByTestId("ccourse").selectOption("MIX101");
+  });
+  await confirmAndSolve(page);
+  await expect(page.getByTestId("results")).toBeVisible({ timeout: 30_000 });
+  await expect(page.getByTestId("selected-sections")).toContainText("분반별구분과목");
+  // 상세에서 분반 이수구분 표시(02·03분반이면 대표값 상속, 01분반이면 '이 분반 이수구분')
+  await page.locator(".tt-block", { hasText: "분반별구분과목" }).first().click();
+  await expect(page.getByTestId("section-detail")).toContainText(/분류: 전(선|필)/);
+});

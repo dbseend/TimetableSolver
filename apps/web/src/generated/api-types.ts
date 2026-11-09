@@ -781,8 +781,12 @@ export interface components {
         };
         /** Section */
         Section: {
+            /** Category Ids */
+            category_ids?: string[] | null;
             /** Course Id */
             course_id: string;
+            /** Credit Units */
+            credit_units?: number | null;
             /**
              * Delivery Mode
              * @enum {string}

@@ -172,7 +172,7 @@ timetable-solver/
 
 이 예시는 최소 조각이다. `catalog_revision`은 업로드 정규화 후 계산해 envelope에 넣는다.
 
-Course는 과목 정체성·학점·분류를, Section은 분반·교수·수업 방식을, Meeting은 여러 시간 블록을 가진다. 동일 과목의 학점·분류가 분반마다 다르면 P0는 가져오기 오류로 보여 주고 학교 어댑터 설계 전까지 자동 병합하지 않는다.
+Course는 과목 정체성·학점·분류를, Section은 분반·교수·수업 방식을, Meeting은 여러 시간 블록을 가진다. 동일 과목의 학점·분류가 분반마다 다르면 Section의 선택 필드 `credit_units`·`category_ids`에 분반 값을 보존한다(null이면 Course 값 상속, 계산은 항상 선택한 분반의 유효값). 과목명이 다르면 같은 과목인지 알 수 없으므로 자동 병합하지 않고 가져오기 오류로 보여 준다. (2026-11-09 개정, `docs/decisions/0008-section-level-credit-category.md`)
 
 `delivery_mode`: `in_person | online_sync | online_async`.
 

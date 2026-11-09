@@ -102,12 +102,30 @@ describe("school-style CSV with Korean headers and period notation", () => {
 });
 
 describe("adapter errors", () => {
-  it("rejects inconsistent course credit across rows instead of merging", () => {
-    const rows = parseDelimited(demo.replace("CSE201,자료구조,02,3,", "CSE201,자료구조,02,2,"));
+  it("preserves per-section credit differences instead of dropping the course (0008)", () => {
+    // 분반 02의 두 행(월·수 Meeting) 모두 2학점으로 바꾼다
+    const rows = parseDelimited(demo.replaceAll("CSE201,자료구조,02,3,", "CSE201,자료구조,02,2,"));
     const r = importCatalog(rows, DEMO_ADAPTER);
+    expect(r.issues.some((i) => i.code === "COURSE_INCONSISTENT")).toBe(false);
+    expect(r.issues.some((i) => i.code === "SECTION_VALUES_PRESERVED")).toBe(true);
+    expect(r.catalog!.courses.find((c) => c.id === "CSE201")!.credit_units).toBe(300); // 동률 → 먼저 나온 분반 값
+    const secs = r.catalog!.sections.filter((s) => s.course_id === "CSE201");
+    expect(secs.map((s) => [s.section_label, s.credit_units, s.category_ids])).toEqual([
+      ["01", null, null],
+      ["02", 200, null],
+    ]);
+  });
+  it("still refuses to merge rows whose course names differ", () => {
+    const r = importCatalog(parseDelimited(demo.replace("CSE201,자료구조,02,", "CSE201,자료구조2,02,")), DEMO_ADAPTER);
     expect(r.issues.some((i) => i.code === "COURSE_INCONSISTENT")).toBe(true);
     expect(r.catalog!.courses.find((c) => c.id === "CSE201")).toBeUndefined();
-    expect(r.catalog!.sections.some((s) => s.course_id === "CSE201")).toBe(false);
+  });
+  it("rows of the same section with different credits make that section unsupported (which value is unknown)", () => {
+    const lines = demo.split(/\r?\n/);
+    const i = lines.findIndex((l) => l.startsWith("CSE201,자료구조,01,3,"));
+    lines[i + 1] = lines[i + 1].replace("CSE201,자료구조,01,3,", "CSE201,자료구조,01,2,");
+    const r = importCatalog(parseDelimited(lines.join("\n")), DEMO_ADAPTER);
+    expect(r.catalog!.sections.find((s) => s.id === "2026-2:CSE201:01")!.issue_codes).toContain("SECTION_VALUE_INCONSISTENT");
   });
   it("rejects credits finer than 0.01", () => {
     const rows = parseDelimited(demo.replace(/GEN205,창의적사고,01,1\.5,/, "GEN205,창의적사고,01,1.505,"));
@@ -123,5 +141,15 @@ describe("adapter errors", () => {
     expect(common).toEqual({ "1": [540, 590], "2": [600, 650] });
     expect(byDay).toEqual({});
     expect(errors).toEqual(["bad", "3=11:00-10:00"]);
+  });
+});
+
+describe("line endings / BOM do not change the imported catalog (revision is a content hash)", () => {
+  it("LF, CRLF and UTF-8 BOM versions of the same CSV produce identical catalogs", () => {
+    const lf = importCatalog(parseDelimited(demo.replace(/\r\n/g, "\n")), DEMO_ADAPTER).catalog;
+    const crlf = importCatalog(parseDelimited(demo.replace(/\r?\n/g, "\r\n")), DEMO_ADAPTER).catalog;
+    const bom = importCatalog(parseDelimited("\uFEFF" + demo), DEMO_ADAPTER).catalog;
+    expect(crlf).toEqual(lf);
+    expect(bom).toEqual(lf);
   });
 });

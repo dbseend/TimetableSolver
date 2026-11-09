@@ -1,7 +1,18 @@
-# 0008. 분반별 학점·이수구분 보존 (제안 — 미구현, API 계약 변경 필요)
+# 0008. 분반별 학점·이수구분 보존
 
-- 상태: **제안**. 사용자 승인 전 구현하지 않음 (2026-11-09)
-- 근거 테스트(현재 동작 고정): `apps/web/tests/unit/major.test.ts` "분반별 학점·이수구분 차이" (합성 반례)
+- 상태: **채택·구현** (2026-11-09, 브랜치 `feat/timetable-integration`). 처음 작성 시점에는 제안이었고 아래 영향 범위를 확인한 뒤 구현했다.
+- 테스트: `services/api/tests/test_section_overrides.py`(유효 학점·분류, 분반 1개 규칙, Meeting 중복 없음, oracle 대조, revision 호환, API 왕복), `apps/web/tests/unit/{adapter,major}.test.ts`, E2E "분반별 학점·이수구분 보존"
+
+## 구현 결과(요약)
+
+- 계약: `Section.credit_units: int|null`, `Section.category_ids: string[]|null` (추가 필드, 기본 null). `schema_version`은 하위 호환이라 "1.0" 유지.
+- 유효값: 서버 `CatalogIndex.units_of / categories_of`, 프론트 `lib/catalog.ts`의 `sectionUnits / sectionCategories` — 같은 규칙. 검증기 category_min·학점 합, 솔버 학점 계수·category_min, facts가 모두 유효값 사용. 진단의 학점 범위 수정은 학점 값을 쓰지 않아 변경 없음.
+- **catalog_revision 호환**: 새 필드가 null이면 직렬화에서 제외 → 분반 값이 없는 기존 카탈로그 revision 불변(테스트로 확인). 값이 있으면 revision에 반영.
+- 어댑터: 과목 대표값 = 분반 값의 최빈값(동률이면 먼저 나온 분반), 대표값과 다른 분반만 분반 값을 가진다. 과목명이 다르면 여전히 `COURSE_INCONSISTENT`로 제외. 같은 분반의 여러 행끼리 학점·이수구분이 다르면 `SECTION_VALUE_INCONSISTENT`로 그 분반만 미지원.
+- 내 전공(0007)과의 관계: `내전공` 분류는 **분반 단위**로 붙인다(유효 이수구분이 선택한 전공 유형인 분반만). 과목 대표값만 바꾸면 분반 값이 있는 분반에서 빠지거나 교선 분반까지 전공이 되는 충돌을 막는다.
+- 저장 데이터: 브라우저에 저장하는 것은 정규화된 이수내역(`profile.v1`, 과목코드·상태)뿐이며 이 변경과 무관하다. 카탈로그·조건 초안은 저장하지 않으므로(세션마다 다시 가져오기) 마이그레이션 대상이 없다. 새 필드가 없는 이전 형식 카탈로그 JSON은 그대로 유효(필드 선택)하다.
+- 실제 파일 재가져오기: 과목 511→518, 분반 778→819, 정상 분반 651→656(시간 있는 5분반 복구), 미지원 127→163(가변 학점 36분반 포함 — 시간 미정이라 미지원 유지, 비동기로 간주 안 함), Meeting 1,293→1,303, 분반 값 보존 15분반(학점 13, 이수구분 2).
+
 
 ## 조사 결과: 제외된 7과목(41분반)
 
