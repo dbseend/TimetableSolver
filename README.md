@@ -5,7 +5,24 @@
 - 백엔드: `services/api` (FastAPI, Pydantic v2, OR-Tools, uv)
 - 프론트: `apps/web` (React 19, Vite, TypeScript, 생성 OpenAPI 타입)
 - 계약 원본: `services/api/app/contracts.py` → `packages/contracts/openapi.json` → `apps/web/src/generated/api-types.ts`
-- 진행 상황·미구현·미검증 목록: [`docs/PROGRESS.md`](docs/PROGRESS.md)
+- 진행 상황·미구현·미검증 목록: [`docs/PROGRESS.md`](docs/PROGRESS.md) · main 선별 통합 기록: [`docs/INTEGRATION.md`](docs/INTEGRATION.md) · main 병합 계획(미실행): [`docs/MERGE_PLAN.md`](docs/MERGE_PLAN.md)
+
+> 이 브랜치(`feat/timetable-integration`)는 아직 main에 병합되지 않았다. main에는 이전 구현(`backend/`, `frontend/`)이 있으며, 정리 절차는 `docs/MERGE_PLAN.md`를 따른다.
+
+## 동작하는 기능
+
+- 강좌 준비: 합성 샘플, 학교 파일(CSV/TSV, 포털 HTML `.xls`·CP949) 가져오기, 열 매핑·요일별 교시표, 분반별 학점·이수구분 보존, 미지원 분반 사유 표시
+- 조건: 자연어(데모 해석기 또는 Gemini) → 질문·빈 값 직접 입력 → 칩 확인, 직접 조건 추가, 내 전공 과목 확인 후 내 전공 최소 학점
+- 생성: 사용자 확인 후 CP-SAT 후보 최대 3개(독립 검증기 통과분만), 시간표·목록·비교표, 충족/아쉬운 조건
+- 불가능: 충돌 조건 묶음 → 재풀이·검증된 단일 수정안 미리보기 → 확인 후 적용
+- 이수내역: 브라우저 안에서만 처리(학번·이름·성적 즉시 제거), 서버엔 수강 가능 분반 ID만
+
+## 알려진 제한
+
+- 시간 미정·토요일 분반은 미지원(실제 학교 파일 819분반 중 656분반 사용), 교시표 적용 학기·예외 미확인
+- 내 전공 인정 규칙은 사용자가 과목을 확인하는 방식으로만 반영(학교 규칙 자동 판정 없음)
+- 자연어: live 모델이 "15~18학점"을 최소만·최대만 있는 초안 2개로 나누는 경우가 있다(학점 범위 정규화 미구현 — 하나를 버리고 다른 하나를 채워야 확인 가능). 자연어 정확도 평가는 미실시
+- 점심·최장 공강·연강, 복수 조건 완화, 범용 xlsx, 공개 배포는 범위 밖
 
 ## 실행 (Windows PowerShell)
 

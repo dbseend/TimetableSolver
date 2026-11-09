@@ -1,6 +1,13 @@
 # 진행 상황
 
-마지막 갱신: 2026-11-09 · 브랜치 **`feat/timetable-integration`** (체크포인트 `a294ccb` on `feat/timetable-mvp` 이후 선별 통합). 원격 push·main 병합·rebase 안 함.
+마지막 갱신: 2026-11-09 (최종) · 브랜치 **`feat/timetable-integration`** · main 미병합.
+
+## 최종 상태 요약
+
+- 완료: README "동작하는 기능" 전부, main 선별 통합(`docs/INTEGRATION.md`), 자연어 결함 수정(교수 분반 제한, 빈 값 직접 입력), 병합 계획(`docs/MERGE_PLAN.md`, 미실행).
+- 최종 검증(코드 마지막 변경 `4e32b73` 기준): 백엔드 193 passed(Python 3.12·3.13), ruff 통과, Vitest 71, 타입 검사 0, 빌드 성공, Playwright E2E 15 passed. 이후 변경은 문서뿐.
+- **알려진 제한(이번에 하지 않음)**: live 모델이 "15~18학점"을 최소만·최대만 있는 학점 범위 초안 2개로 나누는 경우의 **정규화(병합) 미구현** — 두 초안을 모두 채우면 'hard 학점 범위 하나' 규칙으로 확인이 막히므로 하나를 버려야 한다. 그 밖의 미완료·미검증은 6절.
+- main 반영 전 남은 일: 병합 충돌 4개 파일 해결, main의 `backend/`·`frontend/`·`data/`·`supabase/`·`render.yaml` 정리(`docs/MERGE_PLAN.md`), Render/Vercel 연결 확인, GitHub CI 결과 확인.
 
 ## 0. 선별 통합 (2026-11-09) — 상세 `docs/INTEGRATION.md`
 
