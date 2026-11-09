@@ -16,6 +16,7 @@ from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
+from app.application.default_catalogs import get_catalog, list_catalogs
 from app.application.parse import build_response, provider_from_env
 from app.application.solve import InternalSolverError, diagnose, solve
 from app.contracts import (
@@ -24,6 +25,8 @@ from app.contracts import (
     Capabilities,
     CatalogValidateRequest,
     CatalogValidateResponse,
+    DefaultCatalogList,
+    DefaultCatalogResponse,
     DiagnoseRequest,
     DiagnosisResponse,
     ErrorResponse,
@@ -195,6 +198,7 @@ async def capabilities() -> Capabilities:
             "diagnose_single_change": "implemented",
             "diagnose_multi_change": ni,
             "csv_import": "implemented",
+            "default_school_catalog": "implemented",
             "xlsx_import": ni,
             "advanced_time_constraints": ni,
             "explain_llm": ni,
@@ -238,6 +242,21 @@ async def catalog_validate(body: CatalogValidateRequest, request: Request) -> Ca
             "meetings": sum(len(s.meetings) for s in c.sections),
         },
     )
+
+
+@api.get("/catalogs", response_model=DefaultCatalogList)
+async def catalogs_list() -> DefaultCatalogList:
+    """관리자가 변환해 둔 기본 학교 카탈로그 목록(학기·기준일·지원 분반 수·제외 사유)."""
+    return DefaultCatalogList(catalogs=await asyncio.to_thread(list_catalogs))
+
+
+@api.get("/catalogs/{catalog_id}", response_model=DefaultCatalogResponse)
+async def catalogs_get(catalog_id: str, request: Request):
+    """기본 학교 카탈로그 본문. 업로드와 같은 서버 검증을 통과한 것만 내려준다."""
+    resp = await asyncio.to_thread(get_catalog, catalog_id)
+    if resp is None:
+        return err(request, 404, "CATALOG_NOT_FOUND", "기본 학교 카탈로그가 없거나 검증에 실패했습니다.")
+    return resp
 
 
 def _disconnect_probe(request: Request):

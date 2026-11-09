@@ -11,8 +11,10 @@ import type { MajorDefinition } from "../features/major/major";
 export interface LoadedCatalog {
   catalog: Catalog;
   revision: string;
-  source: "demo" | "upload";
+  source: "demo" | "upload" | "school";
   fileName: string;
+  /** 기본 학교 데이터의 기준일(YYYY-MM-DD). 모르면 null. 샘플·업로드는 undefined. */
+  asOf?: string | null;
   issues: ImportIssue[];
   serverWarnings: string[];
   /** 과목 → 개설 소속(로컬 메타데이터, 서버 미전송). */

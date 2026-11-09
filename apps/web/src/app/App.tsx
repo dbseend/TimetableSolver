@@ -189,6 +189,7 @@ export function App() {
             </Badge>
             <span>
               {s.loaded.catalog.term_id} 학기 · {s.loaded.fileName}
+              {s.loaded.source === "school" && ` · 기준일 ${s.loaded.asOf ?? "미확인"}`}
             </span>
           </>
         ) : (

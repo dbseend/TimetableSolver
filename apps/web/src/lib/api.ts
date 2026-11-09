@@ -3,6 +3,8 @@ import type {
   Capabilities,
   Catalog,
   CatalogValidateResponse,
+  DefaultCatalogList,
+  DefaultCatalogResponse,
   DiagnoseRequest,
   DiagnosisResponse,
   ErrorResponse,
@@ -56,6 +58,9 @@ async function call<T>(path: string, body: unknown | undefined, signal?: AbortSi
 
 export const api = {
   capabilities: (signal?: AbortSignal) => call<Capabilities>("/capabilities", undefined, signal),
+  /** 관리자가 변환해 둔 기본 학교 카탈로그 목록·본문(서버가 업로드와 같은 검증을 거친 것만) */
+  listCatalogs: (signal?: AbortSignal) => call<DefaultCatalogList>("/catalogs", undefined, signal),
+  getCatalog: (id: string, signal?: AbortSignal) => call<DefaultCatalogResponse>(`/catalogs/${encodeURIComponent(id)}`, undefined, signal),
   validateCatalog: (catalog: Catalog, signal?: AbortSignal) => call<CatalogValidateResponse>("/catalog/validate", { catalog }, signal),
   parse: (req: ParseRequest, signal?: AbortSignal) => call<ParseResponse>("/constraints/parse", req, signal),
   solve: (req: SolveRequest, signal?: AbortSignal) => call<SolveResponse>("/solve", req, signal),

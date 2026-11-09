@@ -38,6 +38,46 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/catalogs": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Catalogs List
+         * @description 관리자가 변환해 둔 기본 학교 카탈로그 목록(학기·기준일·지원 분반 수·제외 사유).
+         */
+        get: operations["catalogs_list_api_v1_catalogs_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/catalogs/{catalog_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Catalogs Get
+         * @description 기본 학교 카탈로그 본문. 업로드와 같은 서버 검증을 통과한 것만 내려준다.
+         */
+        get: operations["catalogs_get_api_v1_catalogs__catalog_id__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/constraints/parse": {
         parameters: {
             query?: never;
@@ -368,6 +408,62 @@ export interface components {
         DayOffParams: {
             /** Days */
             days: ("Mon" | "Tue" | "Wed" | "Thu" | "Fri" | "Sat" | "Sun")[];
+        };
+        /** DefaultCatalogList */
+        DefaultCatalogList: {
+            /** Catalogs */
+            catalogs: components["schemas"]["DefaultCatalogSummary"][];
+        };
+        /** DefaultCatalogResponse */
+        DefaultCatalogResponse: {
+            catalog: components["schemas"]["Catalog"];
+            /** Catalog Revision */
+            catalog_revision: string;
+            /** Course Orgs */
+            course_orgs: {
+                [key: string]: string;
+            };
+            /** Import Issues */
+            import_issues: {
+                [key: string]: unknown;
+            }[];
+            /** Major Type Categories */
+            major_type_categories: string[];
+            summary: components["schemas"]["DefaultCatalogSummary"];
+        };
+        /**
+         * DefaultCatalogSummary
+         * @description 관리자가 변환해 둔 기본 학교 카탈로그 요약(서버가 읽을 때 다시 검증).
+         */
+        DefaultCatalogSummary: {
+            /** As Of */
+            as_of: string | null;
+            /** Error */
+            error: string | null;
+            /** Excluded Courses */
+            excluded_courses: number;
+            /** Exclusion Reasons */
+            exclusion_reasons: {
+                [key: string]: number;
+            };
+            /** Generated At */
+            generated_at: string | null;
+            /** Id */
+            id: string;
+            /** Label */
+            label: string;
+            /** Period Table Basis */
+            period_table_basis: string | null;
+            /** Source File */
+            source_file: string | null;
+            /** Stats */
+            stats: {
+                [key: string]: number;
+            };
+            /** Term Id */
+            term_id: string;
+            /** Valid */
+            valid: boolean;
         };
         /** DiagnoseRequest */
         DiagnoseRequest: {
@@ -1054,6 +1150,210 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["CatalogValidateResponse"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Request Entity Too Large */
+            413: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Too Many Requests */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Internal Server Error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Bad Gateway */
+            502: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Service Unavailable */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Gateway Timeout */
+            504: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    catalogs_list_api_v1_catalogs_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DefaultCatalogList"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Request Entity Too Large */
+            413: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Too Many Requests */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Internal Server Error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Bad Gateway */
+            502: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Service Unavailable */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Gateway Timeout */
+            504: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    catalogs_get_api_v1_catalogs__catalog_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                catalog_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DefaultCatalogResponse"];
                 };
             };
             /** @description Bad Request */

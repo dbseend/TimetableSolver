@@ -6,6 +6,8 @@ import type { LoadedCatalog } from "../../app/state";
 import type { Catalog } from "../../lib/types";
 import { parseDelimited } from "./csv";
 import { decodeTableFile, looksLikeHtml, parseHtmlTable } from "./htmlTable";
+import { SECTION_ISSUE_LABEL } from "./issueLabels";
+import { SchoolStart } from "./SchoolStart";
 import { matchesPortalExport, PORTAL_ADAPTER_BASE, PORTAL_MAJOR_TYPE_CATEGORIES, PORTAL_PERIOD_TABLE_TEXT } from "./presets";
 import {
   type AdapterConfig,
@@ -163,7 +165,7 @@ export function CatalogPanel({ loaded, onLoaded, onCancel }: { loaded: LoadedCat
       <div className="card-head">
         <div>
           <h2 id="catalog-h">강좌 준비</h2>
-          <p>시간표를 만들 개설강좌를 고르세요. 샘플과 학교 파일은 같은 변환·검증 과정을 거칩니다.</p>
+          <p>학기를 고르고 학교 강좌로 시작하세요. 파일을 올릴 필요가 없어요.</p>
         </div>
         {loaded && onCancel && (
           <Button variant="secondary" size="sm" onClick={onCancel}>
@@ -172,19 +174,26 @@ export function CatalogPanel({ loaded, onLoaded, onCancel }: { loaded: LoadedCat
         )}
       </div>
 
+      {!upload && <SchoolStart onLoaded={onLoaded} />}
+
+      {!upload && (
+        <h3 className="muted" style={{ margin: "24px 0 12px", fontSize: 15 }}>
+          다른 방법으로 시작
+        </h3>
+      )}
       {!upload && (
         <div className="onboard">
           <div className="choice">
-            <h3>샘플로 체험하기</h3>
+            <h3>샘플로 체험하기 (보조)</h3>
             <p>가상 학교의 합성 개설강좌(32개 분반)로 바로 시작합니다. 실제 학교 자료가 아닙니다.</p>
             <div>
-              <Button onClick={() => run(parseDelimited(demoCsv), DEMO_ADAPTER, "demo", "demo-campus-2026-2.csv")} disabled={busy} data-testid="load-demo">
+              <Button variant="secondary" onClick={() => run(parseDelimited(demoCsv), DEMO_ADAPTER, "demo", "demo-campus-2026-2.csv")} disabled={busy} data-testid="load-demo">
                 샘플로 체험하기
               </Button>
             </div>
           </div>
           <div className="choice">
-            <h3>학교 개설강좌 올리기</h3>
+            <h3>개설강좌 파일 직접 올리기 (데이터 갱신·개별 파일용)</h3>
             <div
               className={`drop ${dragOver ? "over" : ""}`}
               onDragOver={(e) => {
@@ -421,23 +430,6 @@ const ISSUE_HINT: Record<string, string> = {
   SECTION_UNSUPPORTED: "학교 자료에서 시간을 확인할 수 있으면 파일을 고쳐 다시 올리세요.",
 };
 
-export const SECTION_ISSUE_LABEL: Record<string, string> = {
-  TIME_TBD: "수업시간 미정",
-  PERIOD_TABLE_MISSING_FOR_DAY: "교시표가 없는 요일(토·일 등)",
-  IRREGULAR_SCHEDULE: "격주·비정기 비고",
-  SCHEDULE_TEXT_UNPARSED: "해석할 수 없는 시간 표기",
-  PERIOD_UNKNOWN: "교시표에 없는 교시",
-  PERIOD_RANGE: "교시 범위 오류",
-  PERIOD_EMPTY: "교시 비어 있음",
-  TIME_FORMAT: "시각 형식 오류",
-  DAY_UNKNOWN: "요일 해석 불가",
-  DELIVERY_UNKNOWN: "수업방식 해석 불가",
-  DELIVERY_INCONSISTENT: "행마다 수업방식이 다름",
-  PARTIAL_TIME: "일부 행만 시간 있음",
-  INTRA_SECTION_OVERLAP: "분반 내부 시간 겹침",
-  ASYNC_WITH_TIME: "비동기인데 시간 있음",
-  INSTRUCTOR_MISMATCH: "교수 ID·이름 개수 불일치",
-};
 
 function IssueList({ issues, testId }: { issues: ImportIssue[]; testId?: string }) {
   return (
@@ -476,8 +468,11 @@ export function DataSummary({ loaded, onChange }: { loaded: LoadedCatalog; onCha
         </Button>
       </div>
       <p className="small" data-testid="catalog-status" style={{ marginTop: 6 }}>
-        <Badge tone={loaded.source === "demo" ? "outline" : "primary"}>{loaded.source === "demo" ? "합성 샘플" : "학교 데이터 · 업로드"}</Badge> <b>{c.catalog_id}</b> · 학기{" "}
-        {c.term_id} · 과목 {c.courses.length} · 분반 {c.sections.length} (미지원 {unsupported.length})
+        <Badge tone={loaded.source === "demo" ? "outline" : "primary"}>
+          {loaded.source === "demo" ? "합성 샘플" : loaded.source === "school" ? "학교 데이터 · 기본 제공" : "학교 데이터 · 업로드"}
+        </Badge>{" "}
+        <b>{loaded.source === "school" ? loaded.fileName : c.catalog_id}</b> · 학기 {c.term_id}
+        {loaded.source === "school" && <> · 기준일 {loaded.asOf ?? "미확인"}</>} · 과목 {c.courses.length} · 분반 {c.sections.length} (미지원 {unsupported.length})
       </p>
       <dl className="data-facts">
         <div>
@@ -514,7 +509,7 @@ export function DataSummary({ loaded, onChange }: { loaded: LoadedCatalog; onCha
           </ul>
         </div>
       )}
-      {loaded.source === "upload" && unsupported.length + excludedCourses.length > 0 && (
+      {loaded.source !== "demo" && unsupported.length + excludedCourses.length > 0 && (
         <p className="xs muted" style={{ marginTop: 10 }} data-testid="partial-support">
           학교 강좌 전체를 지원하지 않아요. 위 항목은 시간표 후보에 나오지 않습니다.
         </p>

@@ -2,6 +2,14 @@
 
 마지막 갱신: 2026-11-09 (최종) · 브랜치 **`feat/timetable-integration`** · main 미병합.
 
+## 기본 학교 데이터 제공 (2026-11-09) — `docs/decisions/0009-default-school-catalog.md`
+
+- 첫 화면: 학기 선택 → 학교 강좌로 시작하기(권장). 샘플·파일 직접 올리기는 "다른 방법으로 시작"(보조)으로 이동.
+- 관리자 변환 스크립트 `apps/web/scripts/build-school-catalog.mjs`(화면 업로드와 같은 `importCatalog`), 결과는 `local-data/catalogs/`(Git 제외). 백엔드 `GET /api/v1/catalogs`, `GET /api/v1/catalogs/{id}` — 업로드와 같은 서버 검증, 같은 `/solve`.
+- 실데이터: 2026-2학기, 기준일 2026-11-09(사용자 확인), 518과목·819분반, 시간표에 쓰는 분반 656, 제외 163(시간 미정 153, 토요일 10).
+- 검증: 백엔드 200 passed(+7 기본 카탈로그 테스트), ruff 통과, Vitest 71, 타입 검사 0, 빌드 성공(번들 비밀 문자열 0), E2E 17 passed(+2: 새 접속에서 업로드 없이 생성, 기본 데이터 없을 때 안내). 실데이터로 새 브라우저 접속 → 학교 강좌로 시작 → 생성: optimal 후보 3개(각 15학점, 검증 통과), 서버로 보낸 POST는 `/solve` 하나(업로드·변환 없음). Gemini 호출 0.
+- 미결정: 배포 시 데이터 저장 위치·공개 범위(0009 표).
+
 ## 최종 상태 요약
 
 - 완료: README "동작하는 기능" 전부, main 선별 통합(`docs/INTEGRATION.md`), 자연어 결함 수정(교수 분반 제한, 빈 값 직접 입력), 병합 계획(`docs/MERGE_PLAN.md`, 미실행).

@@ -2,7 +2,15 @@ import { defineConfig } from "@playwright/test";
 
 // E2E 전용 서버: 실제 FastAPI(fixture 해석기, 포트 8010) + Vite(포트 5174).
 // 개발용 서버(8000/5173, live Gemini일 수 있음)와 분리해 외부 LLM을 호출하지 않고 결정적으로 돌린다.
-const env = { ...process.env, LLM_PROVIDER: "fixture", GEMINI_API_KEY: "", ENABLE_DEMO_FIXTURES: "1", CORS_ORIGINS: "http://127.0.0.1:5174" };
+// 기본 학교 카탈로그는 합성 픽스처 폴더(실데이터 아님). 경로는 services/api 기준 상대 경로.
+const env = {
+  ...process.env,
+  LLM_PROVIDER: "fixture",
+  GEMINI_API_KEY: "",
+  ENABLE_DEMO_FIXTURES: "1",
+  CORS_ORIGINS: "http://127.0.0.1:5174",
+  CATALOG_DIR: "../../fixtures/default-catalogs",
+};
 
 export default defineConfig({
   testDir: "tests/e2e",

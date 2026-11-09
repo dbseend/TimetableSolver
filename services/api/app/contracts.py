@@ -366,6 +366,39 @@ class CatalogValidateResponse(Strict):
     stats: dict[str, int]
 
 
+# ---------------------------------------------------------------- default school catalogs
+
+
+class DefaultCatalogSummary(Strict):
+    """관리자가 변환해 둔 기본 학교 카탈로그 요약(서버가 읽을 때 다시 검증)."""
+
+    id: str
+    term_id: str
+    label: str
+    as_of: str | None  # 데이터 기준일(YYYY-MM-DD). 모르면 null → 화면에 '기준일 미확인'
+    source_file: str | None
+    generated_at: str | None
+    period_table_basis: str | None
+    valid: bool
+    error: str | None
+    stats: dict[str, int]
+    exclusion_reasons: dict[str, int]
+    excluded_courses: int
+
+
+class DefaultCatalogList(Strict):
+    catalogs: list[DefaultCatalogSummary]
+
+
+class DefaultCatalogResponse(Strict):
+    summary: DefaultCatalogSummary
+    catalog: Catalog
+    catalog_revision: str
+    course_orgs: dict[str, str]
+    major_type_categories: list[str]
+    import_issues: list[dict[str, Any]]
+
+
 # ---------------------------------------------------------------- parse (NL)
 
 
