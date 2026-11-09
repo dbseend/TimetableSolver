@@ -98,6 +98,7 @@
         "type": "object"
       },
       "CatalogSummary": {
+        "description": "What the parser needs to resolve names. Only `categories` is shown to the LLM; courses and\ninstructors are matched on the server.",
         "properties": {
           "categories": {
             "items": {
@@ -106,11 +107,11 @@
             "title": "Categories",
             "type": "array"
           },
-          "course_names": {
+          "courses": {
             "items": {
-              "type": "string"
+              "$ref": "#/components/schemas/CourseRef"
             },
-            "title": "Course Names",
+            "title": "Courses",
             "type": "array"
           },
           "instructors": {
@@ -403,6 +404,26 @@
           "category"
         ],
         "title": "Course",
+        "type": "object"
+      },
+      "CourseRef": {
+        "properties": {
+          "id": {
+            "minLength": 1,
+            "title": "Id",
+            "type": "string"
+          },
+          "name": {
+            "minLength": 1,
+            "title": "Name",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "name"
+        ],
+        "title": "CourseRef",
         "type": "object"
       },
       "CourseRefParams": {
@@ -771,6 +792,17 @@
               }
             ],
             "title": "Diagnosis Text"
+          },
+          "sources": {
+            "items": {
+              "enum": [
+                "llm",
+                "template"
+              ],
+              "type": "string"
+            },
+            "title": "Sources",
+            "type": "array"
           }
         },
         "required": [
@@ -1322,6 +1354,28 @@
         "title": "MustInclude",
         "type": "object"
       },
+      "PoolItem": {
+        "description": "A course the student wants to consider. Higher priority is preferred when not all fit.",
+        "properties": {
+          "course_id": {
+            "minLength": 1,
+            "title": "Course Id",
+            "type": "string"
+          },
+          "priority": {
+            "default": 3,
+            "maximum": 5.0,
+            "minimum": 1.0,
+            "title": "Priority",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "course_id"
+        ],
+        "title": "PoolItem",
+        "type": "object"
+      },
       "Profile": {
         "description": "Student's completed/in-progress courses. Grades are intentionally not modelled.",
         "properties": {
@@ -1448,6 +1502,7 @@
                 "type": "null"
               }
             ],
+            "description": "Best objective without `drop` minus the best objective with no hard user constraints at all (<= 0; 0 = dropping it costs nothing). None when still infeasible.",
             "title": "Objective Delta"
           }
         },
@@ -1563,6 +1618,7 @@
         "type": "object"
       },
       "SolveRequest": {
+        "description": "The solver picks courses only from `pool` (plus must_include targets), never the whole\ncatalog: without a pool it fills credits with arbitrary 0/1-credit courses.",
         "properties": {
           "catalog": {
             "$ref": "#/components/schemas/Catalog"
@@ -1645,6 +1701,14 @@
             "title": "N",
             "type": "integer"
           },
+          "pool": {
+            "items": {
+              "$ref": "#/components/schemas/PoolItem"
+            },
+            "minItems": 1,
+            "title": "Pool",
+            "type": "array"
+          },
           "profile": {
             "$ref": "#/components/schemas/Profile"
           },
@@ -1662,7 +1726,8 @@
           }
         },
         "required": [
-          "catalog"
+          "catalog",
+          "pool"
         ],
         "title": "SolveRequest",
         "type": "object"
@@ -2007,6 +2072,16 @@
             },
             "description": "Validation error"
           },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "LLM rate or daily limit reached"
+          },
           "501": {
             "content": {
               "application/json": {
@@ -2016,6 +2091,26 @@
               }
             },
             "description": "Not implemented yet"
+          },
+          "502": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "LLM failed or returned invalid output"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "LLM disabled (no provider or key)"
           }
         },
         "summary": "Parse Constraints",
@@ -2026,6 +2121,7 @@
     },
     "/explain": {
       "post": {
+        "description": "Always answers: template text, LLM rewrite only when it passes the fact check.",
         "operationId": "explain_explain_post",
         "requestBody": {
           "content": {

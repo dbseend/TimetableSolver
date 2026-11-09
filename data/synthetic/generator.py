@@ -25,10 +25,11 @@ CATEGORIES = ["전필", "전선", "교양", "기타"]
 CATEGORY_WEIGHTS = [0.25, 0.35, 0.3, 0.1]
 CREDIT_WEIGHTS = {3: 0.7, 2: 0.2, 1: 0.1}
 
-# 75-minute twice-weekly slots (the dominant pattern)
-TWICE_STARTS = ["09:00", "10:30", "12:00", "13:30", "15:00", "16:30"]
+# Every start is a period start (09:00 + 90min steps, docs/academic_rules.md §1); classes last 75min
+# (3 credits) or 50min (2 credits), and two consecutive periods are one block (165 / 140 min).
+TWICE_STARTS = ["09:00", "10:30", "12:00", "13:30", "15:00", "16:30"]  # periods 1-6
 TWICE_DAYS = [("Mon", "Wed"), ("Tue", "Thu")]
-BLOCK_STARTS = ["09:00", "13:00", "14:00"]  # 3-hour single block
+BLOCK_STARTS = ["09:00", "12:00", "13:30"]  # two consecutive periods
 WEEKDAYS = ["Mon", "Tue", "Wed", "Thu"]
 
 
@@ -45,16 +46,18 @@ def _meetings(rng: random.Random, credit: int) -> list[dict]:
         if r < 0.88:
             return [_m(rng.choice(WEEKDAYS), rng.choice(BLOCK_STARTS), 165)]
         if r < 0.94:
-            return [_m(rng.choice(WEEKDAYS), "19:00", 165)]  # night
-        return [_m("Fri", rng.choice(["09:00", "13:00"]), 165)]  # Friday only
+            return [_m(rng.choice(WEEKDAYS), "19:30", 165)]  # night, periods 8-9
+        return [_m("Fri", rng.choice(["09:00", "13:30"]), 165)]  # Friday only
     if credit == 2:
         if r < 0.6:
-            return [_m(rng.choice(WEEKDAYS), rng.choice(TWICE_STARTS), 100)]
+            days = rng.choice(TWICE_DAYS)
+            start = rng.choice(TWICE_STARTS)
+            return [_m(d, start, 50) for d in days]
         if r < 0.8:
-            return [_m(rng.choice(WEEKDAYS), "19:00", 100)]
-        return [_m("Fri", rng.choice(["10:00", "14:00"]), 100)]
+            return [_m(rng.choice(WEEKDAYS), "19:30", 140)]
+        return [_m("Fri", rng.choice(["10:30", "13:30"]), 140)]
     day = rng.choice(WEEKDAYS + ["Fri"])
-    return [_m(day, rng.choice(["09:00", "13:00", "16:00", "18:00"]), 50)]
+    return [_m(day, rng.choice(["09:00", "13:30", "16:30", "18:00"]), 50)]
 
 
 def generate(n_sections: int, seed: int) -> dict:

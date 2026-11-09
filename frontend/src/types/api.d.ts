@@ -47,7 +47,10 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** Explain */
+        /**
+         * Explain
+         * @description Always answers: template text, LLM rewrite only when it passes the fact check.
+         */
         post: operations["explain_explain_post"];
         delete?: never;
         options?: never;
@@ -143,12 +146,16 @@ export interface components {
             /** Sections */
             sections: components["schemas"]["Section"][];
         };
-        /** CatalogSummary */
+        /**
+         * CatalogSummary
+         * @description What the parser needs to resolve names. Only `categories` is shown to the LLM; courses and
+         *     instructors are matched on the server.
+         */
         CatalogSummary: {
             /** Categories */
             categories?: string[];
-            /** Course Names */
-            course_names?: string[];
+            /** Courses */
+            courses?: components["schemas"]["CourseRef"][];
             /** Instructors */
             instructors?: string[];
         };
@@ -229,6 +236,13 @@ export interface components {
             name: string;
             /** Prerequisites */
             prerequisites?: string[];
+        };
+        /** CourseRef */
+        CourseRef: {
+            /** Id */
+            id: string;
+            /** Name */
+            name: string;
         };
         /** CourseRefParams */
         CourseRefParams: {
@@ -347,6 +361,8 @@ export interface components {
             candidate_explanations: string[];
             /** Diagnosis Text */
             diagnosis_text?: string | null;
+            /** Sources */
+            sources?: ("llm" | "template")[];
         };
         /** HealthResponse */
         HealthResponse: {
@@ -579,6 +595,19 @@ export interface components {
             weight: number;
         };
         /**
+         * PoolItem
+         * @description A course the student wants to consider. Higher priority is preferred when not all fit.
+         */
+        PoolItem: {
+            /** Course Id */
+            course_id: string;
+            /**
+             * Priority
+             * @default 3
+             */
+            priority: number;
+        };
+        /**
          * Profile
          * @description Student's completed/in-progress courses. Grades are intentionally not modelled.
          */
@@ -623,7 +652,10 @@ export interface components {
             drop: string;
             /** Feasible */
             feasible: boolean;
-            /** Objective Delta */
+            /**
+             * Objective Delta
+             * @description Best objective without `drop` minus the best objective with no hard user constraints at all (<= 0; 0 = dropping it costs nothing). None when still infeasible.
+             */
             objective_delta?: number | null;
         };
         /** RowError */
@@ -655,7 +687,11 @@ export interface components {
             /** Meetings */
             meetings?: components["schemas"]["Meeting"][];
         };
-        /** SolveRequest */
+        /**
+         * SolveRequest
+         * @description The solver picks courses only from `pool` (plus must_include targets), never the whole
+         *     catalog: without a pool it fills credits with arbitrary 0/1-credit courses.
+         */
         SolveRequest: {
             catalog: components["schemas"]["Catalog"];
             /** Constraints */
@@ -670,6 +706,8 @@ export interface components {
              * @default 3
              */
             n: number;
+            /** Pool */
+            pool: components["schemas"]["PoolItem"][];
             profile?: components["schemas"]["Profile"];
             /** Time Limit S */
             time_limit_s?: number | null;
@@ -842,8 +880,35 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
+            /** @description LLM rate or daily limit reached */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
             /** @description Not implemented yet */
             501: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description LLM failed or returned invalid output */
+            502: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description LLM disabled (no provider or key) */
+            503: {
                 headers: {
                     [name: string]: unknown;
                 };

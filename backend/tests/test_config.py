@@ -6,6 +6,11 @@ from app.core.config import Settings
 from app.main import create_app
 
 
+@pytest.fixture(autouse=True)
+def _no_env_override(monkeypatch):
+    monkeypatch.delenv("LLM_PROVIDER", raising=False)  # conftest pins it to "none"
+
+
 def make(**kw) -> Settings:
     return Settings(_env_file=None, **kw)
 

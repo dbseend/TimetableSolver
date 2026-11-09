@@ -4,6 +4,8 @@ import { defineConfig } from "vite";
 
 export default defineConfig({
   plugins: [react()],
+  // the "sample" buttons import the committed synthetic catalogs from ../data/synthetic
+  server: { fs: { allow: [".."] } },
   test: {
     environment: "jsdom",
     setupFiles: ["./src/test/setup.ts"],

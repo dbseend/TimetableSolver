@@ -73,8 +73,16 @@ class ProfileParseResponse(BaseModel):
 # ---- /constraints/parse ----------------------------------------------------------------
 
 
+class CourseRef(BaseModel):
+    id: str = Field(min_length=1)
+    name: str = Field(min_length=1)
+
+
 class CatalogSummary(BaseModel):
-    course_names: list[str] = Field(default_factory=list)
+    """What the parser needs to resolve names. Only `categories` is shown to the LLM; courses and
+    instructors are matched on the server."""
+
+    courses: list[CourseRef] = Field(default_factory=list)
     instructors: list[str] = Field(default_factory=list)
     categories: list[str] = Field(default_factory=list)
 
@@ -111,8 +119,19 @@ class ConstraintsParseResponse(BaseModel):
 # ---- /solve ----------------------------------------------------------------------------
 
 
+class PoolItem(BaseModel):
+    """A course the student wants to consider. Higher priority is preferred when not all fit."""
+
+    course_id: str = Field(min_length=1)
+    priority: int = Field(default=3, ge=1, le=5)
+
+
 class SolveRequest(BaseModel):
+    """The solver picks courses only from `pool` (plus must_include targets), never the whole
+    catalog: without a pool it fills credits with arbitrary 0/1-credit courses."""
+
     catalog: Catalog
+    pool: list[PoolItem] = Field(min_length=1)
     profile: Profile = Field(default_factory=Profile)
     constraints: list[Constraint] = Field(default_factory=list)
     n: int = Field(default=3, ge=1, le=10)
@@ -120,10 +139,16 @@ class SolveRequest(BaseModel):
     time_limit_s: float | None = Field(default=None, gt=0)
 
     @model_validator(mode="after")
-    def _unique_constraint_ids(self) -> "SolveRequest":
+    def _unique_ids(self) -> "SolveRequest":
         ids = [c.id for c in self.constraints]
         if len(set(ids)) != len(ids):
             raise ValueError("duplicate constraint id")
+        pool = [p.course_id for p in self.pool]
+        if len(set(pool)) != len(pool):
+            raise ValueError("duplicate pool course id")
+        # a must_include target missing from the catalog is a diagnosis, not a 422; pool is not
+        if set(pool) - {c.id for c in self.catalog.courses}:
+            raise ValueError("pool references an unknown course")
         return self
 
 
@@ -142,7 +167,11 @@ class Candidate(BaseModel):
 class Relaxation(BaseModel):
     drop: str
     feasible: bool
-    objective_delta: int | None = None
+    objective_delta: int | None = Field(
+        default=None,
+        description="Best objective without `drop` minus the best objective with no hard user "
+        "constraints at all (<= 0; 0 = dropping it costs nothing). None when still infeasible.",
+    )
 
 
 class Diagnosis(BaseModel):
@@ -176,3 +205,6 @@ class ExplainRequest(BaseModel):
 class ExplainResponse(BaseModel):
     candidate_explanations: list[str]
     diagnosis_text: str | None = None
+    # per explanation (candidates first, then the diagnosis): "llm" if the LLM rewrite passed
+    # the fact check, "template" otherwise
+    sources: list[Literal["llm", "template"]] = Field(default_factory=list)

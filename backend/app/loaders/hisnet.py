@@ -13,21 +13,10 @@ from html.parser import HTMLParser
 
 from pydantic import ValidationError
 
+from app.core.periods import period_len, period_start
 from app.core.time_slots import format_hhmm
 from app.domain.api_models import RowError
 from app.domain.models import Catalog, Course, Section
-
-# Period n starts at 09:00 + (n-1)*90min; a class lasts 75min for 3-credit courses and 50min
-# for 2-credit ones (confirmed by the user for 2026-2, docs/academic_rules.md §1).
-FIRST_PERIOD_MIN = 9 * 60
-PERIOD_STEP_MIN = 90
-
-
-def period_len(credit: float) -> int:
-    # shortcut: credits other than 2 and 3 are unconfirmed; >=3 -> 75, else 50 (50min per credit
-    # rule, Academic Regulation art. 42). Revisit if real 1- or 4+-credit timings differ.
-    return 75 if credit >= 3 else 50
-
 
 _SLOT = re.compile(r"^(Mon|Tue|Wed|Thu|Fri|Sat|Sun)(\d{1,2})$")
 _KO_SLOT = re.compile(r"^([월화수목금토일])(\d{1,2})$")
@@ -36,10 +25,6 @@ _KO_DAY = dict(
 )
 _OPENER = re.compile(r"^\S+\s+(?:주간|야간)(.*?)(?:\s*외\s*\d+명)?$")
 REQUIRED = ("구분", "과목코드", "분반", "과목명", "학점", "시간")
-
-
-def period_start(n: int) -> int:
-    return FIRST_PERIOD_MIN + (n - 1) * PERIOD_STEP_MIN
 
 
 def parse_time(value: str, credit: float = 3) -> list[dict]:
